@@ -16,6 +16,29 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" />
   <style>
+   #randomGameBtn {
+  position: fixed;   /* <- this keeps it visible at all times */
+  top: 20px;         /* distance from the top of the screen */
+  right: 20px;       /* distance from the right edge */
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #0ff;
+  border: 2px solid #0ff;
+  padding: 12px 25px;
+  font-size: 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;     /* makes sure it stays above everything */
+}
+
+#randomGameBtn:hover {
+  background-color: #0ff;
+  color: #000;
+  box-shadow: 0 0 25px #0ff;
+  transform: scale(1.1);
+}
+
+
     body {
       margin: 0;
       font-family: 'Roboto', sans-serif;
@@ -110,13 +133,16 @@
     <h1>UBG-Village-Pro</h1>
     <p>Some of the games may take a while to load.</p>
 
+      <!-- 🎲 Random Game Button -->
+  <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random Game</button>
+
+
     <button class="feedback-button" onclick="openGame('https://forms.gle/REK8pubhBD5igob87')">
       Suggest Game
     </button>
 
     <div class="game-buttons">
       <button onclick="openGame('https://padlet.com/aidyndmello1/chat-room-24cgu4gx03ubczes')"> <img src="img/596-uu.png">Open Chat!</button>
-      <button onclick="openGame('baloonstd/bloons5')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/75.png">Play Bloons TD 5!</button>
       <button onclick="openGame('bitlife/bitlife.html')"> <img src="img/3.webp">Play Bitlife!</button>
       <button onclick="openGame('https://devilapig247.github.io/block-blast/')"> <img src="img/4.webp">Play Block Blast!</button>
       <button onclick="openGame('CookieClicker/cookieclicker.html')"> <img src="img/6.webp">Play Cookie Clicker!</button>
@@ -182,6 +208,31 @@
     function openGame(url){
       window.open(url, "_blank");
     }
+        // 🎲 Random Game Picker
+    function openRandomGame() {
+      // Grab all game URLs from buttons automatically
+      const buttons = document.querySelectorAll('.game-buttons button');
+      const games = Array.from(buttons).map(btn => {
+        const onclick = btn.getAttribute('onclick');
+        const match = onclick.match(/'(.*?)'/);
+        return match ? match[1] : null;
+      }).filter(Boolean);
+
+      if (games.length === 0) {
+        alert("No games found!");
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * games.length);
+      const randomGame = games[randomIndex];
+      openGame(randomGame);
+    }
+  </script>
+</body>
+</html>
+
+
+
   </script>
 </body>
 </html>
