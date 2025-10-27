@@ -1,146 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y4MCPVK8QF"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UBG-Village-Pro</title>
+<link rel="icon" type="image/png" href="llv.png">
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" />
 
-  gtag('config', 'G-Y4MCPVK8QF');
-</script>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: #000401;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UBG-Village-Pro</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" />
-  <style>
-   #randomGameBtn {
-  position: fixed;   /* <- this keeps it visible at all times */
-  top: 20px;         /* distance from the top of the screen */
-  right: 20px;       /* distance from the right edge */
-  background-color: rgba(0, 0, 0, 0.7);
-  color: #0ff;
-  border: 2px solid #0ff;
-  padding: 12px 25px;
-  font-size: 18px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 1000;     /* makes sure it stays above everything */
-}
+  .container {
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background: #000401;
+    border-radius: 10px;
+    position: relative;
+  }
 
-#randomGameBtn:hover {
-  background-color: #0ff;
-  color: #000;
-  box-shadow: 0 0 25px #0ff;
-  transform: scale(1.1);
-}
+  h1, h2, h3, p {
+    text-align: center;
+    margin: 10px 0;
+  }
 
+  h1 {
+    font-size: 2.5rem;
+    color: #66ccff;
+  }
 
-    body {
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background: #000401;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+  h3 {
+    font-weight: 400;
+    color: #a0cce0;
+  }
 
-    .container {
-      flex: 1;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      background: #000401;
-      border-radius: 10px;
-      position: relative;
-    }
+  /* GUI Button */
+  #openFakeUrlGuiBtn {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #0ff;
+    border: 2px solid #0ff;
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
 
-    h1, h2, h3, p {
-      text-align: center;
-      margin: 10px 0;
-    }
+  #openFakeUrlGuiBtn:hover {
+    background-color: #0ff;
+    color: #000;
+    box-shadow: 0 0 25px #0ff;
+    transform: scale(1.1);
+  }
 
-    h1 {
-      font-size: 2.5rem;
-      color: #66ccff;
-    }
+  /* Fake URL GUI */
+  #fakeUrlGui {
+    display: none;
+    position: fixed;
+    top: 135px;
+    right: 20px;
+    background: #111;
+    padding: 15px;
+    border: 2px solid #0ff;
+    border-radius: 12px;
+    z-index: 1000;
+  }
 
-    h3 {
-      font-weight: 400;
-      color: #a0cce0;
-    }
+  #fakeUrlGui input {
+    padding: 6px;
+    width: 150px;
+    border-radius: 6px;
+    border: 1px solid #0ff;
+    margin-right: 5px;
+    background: #000401;
+    color: #0ff;
+  }
 
-    .game-buttons {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 25px;
-      margin-top: 40px;
-    }
+  #fakeUrlGui button {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 2px solid #0ff;
+    background: #000401;
+    color: #0ff;
+    cursor: pointer;
+  }
 
-    .game-buttons button {
-      background: rgba(0, 47, 150, 0.2);
-      border: 2px solid rgba(0,150,255,0.4);
-      border-radius: 15px;
-      padding: 20px;
-      color: #e0f7ff;
-      font-size: 15px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0,0,50,0.4);
-    }
+  /* Random Game Button */
+  #randomGameBtn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #0ff;
+    border: 2px solid #0ff;
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
 
-    .game-buttons button:hover {
-      transform: translateY(-6px);
-      background: rgba(0,120,255,0.3);
-      border-color: #66ccff;
-      box-shadow: 0 8px 25px rgba(0,0,80,0.6);
-    }
+  #randomGameBtn:hover {
+    background-color: #0ff;
+    color: #000;
+    box-shadow: 0 0 25px #0ff;
+    transform: scale(1.1);
+  }
 
-    .game-buttons button img {
-      width: 96px;
-      height: 96px;
-      margin-bottom: 12px;
-      border-radius: 12px;
-      border: 2px solid rgba(100,180,255,0.5);
-    }
+  .game-buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 25px;
+    margin-top: 40px;
+  }
 
-    .feedback-button {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(0, 0, 10, 0.2);
-      border: 2px solid rgba(0,150,255,0.4);
-      border-radius: 5px;
-      padding: 12px 10px;
-      color: #e0f7ff;
-      font-size: 14px;
-      cursor: pointer;
+  .game-buttons button {
+    background: rgba(0, 47, 150, 0.2);
+    border: 2px solid rgba(0,150,255,0.4);
+    border-radius: 15px;
+    padding: 20px;
+    color: #e0f7ff;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,50,0.4);
+  }
 
-    }
-  </style>
+  .game-buttons button:hover {
+    transform: translateY(-6px);
+    background: rgba(0,120,255,0.3);
+    border-color: #66ccff;
+    box-shadow: 0 8px 25px rgba(0,0,80,0.6);
+  }
+
+  .game-buttons button img {
+    width: 96px;
+    height: 96px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    border: 2px solid rgba(100,180,255,0.5);
+  }
+</style>
 </head>
 <body>
   <div class="container">
     <h1>UBG-Village-Pro</h1>
     <p>Some of the games may take a while to load.</p>
 
-      <!-- 🎲 Random Game Button -->
-  <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random Game</button>
+    <!-- Fake URL GUI -->
+    <div id="fakeUrlGui">
+      <input id="fakeUrlInput" type="text" placeholder="Enter fake URL">
+      <button id="fakeUrlBtn">Tab Cloaking</button>
+    </div>
 
+    <!-- Open Fake URL GUI Button -->
+    <button id="openFakeUrlGuiBtn">Tab Cloaking</button>
 
-    <button class="feedback-button" onclick="openGame('https://forms.gle/REK8pubhBD5igob87')">
-      Suggest Game
-    </button>
+    <!-- Random Game Button -->
+    <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random Game</button>
 
+    <!-- Game buttons container -->
     <div class="game-buttons">
       <button onclick="openGame('https://padlet.com/aidyndmello1/chat-room-24cgu4gx03ubczes')"> <img src="img/596-uu.png">Open Chat!</button>
       <button onclick="openGame('bitlife/bitlife.html')"> <img src="img/3.webp">Play Bitlife!</button>
@@ -195,23 +233,51 @@
       <button onclick="openGame('GAMES/1v1.lol.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/58.png">Play 1v1.lol!</button>
       <button onclick="openGame('GAMES/Clustertruck.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/81.png">Play Clustertruck!</button>
       <button onclick="openGame('GAMES/Escape road.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/264.png">Play Escape Road!</button>
-      <button onclick="openGame('GAMES/Run 2.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/176.png">Play Run 2!</button>
+      <button onclick="openGame('GAMES/bloons5.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/75.png">Play Bloons Tower Defence 5!</button>
       <button onclick="openGame('GAMES/Rooftop Snipers.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/283.png">Play Rooftop Snipers!</button>
-
-
-
-
 
     </div>
   </div>
 
   <script>
-    function openGame(url){
+    document.addEventListener('DOMContentLoaded', () => {
+      const gui = document.getElementById('fakeUrlGui');
+      const openBtn = document.getElementById('openFakeUrlGuiBtn');
+      const fakeUrlInput = document.getElementById('fakeUrlInput');
+      const fakeUrlBtn = document.getElementById('fakeUrlBtn');
+
+      // Toggle GUI display when button clicked
+      openBtn.addEventListener('click', () => {
+        gui.style.display = gui.style.display === 'block' ? 'none' : 'block';
+      });
+
+      // Set fake URL
+      fakeUrlBtn.addEventListener('click', () => {
+        const fakeUrl = fakeUrlInput.value.trim();
+        if(fakeUrl) {
+          document.title = fakeUrl;
+          window.history.pushState({}, '', '/' + fakeUrl);
+          alert('Fake URL applied! The page path and title updated.');
+        }
+      });
+
+      // Hide GUI if mouse moves away from it and button
+      document.addEventListener('mousemove', (e) => {
+        if(gui.style.display === 'block' &&
+           !gui.contains(e.target) &&
+           e.target !== openBtn) {
+          gui.style.display = 'none';
+        }
+      });
+    });
+
+    // Open a game in new tab
+    function openGame(url) {
       window.open(url, "_blank");
     }
-        // 🎲 Random Game Picker
+
+    // Random Game Picker
     function openRandomGame() {
-      // Grab all game URLs from buttons automatically
       const buttons = document.querySelectorAll('.game-buttons button');
       const games = Array.from(buttons).map(btn => {
         const onclick = btn.getAttribute('onclick');
@@ -219,21 +285,14 @@
         return match ? match[1] : null;
       }).filter(Boolean);
 
-      if (games.length === 0) {
+      if(games.length === 0) {
         alert("No games found!");
         return;
       }
 
       const randomIndex = Math.floor(Math.random() * games.length);
-      const randomGame = games[randomIndex];
-      openGame(randomGame);
+      openGame(games[randomIndex]);
     }
-  </script>
-</body>
-</html>
-
-
-
   </script>
 </body>
 </html>
