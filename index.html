@@ -43,61 +43,6 @@
     color: #a0cce0;
   }
 
-  /* GUI Button */
-  #openFakeUrlGuiBtn {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    z-index: 1000;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: #0ff;
-    border: 2px solid #0ff;
-    padding: 12px 25px;
-    font-size: 18px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  #openFakeUrlGuiBtn:hover {
-    background-color: #0ff;
-    color: #000;
-    box-shadow: 0 0 25px #0ff;
-    transform: scale(1.1);
-  }
-
-  /* Fake URL GUI */
-  #fakeUrlGui {
-    display: none;
-    position: fixed;
-    top: 130px;
-    right: 20px;
-    background: #111;
-    padding: 15px;
-    border: 2px solid #0ff;
-    border-radius: 12px;
-    z-index: 1000;
-  }
-
-  #fakeUrlGui input {
-    padding: 6px;
-    width: 150px;
-    border-radius: 6px;
-    border: 1px solid #0ff;
-    margin-right: 5px;
-    background: #000401;
-    color: #0ff;
-  }
-
-  #fakeUrlGui button {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 2px solid #0ff;
-    background: #000401;
-    color: #0ff;
-    cursor: pointer;
-  }
-
   /* Random Game Button */
   #randomGameBtn {
     position: fixed;
@@ -166,15 +111,6 @@
     <h1>UBG-Village-Pro</h1>
     <p>Some of the games may take a while to load.</p>
 
-    <!-- Fake URL GUI -->
-    <div id="fakeUrlGui">
-      <input id="fakeUrlInput" type="text" placeholder="Enter fake URL">
-      <button id="fakeUrlBtn">Tab Cloaking</button>
-    </div>
-
-    <!-- Open Fake URL GUI Button -->
-    <button id="openFakeUrlGuiBtn">Tab Cloaking</button>
-
     <!-- Random Game Button -->
     <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random Game</button>
 
@@ -240,36 +176,6 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const gui = document.getElementById('fakeUrlGui');
-      const openBtn = document.getElementById('openFakeUrlGuiBtn');
-      const fakeUrlInput = document.getElementById('fakeUrlInput');
-      const fakeUrlBtn = document.getElementById('fakeUrlBtn');
-
-      // Toggle GUI display when button clicked
-      openBtn.addEventListener('click', () => {
-        gui.style.display = gui.style.display === 'block' ? 'none' : 'block';
-      });
-
-      // Set fake URL
-      fakeUrlBtn.addEventListener('click', () => {
-        const fakeUrl = fakeUrlInput.value.trim();
-        if(fakeUrl) {
-          document.title = fakeUrl;
-          window.history.pushState({}, '', '/' + fakeUrl);
-          alert('Fake URL applied! The page path and title updated.');
-        }
-      });
-
-      // Hide GUI if mouse moves away from it and button
-      document.addEventListener('mousemove', (e) => {
-        if(gui.style.display === 'block' &&
-           !gui.contains(e.target) &&
-           e.target !== openBtn) {
-          gui.style.display = 'none';
-        }
-      });
-    });
 
     // Open a game in new tab
     function openGame(url) {
