@@ -278,7 +278,6 @@ h1 {
 
 
 
-<input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames()">
 
 
 
@@ -296,7 +295,13 @@ h1 {
 
 
 <h1 id="recentlyPlayedHeader">Recently Played</h1>
+<button id="clearRecentBtn" style="margin-bottom:15px; border:1px solid var(--accent); color:var(--accent); background: rgba(0,0,0,0.2); padding:6px 12px; border-radius:8px; cursor:pointer;">
+  Clear Recently Played
+</button>
 <div id="recentlyPlayed" class="game-buttons"></div>
+
+
+<input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames()">
 
 
 
@@ -454,6 +459,12 @@ function displayRecentGames() {
   let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
   let container = document.getElementById("recentlyPlayed");
 
+  if (recent.length === 0) {
+    container.style.marginBottom = "10px"; // smaller gap when empty
+  } else {
+    container.style.marginBottom = "80px"; // normal gap
+  }
+
   container.innerHTML = recent.map(g => `
     <button onclick="openGame('${g.url}')">
       <img src="${g.img}">
@@ -462,8 +473,16 @@ function displayRecentGames() {
   `).join("");
 }
 
+
 // Load on page start
 displayRecentGames();
+
+// CLEAR RECENTLY PLAYED
+document.getElementById("clearRecentBtn").onclick = () => {
+  localStorage.removeItem("recentGames");
+  displayRecentGames();
+};
+
 
 
 
@@ -540,6 +559,13 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("themeSelect").value = savedTheme;
 });
 
+if (recent.length === 0) {
+    container.style.marginBottom = "10px";
+    document.getElementById("searchBar").style.marginTop = "10px";
+} else {
+    container.style.marginBottom = "80px";
+    document.getElementById("searchBar").style.marginTop = "20px";
+}
 
 </script>
 
