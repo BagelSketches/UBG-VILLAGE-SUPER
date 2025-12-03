@@ -10,6 +10,44 @@
 
 <style>
 
+  /* RECENTLY PLAYED HEADER */
+#recentlyPlayedHeader {
+  color: var(--accent);
+  transition: 0.2s;
+}
+
+  :root {
+  --accent: #00ff00;
+  --bgGlow: rgba(0,255,0,0.3);
+}
+
+/* APPLY TO BUTTONS */
+button {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  box-shadow: 0 0 10px var(--bgGlow) !important;
+}
+
+/* GAME BUTTON HOVER */
+.game-buttons button:hover {
+  background: var(--bgGlow) !important;
+}
+
+/* HEADER LINE */
+#topBar {
+  border-bottom-color: var(--accent) !important;
+}
+
+/* SELECT THEME DROPDOWN */
+#themeSelect {
+  background:black;
+  color:var(--accent);
+  border:2px solid var(--accent);
+  border-radius:8px;
+  padding:6px;
+}
+
+
   #recentlyPlayed {
   margin-bottom: 80px; /* adjust spacing */
 }
@@ -49,18 +87,20 @@
   border-bottom: 2px solid #00ff00;
 }
 
+/* THEME-DEPENDENT ELEMENTS */
 #topBar button {
   background: black;
-  color: lime;
-  border: 2px solid lime;
+  color: var(--accent);
+  border: 2px solid var(--accent);
   padding: 8px 14px;
   border-radius: 15px;
   cursor: pointer;
   font-size: 16px;
+  transition: 0.2s;
 }
 
 #topBar button:hover {
-  background: lime;
+  background: var(--accent);
   color: black;
 }
 
@@ -137,10 +177,14 @@ h1 {
   padding: 12px;
   border-radius: 10px;
   font-size: 16px;
-  border: none;
+  border: 2px solid var(--theme-color);
   outline: none;
   text-align: center;
+  background: rgba(0,0,0,0.9);
+  color: white;
+  transition: 0.2s;
 }
+
 
 
 /* RANDOM BUTTON */
@@ -237,9 +281,21 @@ h1 {
 <input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames()">
 
 
+
+
 <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random</button>
 
-<h1>Recently Played</h1>
+<select id="themeSelect" onchange="setTheme(this.value)" style="margin-left:10px;">
+  <option value="green">Green</option>
+  <option value="blue">Blue</option>
+  <option value="red">Red</option>
+  <option value="purple">Purple</option>
+  <option value="gold">Gold</option>
+</select>
+
+
+
+<h1 id="recentlyPlayedHeader">Recently Played</h1>
 <div id="recentlyPlayed" class="game-buttons"></div>
 
 
@@ -320,6 +376,14 @@ h1 {
 
 <script>
 function openGame(url) {
+
+  // ALLOW DISCORD TO OPEN NORMALLY
+  if (url.includes("discord.gg") || url.includes("discord.com")) {
+    window.open(url, "_blank");
+    return;
+  }
+
+  // OPEN EVERYTHING ELSE IN OVERLAY
   document.getElementById("gameOverlay").style.display = "flex";
   document.getElementById("gameFrame").src = url;
 
@@ -333,6 +397,7 @@ function openGame(url) {
     addRecentGame(name, url, img);
   }
 }
+
 
 // CLOSE GAME
 document.getElementById("closeGame").onclick = () => {
@@ -422,8 +487,8 @@ function drawMatrix() {
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
 
-  ctx.fillStyle = "#00ff00";
-  ctx.font = fontSize + "px monospace";
+ ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--accent");
+ ctx.font = fontSize + "px monospace";
 
 
   for(let i=0;i<drops.length;i++){
@@ -446,6 +511,36 @@ window.onresize = ()=>{
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 };
+const themes = {
+  green:  { accent:"#00ff00", glow:"rgba(0,255,0,0.4)" },
+  blue:   { accent:"#00ffff", glow:"rgba(0,200,255,0.4)" },
+  red:    { accent:"#ff0033", glow:"rgba(255,0,0,0.4)" },
+  purple: { accent:"#b700ff", glow:"rgba(190,0,255,0.4)" },
+  gold:   { accent:"#ffcc00", glow:"rgba(255,204,0,0.4)" }
+};
+
+// SET THEME
+function setTheme(name){
+  let t = themes[name];
+  if(!t) return;
+
+  document.documentElement.style.setProperty("--accent", t.accent);
+  document.documentElement.style.setProperty("--bgGlow", t.glow);
+
+  // Save selected theme
+  localStorage.setItem("theme", name);
+}
+
+// LOAD THEME ON START
+window.addEventListener("DOMContentLoaded", () => {
+  let savedTheme = localStorage.getItem("theme") || "green"; // default green
+  setTheme(savedTheme);
+
+  // Also update the dropdown to match saved theme
+  document.getElementById("themeSelect").value = savedTheme;
+});
+
+
 </script>
 
 
