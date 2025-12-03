@@ -10,6 +10,20 @@
 
 <style>
 
+  #recentlyPlayed {
+  margin-bottom: 80px; /* adjust spacing */
+}
+
+#recentlyPlayed button {
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid lime;
+}
+
+#recentlyPlayed button:hover {
+  background: rgba(0, 255, 0, 0.3);
+}
+
+
   /* GAME OVERLAY */
 #gameOverlay {
   position: fixed;
@@ -225,6 +239,10 @@ h1 {
 
 <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random</button>
 
+<h1>Recently Played</h1>
+<div id="recentlyPlayed" class="game-buttons"></div>
+
+
 
 <div class="game-buttons">
 <button onclick="openGame('https://padlet.com/aidyndmello1/chat-room-24cgu4gx03ubczes')"> <img src="img/596-uu.png">Open Chat!</button>
@@ -301,10 +319,19 @@ h1 {
 
 
 <script>
-// OPEN GAME IN OVERLAY
 function openGame(url) {
   document.getElementById("gameOverlay").style.display = "flex";
   document.getElementById("gameFrame").src = url;
+
+  // find button information
+  let btn = [...document.querySelectorAll(".game-buttons button")]
+              .find(b => b.getAttribute("onclick") === `openGame('${url}')`);
+
+  if (btn) {
+    let name = btn.innerText.trim();
+    let img = btn.querySelector("img").src;
+    addRecentGame(name, url, img);
+  }
 }
 
 // CLOSE GAME
@@ -339,6 +366,40 @@ function openRandomGame(){
   let visible = [...document.querySelectorAll(".game-buttons button")].filter(b=>b.style.display!="none");
   visible[Math.floor(Math.random()*visible.length)]?.click();
 }
+
+// SAVE RECENTLY PLAYED
+function addRecentGame(name, url, img) {
+  let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
+
+  // Remove duplicates
+  recent = recent.filter(g => g.url !== url);
+
+  // Add to top
+  recent.unshift({ name, url, img });
+
+  // Limit to 10 games
+  recent = recent.slice(0, 10);
+
+  localStorage.setItem("recentGames", JSON.stringify(recent));
+  displayRecentGames();
+}
+
+// DISPLAY RECENTLY PLAYED
+function displayRecentGames() {
+  let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
+  let container = document.getElementById("recentlyPlayed");
+
+  container.innerHTML = recent.map(g => `
+    <button onclick="openGame('${g.url}')">
+      <img src="${g.img}">
+      ${g.name}
+    </button>
+  `).join("");
+}
+
+// Load on page start
+displayRecentGames();
+
 
 
 // MATRIX RAIN SETUP
