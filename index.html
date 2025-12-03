@@ -259,10 +259,14 @@ h1 {
 
 <!-- GAME OVERLAY (hidden by default) -->
 <div id="gameOverlay">
-  <div id="topBar">
+<div id="topBar">
+  <span id="gameTitle" style="color: var(--accent); font-weight:bold;">No game</span>
+  <div>
     <button id="closeGame">✖ Close</button>
     <button id="fullScreenBtn">⛶ Fullscreen</button>
   </div>
+</div>
+
   <iframe id="gameFrame" src="" frameborder="0" allowfullscreen></iframe>
 </div>
 
@@ -397,17 +401,24 @@ function openGame(url) {
               .find(b => b.getAttribute("onclick") === `openGame('${url}')`);
 
   if (btn) {
-    let name = btn.innerText.trim();
-    let img = btn.querySelector("img").src;
-    addRecentGame(name, url, img);
-  }
+  let name = btn.innerText.trim();
+  let img = btn.querySelector("img").src;
+  addRecentGame(name, url, img);
+
+  // Update top bar game title
+  document.getElementById("gameTitle").innerText = name;
 }
+
 
 
 // CLOSE GAME
 document.getElementById("closeGame").onclick = () => {
   document.getElementById("gameOverlay").style.display = "none";
   document.getElementById("gameFrame").src = "";
+  document.getElementById("gameTitle").innerText = "No game"; // reset
+};
+
+  
 };
 
 // FULLSCREEN TOGGLE
@@ -458,20 +469,25 @@ function addRecentGame(name, url, img) {
 function displayRecentGames() {
   let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
   let container = document.getElementById("recentlyPlayed");
+  let clearBtn = document.getElementById("clearRecentBtn");
 
+  // Hide button if no recent games
   if (recent.length === 0) {
+    container.innerHTML = "";  // clear container
+    clearBtn.style.display = "none";  // hide button
     container.style.marginBottom = "10px"; // smaller gap when empty
   } else {
+    container.innerHTML = recent.map(g => `
+      <button onclick="openGame('${g.url}')">
+        <img src="${g.img}">
+        ${g.name}
+      </button>
+    `).join("");
+    clearBtn.style.display = "inline-block"; // show button
     container.style.marginBottom = "80px"; // normal gap
   }
-
-  container.innerHTML = recent.map(g => `
-    <button onclick="openGame('${g.url}')">
-      <img src="${g.img}">
-      ${g.name}
-    </button>
-  `).join("");
 }
+
 
 
 // Load on page start
