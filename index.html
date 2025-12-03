@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +9,54 @@
 
 
 <style>
+
+  /* GAME OVERLAY */
+#gameOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  display: none;
+  flex-direction: column;
+  z-index: 9999;
+}
+
+/* TOP BAR */
+#topBar {
+  width: 98%;
+  height: 50px;
+  background: #111;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 15px;
+  border-bottom: 2px solid #00ff00;
+}
+
+#topBar button {
+  background: black;
+  color: lime;
+  border: 2px solid lime;
+  padding: 8px 14px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#topBar button:hover {
+  background: lime;
+  color: black;
+}
+
+/* GAME FRAME */
+#gameFrame {
+  width: 100%;
+  height: calc(100vh - 50px);
+  border: none;
+}
+
 
   .site-logo {
   display: block;
@@ -150,9 +199,18 @@ h1 {
 </style>
 </head>
 
+<!-- GAME OVERLAY (hidden by default) -->
+<div id="gameOverlay">
+  <div id="topBar">
+    <button id="closeGame">✖ Close</button>
+    <button id="fullScreenBtn">⛶ Fullscreen</button>
+  </div>
+  <iframe id="gameFrame" src="" frameborder="0" allowfullscreen></iframe>
+</div>
+
 
 <body>
-
+ 
 
 <canvas id="matrix"></canvas>
 
@@ -243,10 +301,28 @@ h1 {
 
 
 <script>
-// GAME OPEN
+// OPEN GAME IN OVERLAY
 function openGame(url) {
-  window.open(url, "_blank");
+  document.getElementById("gameOverlay").style.display = "flex";
+  document.getElementById("gameFrame").src = url;
 }
+
+// CLOSE GAME
+document.getElementById("closeGame").onclick = () => {
+  document.getElementById("gameOverlay").style.display = "none";
+  document.getElementById("gameFrame").src = "";
+};
+
+// FULLSCREEN TOGGLE
+document.getElementById("fullScreenBtn").onclick = () => {
+  let frame = document.getElementById("gameFrame");
+
+  if (!document.fullscreenElement) {
+    frame.requestFullscreen().catch(err => console.log(err));
+  } else {
+    document.exitFullscreen();
+  }
+};
 
 
 // SEARCH FILTER
@@ -314,5 +390,3 @@ window.onresize = ()=>{
 
 </body>
 </html>
-
-
