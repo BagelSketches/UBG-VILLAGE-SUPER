@@ -402,6 +402,12 @@ function openGame(url) {
     return;
   }
 
+   // ALLOW DISCORD TO OPEN NORMALLY
+  if (url.includes("https://devilapig247.github.io/chat/") || url.includes("https://devilapig247.github.io/chat/)) {
+    window.open(url, "_blank");
+    return;
+  }
+
   // OPEN EVERYTHING ELSE IN OVERLAY
   document.getElementById("gameOverlay").style.display = "flex";
   document.getElementById("gameFrame").src = url;
