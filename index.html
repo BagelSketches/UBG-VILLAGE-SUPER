@@ -394,10 +394,11 @@ h1 {
 
 
 <script>
+<script>
 function openGame(url) {
 
-  // ALLOW DISCORD TO OPEN NORMALLY
-  if (url.includes("discord.gg") || url.includes("discord.com")) {
+  // ALLOW DISCORD, CHAT, and COMMENTS TO OPEN NORMALLY (in a new tab)
+  if (url.includes("discord.gg") || url.includes("discord.com") || url.includes("devilapig247.github.io/chat/") || url.includes("padlet.com/aidyndmello1/chat-room-24cgu4gx03ubczes")) {
     window.open(url, "_blank");
     return;
   }
@@ -420,14 +421,12 @@ function openGame(url) {
 }
 
 
-
 // CLOSE GAME
 document.getElementById("closeGame").onclick = () => {
   document.getElementById("gameOverlay").style.display = "none";
   document.getElementById("gameFrame").src = "";
   document.getElementById("gameTitle").innerText = "No game"; // reset
 };
-
   
 };
 
@@ -510,8 +509,6 @@ document.getElementById("clearRecentBtn").onclick = () => {
 };
 
 
-
-
 // MATRIX RAIN SETUP
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
@@ -592,6 +589,8 @@ if (recent.length === 0) {
     container.style.marginBottom = "80px";
     document.getElementById("searchBar").style.marginTop = "20px";
 }
+
+</script>
 
 </script>
 
