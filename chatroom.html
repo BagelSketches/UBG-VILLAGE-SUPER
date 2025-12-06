@@ -16,7 +16,6 @@ body {
     flex-direction: column;
     height: 100vh; 
 }
-/* App container now takes full width and height */
 #app-container {
     display: flex;
     flex-direction: column;
@@ -42,7 +41,6 @@ header > span {
     flex-grow: 1;
     text-align: center;
 }
-/* New UI elements in Header */
 #status-info {
     font-size: 14px;
     font-weight: normal;
@@ -59,8 +57,6 @@ header > span {
 #online-count i, #room-user-count i {
     color: #ff5722;
 }
-
-/* NEW STYLING FOR SECRET BUTTON (REMAINS TINY) */
 #secret-admin-button {
     position: absolute;
     top: 0;
@@ -162,9 +158,8 @@ header > span {
     color: #a0a0a0;
     margin-bottom: 3px;
 }
-/* Styling for private message names */
 .whisper-name {
-    color: #ffb74d; /* Orange/Gold color */
+    color: #ffb74d; 
     font-weight: bold;
 }
 .bubble-wrapper {
@@ -186,9 +181,8 @@ header > span {
     color: #10193a;
     border-bottom-right-radius: 4px;
 }
-/* NEW: Private Message Bubble Style */
 .msg.private .bubble {
-    background: #3a3a10; /* Dark Gold/Brown background */
+    background: #3a3a10; 
     border: 1px solid #ffd700;
 }
 .msg.private.me .bubble {
@@ -199,13 +193,13 @@ header > span {
     border-bottom-left-radius: 4px;
 }
 
-/* Correctly order the bubble and action buttons for 'me' messages */
+/* Flex Order for "Me" vs Others */
 .me .bubble-wrapper {
-    align-items: flex-end; /* Align name and bubble to the right */
+    align-items: flex-end; 
     order: 1; 
 }
 .me .action-buttons {
-    order: 0; /* Ensures buttons are on the right (before wrapper) in a flex-end container */
+    order: 0; 
 }
 .msg:not(.me) .action-buttons {
     order: 1;
@@ -214,8 +208,7 @@ header > span {
     order: 0;
 }
 
-
-/* Input Area and Controls */
+/* Input Area */
 #input-wrapper {
     padding: 10px;
     background: #081023;
@@ -243,10 +236,9 @@ header > span {
     background: #1f2d57;
     color: white;
     outline: none;
-    flex: 1; /* Message input takes all space */
+    flex: 1; 
     font-size: 16px;
 }
-
 #input .action-button {
     background: #00e6b1;
     color: #0b1225;
@@ -263,7 +255,6 @@ header > span {
 #input .action-button:active {
     transform: scale(0.98);
 }
-/* Command Button Specific Styling */
 #commands-toggle-btn {
     background: #1f2d57;
     color: #ffd700;
@@ -272,8 +263,7 @@ header > span {
     background: #2a3a69;
 }
 
-
-/* Emoji Panel Styling (Unchanged) */
+/* Emoji Panel */
 #emoji-toggle-btn {
     background: #1f2d57;
     color: #ffd700;
@@ -325,7 +315,7 @@ header > span {
     background: #1f2d57;
 }
 
-/* Admin Panel Styling (Unchanged) */
+/* Admin Banner */
 #admin-banner {
     position: sticky;
     top: 0;
@@ -339,7 +329,7 @@ header > span {
     animation: fadeIn 0.3s ease-out;
     box-shadow: 0 3px 5px rgba(0,0,0,0.2);
 }
-#admin-banner button { /* Styling for Clear All Messages button */
+#admin-banner button { 
     background: #a82733;
     color: white;
     border: none;
@@ -353,13 +343,12 @@ header > span {
 #admin-banner button:hover {
     background: #8a1f29;
 }
-
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* ACTION BUTTON STYLES (Visibility controlled by opacity/hover) */
+/* ACTION BUTTONS (Edit/Delete) */
 .action-btn {
     background: #1f2d57;
     color: white;
@@ -375,15 +364,13 @@ header > span {
     pointer-events: none; 
     margin-right: 5px; 
 }
-
 .delete-btn {
     background: #e63946;
 }
 .delete-btn:hover {
     background: #cc2936;
 }
-
-/* Edit button styling */
+/* RESTORED: Edit button styling */
 .edit-btn {
     background: #2a7e78; 
 }
@@ -391,20 +378,48 @@ header > span {
     background: #21635e;
 }
 
-/* Show buttons on message hover */
-.msg:hover .action-buttons .action-btn {
-    opacity: 1;
-    pointer-events: auto; 
-}
-
-/* Always show buttons for admin mode messages and 'me' messages */
+.msg:hover .action-buttons .action-btn,
 .msg.admin .action-buttons .action-btn,
 .msg.me .action-buttons .action-btn {
     opacity: 1;
     pointer-events: auto;
 }
 
-/* User List Sidebar Styling */
+/* RESTORED: Edit Input Wrapper */
+.edit-input-wrapper {
+    background: #1f2d57;
+    padding: 10px;
+    border-radius: 12px;
+    margin-top: 5px;
+    display: none; /* Hide by default */
+    gap: 5px;
+    align-items: center;
+}
+.edit-input-wrapper input {
+    flex-grow: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    background: #081023;
+    color: white;
+    outline: none;
+}
+.edit-input-wrapper button {
+    background: #00e6b1;
+    color: #10193a;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+.edit-input-wrapper button:hover {
+    background: #00c99a;
+}
+
+/* User List */
 #user-list-container {
     width: 0;
     background: #10193a;
@@ -446,8 +461,6 @@ header > span {
     color: #00e6b1; 
     font-size: 8px;
 }
-
-/* Styling for Muted Users in the List */
 .user-item.muted-user {
     color: #e63946; 
     font-weight: bold;
@@ -456,7 +469,6 @@ header > span {
     color: #e63946;
 }
 
-/* Media query for smaller screens: Hide user list toggle */
 @media (max-width: 600px) {
     #user-list-toggle {
         display: none;
@@ -471,207 +483,57 @@ header > span {
     }
 }
 
-/* USERNAME MODAL STYLING (Unchanged) */
-#username-modal-overlay {
+/* Modals */
+#username-modal-overlay, #commands-modal-overlay, #clear-confirm-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-}
-#username-modal {
-    background: #10193a;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    text-align: center;
-    max-width: 400px;
-    width: 90%;
-}
-#username-modal h2 {
-    margin-top: 0;
-    color: #00e6b1;
-}
-#username-modal input {
-    width: 100%;
-    padding: 12px;
-    margin: 15px 0 20px 0;
-    border: 1px solid #1f2d57;
-    border-radius: 6px;
-    background: #1f2d57;
-    color: white;
-    box-sizing: border-box;
-    font-size: 16px;
-    outline: none;
-}
-#username-modal button {
-    background: #ff5722;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 20px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-#username-modal button:hover {
-    background: #e64a19;
-}
-
-/* COMMANDS MODAL STYLING (NEW) */
-#commands-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: none; /* Hidden by default */
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-}
-#commands-modal {
-    background: #10193a;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    max-width: 500px;
-    width: 90%;
-}
-#commands-modal h2 {
-    margin-top: 0;
-    color: #00e6b1;
-    border-bottom: 1px solid #1f2d57;
-    padding-bottom: 10px;
-}
-#commands-modal p {
-    color: #a0a0a0;
-    margin-bottom: 20px;
-}
-#commands-modal code {
-    background: #1f2d57;
-    padding: 3px 6px;
-    border-radius: 4px;
-    color: #ffd700;
-    font-weight: bold;
-}
-.command-item {
-    margin-bottom: 15px;
-    border-left: 3px solid #00e6b1;
-    padding-left: 10px;
-}
-
-/* Edit Input Field Styling (Unchanged) */
-.edit-input-wrapper {
-    background: #1f2d57;
-    padding: 10px;
-    border-radius: 12px;
-    margin-top: 5px;
-    display: none; /* Hide by default */
-    gap: 5px;
-    align-items: center;
-}
-
-.edit-input-wrapper input {
-    flex-grow: 1;
-    padding: 8px;
-    border: none;
-    border-radius: 6px;
-    background: #081023;
-    color: white;
-    outline: none;
-}
-
-.edit-input-wrapper button {
-    background: #00e6b1;
-    color: #10193a;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-    white-space: nowrap;
-}
-
-.edit-input-wrapper button:hover {
-    background: #00c99a;
-}
-/* NEW: Clear Confirmation Modal Styles */
-#clear-confirm-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.8);
     display: none; 
     justify-content: center;
     align-items: center;
-    z-index: 2001; /* Higher z-index */
+    z-index: 2000;
 }
-#clear-confirm-modal {
+#username-modal, #commands-modal, #clear-confirm-modal {
     background: #10193a;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    text-align: center;
     max-width: 400px;
     width: 90%;
-    border: 2px solid #e63946;
+    text-align: center;
 }
-#clear-confirm-modal h2 {
-    margin-top: 0;
-    color: #e63946;
+#commands-modal { max-width: 500px; text-align: left; }
+#username-modal h2, #commands-modal h2 { margin-top: 0; color: #00e6b1; }
+#username-modal input {
+    width: 100%; padding: 12px; margin: 15px 0 20px 0;
+    border: 1px solid #1f2d57; border-radius: 6px;
+    background: #1f2d57; color: white; box-sizing: border-box; font-size: 16px; outline: none;
 }
-#clear-confirm-modal button {
-    margin: 0 10px;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
+#username-modal button {
+    background: #ff5722; color: white; border: none; border-radius: 6px; padding: 10px 20px; font-weight: bold; cursor: pointer;
 }
-#clear-confirm-modal button.confirm {
-    background: #e63946;
-    color: white;
-    border: none;
-}
-#clear-confirm-modal button.cancel {
-    background: #1f2d57;
-    color: white;
-    border: none;
-}
+#commands-modal code { background: #1f2d57; padding: 3px 6px; border-radius: 4px; color: #ffd700; font-weight: bold; }
+#clear-confirm-modal { border: 2px solid #e63946; }
+#clear-confirm-modal h2 { color: #e63946; }
+#clear-confirm-modal button { margin: 0 10px; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+#clear-confirm-modal button.confirm { background: #e63946; color: white; border: none; }
+#clear-confirm-modal button.cancel { background: #1f2d57; color: white; border: none; }
+
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
 </head>
 
 <body>
 <div id="app-container">
     <header>
         <div id="status-info">
-            <div id="online-count" title="Total Online Users">
-                <i class="fas fa-globe"></i>
-                <span id="total-online-val">0</span>
-            </div>
-             <div id="room-user-count" title="Users in this Room">
-                <i class="fas fa-users"></i>
-                <span id="room-user-val">0</span>
-            </div>
+            <div id="online-count" title="Total Online Users"><i class="fas fa-globe"></i> <span id="total-online-val">0</span></div>
+            <div id="room-user-count" title="Users in this Room"><i class="fas fa-users"></i> <span id="room-user-val">0</span></div>
         </div>
-        
         <span>Chatroom</span>
-        
         <div id="secret-admin-button" onclick="toggleAdminMode()"></div>
     </header>
 
@@ -685,36 +547,30 @@ header > span {
     <div id="main-content">
         <div id="chat-container">
             <div id="admin-banner">
-                ADMIN MODE ACTIVE! (Click the top-left corner to toggle off)
+                ADMIN MODE ACTIVE! 
                 <button id="clear-chat-btn" onclick="showConfirmClear()">Clear All Messages</button>
             </div>
-            <div id="chat">
-                 </div>
+            <div id="chat"></div>
         </div>
-        
         <div id="user-list-container">
             <div id="user-list-header">Users in #<span id="room-id-header">global</span></div>
-            <div id="user-list">
-                 </div>
+            <div id="user-list"></div>
         </div>
     </div>
 
     <div id="input-wrapper">
-        <div id="emoji-panel">
-                 </div>
-        
+        <div id="emoji-panel"></div>
         <div id="typing-indicator"></div>
-
         <div id="input">
-            <button id="commands-toggle-btn" class="action-button" onclick="toggleCommandsModal()" title="View Chat Commands">?</button>
+            <button id="commands-toggle-btn" class="action-button" onclick="toggleCommandsModal()">?</button>
             <input id="message" placeholder="Message" onkeydown="handleInputKey(event)">
             <button id="emoji-toggle-btn" onclick="toggleEmojiPanel()">&#x1F60A;</button>
             <button class="action-button" onclick="send()">Send</button>
         </div>
-            </div>
+    </div>
 </div>
 
-<div id="username-modal-overlay" style="display: none;">
+<div id="username-modal-overlay">
     <div id="username-modal">
         <h2>Welcome to the Chatroom</h2>
         <p>Please enter a username to start chatting.</p>
@@ -726,12 +582,9 @@ header > span {
 <div id="commands-modal-overlay">
     <div id="commands-modal">
         <h2>Chat Commands</h2>
-        <p>Use these commands in the message box:</p>
-        <div class="command-item">
-            <strong>Private Message (Whisper)</strong>
-            <p>Send a message only visible to you and the target user.</p>
-            <code>/whisper "Username" Your private message here.</code>
-            <p style="font-size: 0.9em; margin-top: 5px;">*The username must match exactly (case-sensitive).</p>
+        <div class="command-item" style="border-left: 3px solid #00e6b1; padding-left: 10px; margin-bottom: 15px;">
+            <strong>Private Message</strong><br>
+            <code>/whisper "Username" Message</code>
         </div>
         <button class="action-button" onclick="toggleCommandsModal()" style="background: #ff5722; color: white;">Close</button>
     </div>
@@ -740,7 +593,7 @@ header > span {
 <div id="clear-confirm-modal-overlay">
     <div id="clear-confirm-modal">
         <h2>⚠️ Confirm Clear Chat</h2>
-        <p>Are you sure you want to delete **ALL** messages in room #<span id="clear-room-name">global</span>?</p>
+        <p>Delete all messages in #<span id="clear-room-name">global</span>?</p>
         <button class="cancel" onclick="document.getElementById('clear-confirm-modal-overlay').style.display = 'none'">Cancel</button>
         <button class="confirm" onclick="confirmClear()">Clear All</button>
     </div>
@@ -761,10 +614,12 @@ const firebaseConfig = {
 /* -------------------------------- */
 
 firebase.initializeApp(firebaseConfig);
+const db = firebase.database(); 
+const auth = firebase.auth(); 
 
+// Variables
 const chat = document.getElementById("chat");
 const messageInput = document.getElementById("message");
-let userName = null;
 const adminBanner = document.getElementById("admin-banner");
 const emojiPanel = document.getElementById("emoji-panel");
 const roomInput = document.getElementById("room-code-input");
@@ -777,817 +632,333 @@ const userListContainer = document.getElementById("user-list-container");
 const roomIdHeader = document.getElementById("room-id-header");
 const usernameModalOverlay = document.getElementById('username-modal-overlay');
 const usernameInput = document.getElementById('username-input');
-// NEW Command Modal
 const commandsModalOverlay = document.getElementById('commands-modal-overlay');
-// NEW Clear Modal
-const clearConfirmModalOverlay = document.getElementById('clear-confirm-modal-overlay');
-const clearRoomNameSpan = document.getElementById('clear-room-name');
 
-
-// 🔥 NEW SECURE VARIABLES 🔥
 const ADMIN_UID = "vRE5kXQHrLMrsTRSPkSGJu2cS7m2"; 
 
 let userId = null; 
+let userName = null;
 let isAdmin = false; 
-
 let currentRoomId = 'global';
 let currentRoomRef = null;
 let chatListener = null; 
-let chatEditListener = null; 
+let chatEditListener = null; // RESTORED
 let roomPresenceListener = null; 
 let typingListener = null; 
+let userMap = {}; 
 
-// 🔥 NEW: User Map for Whisper Command
-let userMap = {}; // { "username": "UID" }
-
-// Firebase References
-const db = firebase.database(); 
-const auth = firebase.auth(); 
 const totalOnlineRef = db.ref('online'); 
 const typingRef = db.ref('typing'); 
-const privateMessageRef = db.ref('privateMessages'); // NEW: Dedicated ref for whispers
-
-// MESSAGE LIMIT, MUTE FEATURE, AND RATE LIMITING (Unchanged)
-const MAX_MESSAGE_LENGTH = 500; 
+const privateMessageRef = db.ref('privateMessages'); 
 const MUTED_USERS_REF = db.ref('mutedUsers'); 
 let mutedUserIds = {}; 
 const MESSAGE_HISTORY = {}; 
 const MAX_MESSAGES_IN_WINDOW = 4; 
 const TIME_WINDOW_MS = 10000; 
 
-function checkRateLimit() {
-    // ... (unchanged logic) ...
-     if (!MESSAGE_HISTORY[userId]) {
-         MESSAGE_HISTORY[userId] = [];
-    }
+// Init
+setupAuthAndInit();
 
-    const now = Date.now();
-    const history = MESSAGE_HISTORY[userId];
-
-    const newHistory = history.filter(time => now - time < TIME_WINDOW_MS);
-    newHistory.push(now);
-    MESSAGE_HISTORY[userId] = newHistory;
-
-    if (newHistory.length > MAX_MESSAGES_IN_WINDOW) {
-        newHistory.pop();
-        console.warn(`Rate limit exceeded for user ${userId}. History length: ${newHistory.length}`);
-        return true;
-    }
-
-    return false;
-}
-
-
-// --- USERNAME & COMMAND MODAL LOGIC ---
-
-function showNameModal() {
-    usernameModalOverlay.style.display = 'flex';
-    usernameInput.focus();
+function setupAuthAndInit() {
+    auth.signInAnonymously().then((u) => {
+        userId = u.user.uid;
+        document.getElementById('username-modal-overlay').style.display = 'flex';
+        usernameInput.focus();
+    }).catch(e => console.error(e));
 }
 
 function saveUsername() {
-    const inputName = usernameInput.value.trim();
-    if (inputName.length < 2 || inputName.length > 20) {
-        alert("Please enter a username between 2 and 20 characters.");
-        usernameInput.focus();
-        return;
-    }
-    
-    userName = inputName;
-    usernameModalOverlay.style.display = 'none';
-    
+    const n = usernameInput.value.trim();
+    if (n.length < 2 || n.length > 20) return alert("Username must be 2-20 chars.");
+    userName = n;
+    document.getElementById('username-modal-overlay').style.display = 'none';
     finishInitialization();
-}
-
-/**
- * Toggles the visibility of the user commands modal.
- */
-function toggleCommandsModal() {
-    const isVisible = commandsModalOverlay.style.display === 'flex';
-    commandsModalOverlay.style.display = isVisible ? 'none' : 'flex';
 }
 
 function finishInitialization() {
     isAdmin = (userId === ADMIN_UID);
-    if(isAdmin) console.log("Admin privileges confirmed.");
-
+    if(isAdmin) adminBanner.style.display = 'flex';
     populateEmojis(); 
     setupRoomConnection(currentRoomId); 
     setupGlobalListeners();
-    setupPrivateMessageListener(); // NEW
-    if(isAdmin) {
-        // Only show the banner if already in admin mode upon init
-        adminBanner.style.display = 'flex';
-    }
+    setupPrivateMessageListener();
 }
 
-// --- AUTHENTICATION AND PRESENCE LOGIC ---
-
-function setupAuthAndInit() {
-    auth.signInAnonymously()
-        .then((userCredential) => {
-            userId = userCredential.user.uid;
-            console.log("Authenticated as:", userId);
-            showNameModal(); 
-
-        })
-        .catch((error) => {
-            console.error("Anonymous authentication failed:", error);
-            console.error("Chat failed to load: Could not authenticate.");
-        });
-}
-
-function setupPresence() {
-    if (!userId || !userName) return; 
-
-    const userRef = totalOnlineRef.child(userId);
-    userRef.onDisconnect().remove();
-
-    userRef.set({
-        name: userName,
-        room: currentRoomId,
-        time: firebase.database.ServerValue.TIMESTAMP
-    });
-}
-
-function setupGlobalListeners() {
-    // 1. Total Online Count (Unchanged)
-    totalOnlineRef.on('value', snapshot => {
-        const count = snapshot.numChildren();
-        totalOnlineVal.textContent = count;
-    });
-
-    // 2. Typing Indicator Listener (Unchanged setup)
-    if (typingListener) typingRef.child(currentRoomId).off('value', typingListener);
-
-    typingListener = typingRef.child(currentRoomId).on('value', snapshot => {
-        const typers = [];
-        snapshot.forEach(child => {
-            if (child.key !== userId) {
-                typers.push(child.val().name);
-            }
-        });
-
-        if (typers.length === 0) {
-            typingIndicator.textContent = '';
-        } else if (typers.length === 1) {
-            typingIndicator.textContent = `${typers[0]} is typing...`;
-        } else {
-            typingIndicator.textContent = `${typers.length} people are typing...`;
-        }
-    });
-    
-    // 3. Muted Users Listener (Unchanged)
-    MUTED_USERS_REF.on('value', snapshot => {
-        mutedUserIds = snapshot.val() || {}; 
-        console.log("Muted users updated:", Object.keys(mutedUserIds));
-    });
-}
-
-
-function setupRoomPresenceListener() {
-    // Detach old listener
-    if (roomPresenceListener) totalOnlineRef.off('value', roomPresenceListener);
-
-    // This listener watches the global presence list and filters by the current room
-    roomPresenceListener = totalOnlineRef.on('value', snapshot => {
-        let roomUsers = [];
-        let roomCount = 0;
-        userMap = {}; // Reset user map for current room
-        
-        snapshot.forEach(child => {
-            const user = child.val();
-            const uid = child.key;
-
-            userMap[user.name] = uid; // Populate user map
-
-            if (user.room === currentRoomId) {
-                roomUsers.push({ id: uid, name: user.name });
-                roomCount++;
-            }
-        });
-
-        // Update UI Counts
-        roomUserVal.textContent = roomCount;
-        
-        // Update User List (Unchanged logic)
-        userList.innerHTML = '';
-        roomUsers.forEach(user => {
-            const item = document.createElement('div');
-            
-            const isMuted = !!mutedUserIds[user.id];
-
-            item.className = 'user-item' + (isMuted ? ' muted-user' : '');
-
-            const icon = document.createElement('i');
-            icon.className = 'fas fa-circle';
-
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = user.name + (user.id === userId ? ' (You)' : '') + (isMuted ? ' (Muted)' : '');
-            
-            item.appendChild(icon);
-            item.appendChild(nameSpan);
-
-            // Admin Mute/Unmute Button (Unchanged logic)
-            if (isAdmin && user.id !== userId) { 
-                const muteBtn = document.createElement('button');
-                muteBtn.className = 'action-btn';
-                muteBtn.textContent = isMuted ? 'Unmute' : 'Mute';
-                muteBtn.style.marginLeft = 'auto'; 
-                muteBtn.style.backgroundColor = isMuted ? '#2ecc71' : '#e74c3c'; 
-                muteBtn.onclick = () => toggleMute(user.id, user.name, isMuted);
-                item.appendChild(muteBtn);
-            }
-
-            userList.appendChild(item);
-        });
-    });
-}
-
-// 🔥 NEW: Private Message Listener (Corrected)
-function setupPrivateMessageListener() {
-    // Detach existing listener if any
-    privateMessageRef.child(userId).off(); 
-    
-    // Listener for messages SENT TO the current user (recipient is 'userId')
-    // We use 'child_added' and 'child_removed' to handle real-time changes
-    privateMessageRef.child(userId).on('child_added', renderMessage);
-
-    privateMessageRef.child(userId).on('child_removed', snap => {
-        const key = snap.key;
-        const el = document.getElementById(key);
-        if (el) {
-            el.remove();
-            chat.scrollTop = chat.scrollHeight;
-        }
-    });
-}
-
-
-// --- ROOM CONTROL LOGIC (Unchanged) ---
-
+// Room Logic
 function setupRoomConnection(roomId) {
-    if (chatListener) {
-        currentRoomRef.off('child_added', chatListener);
-        currentRoomRef.off('child_removed');
-    }
-    if (chatEditListener) {
-        currentRoomRef.off('child_changed', chatEditListener);
-    }
+    if (chatListener) currentRoomRef.off('child_added', chatListener);
+    if (chatEditListener) currentRoomRef.off('child_changed', chatEditListener); // RESTORED
     
     if (userId) typingRef.child(currentRoomId).child(userId).remove(); 
     chat.innerHTML = ''; 
 
-
-    currentRoomId = roomId.toLowerCase().replace(/[^a-z0-9-]/g, ''); 
-    if (!currentRoomId) currentRoomId = 'global';
-    
+    currentRoomId = roomId.toLowerCase().replace(/[^a-z0-9-]/g, '') || 'global';
     currentRoomRef = db.ref(`rooms/${currentRoomId}`);
     
     roomDisplay.textContent = `Room: #${currentRoomId}`;
     roomIdHeader.textContent = currentRoomId;
 
     chatListener = currentRoomRef.limitToLast(100).on("child_added", renderMessage);
-    chatEditListener = currentRoomRef.on("child_changed", updateMessage);
+    chatEditListener = currentRoomRef.on("child_changed", updateMessage); // RESTORED
 
     currentRoomRef.on("child_removed", snap => {
-        const key = snap.key;
-        const el = document.getElementById(key);
-        if (el) {
-            el.remove();
-            chat.scrollTop = chat.scrollHeight;
-        }
+        const el = document.getElementById(snap.key);
+        if (el) el.remove();
     });
 
     setupPresence();
     setupRoomPresenceListener();
-    setupGlobalListeners(); 
-
-    console.log(`Connected to room: ${currentRoomId}`);
 }
 
 function joinRoom() {
-    const newRoom = roomInput.value.trim();
-    if (newRoom && newRoom !== currentRoomId) {
-        setupRoomConnection(newRoom);
-        roomInput.value = ''; 
-    } else if (newRoom === currentRoomId) {
-        console.log("Already in this room.");
-        roomInput.value = ''; 
+    const r = roomInput.value.trim();
+    if (r && r !== currentRoomId) { setupRoomConnection(r); roomInput.value = ''; }
+}
+
+// Sending
+function send() {
+    const text = messageInput.value.trim();
+    if (!text || !userId || !userName) return;
+
+    if (mutedUserIds[userId]) return alert("You are muted.");
+    if (checkRateLimit()) return alert("Slow down!");
+
+    // Command Check
+    if (text.startsWith('/')) {
+        handleCommand(text);
+        messageInput.value = '';
+        return;
     }
-}
 
-function toggleUserList() {
-    userListContainer.classList.toggle('active');
-}
-
-
-// --- EMOJI, TYPING LOGIC (Unchanged) ---
-
-const emojis = [
-'😀','😁','😂','🤣','😃','😄','😅','😆','😉','😊',
-'😋','😎','😍','😘','🥰','😗','😙','😚','🙂','🤗',
-'🤩','🤔','🫢','🤫','🤭','🫡','🤨','😐','😑','😶',
-'🫥','😶‍🌫️','🙄','😏','😣','😥','😮','🤐','😯','😪',
-'😫','🥱','😴','😌','😛','😜','😝','🤤','😒','😓',
-'😔','😕','🫤','🙃','🫠','🫨','😲','☹️','🙁','😖',
-'😞','😟','😤','😢','😭','😦','😧','😨','😩','😬',
-'😮‍💨','😰','😱','🥵','🥶','😳','🤯','😵','😵‍💫',
-'🥴','😠','😡','🤬','😷','🤒','🤕','🤢','🤮','🤧',
-'😇','🥳','🥸','😈','👿','🤠','🤑','🤓','😼','🙀',
-'😿','😹','😻','😾','😺','😸','🤡','💀','☠️','👻',
-'👽','🤖','🎃','💩','👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞',
-'🫰','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️',
-'👍','👎','✊','👊','🤛','🤜','👏','🙌','🫶','🙏',
-'💅','🤝','🫱','🫲','🫳','🫴','👂','🦻','👃','🧠',
-'👀','👁️','👅','👄','🫦','👶','🧒','👦','👧','🧑',
-'👨','👩','🧓','👴','👵','👮','🕵️','💂','🥷','👷',
-'🤴','👸','👳','🧕','🤵','👰','🫅','🫃','🫄','🤱',
-'👼','🎅','🤶','🧙','🧚','🧛','🧜','🧝','🧞','🧟','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐻‍❄️','🐨',
-'🐯','🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐒',
-'🐔','🐧','🐦','🦆','🦅','🦉','🦇','🐺','🐗','🐴',
-'🦄','🐝','🪱','🐛','🦋','🐌','🐞','🪰','🪲','🪳',
-'🦟','🐜','🕷️','🦂','🐢','🐍','🦎','🦖','🦕','🐙',
-'🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋',
-'🦈','🐊','🦭','🦦','🦥','🐘','🦏','🦛','🦒','🦘',
-'🦬','🐄','🐎','🐖','🐏','🐐','🦙','🦌','🐕','🐩',
-'🦮','🐕‍🦺','🐈','🐈‍⬛','🐓','🦃','🦚','🦜','🦢',
-'🪿','🦩','🐀','🐁','🦫','🦔','🌲','🌳','🌴','🌵',
-'🌾','🌿','🍀','🍁','🍂','🍃','🌻','🌹','🌷','🌼','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈',
-'🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦',
-'🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅','🥔',
-'🍞','🥐','🥖','🥨','🥯','🥞','🧇','🧀','🍖','🍗',
-'🥩','🥓','🍔','🍟','🍕','🌭','🥪','🌮','🌯','🫔',
-'🥙','🧆','🥚','🍳','🥘','🍲','🫕','🥣','🥗','🍿',
-'🧈','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜','🍝',
-'🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠','🥡',
-'🦪','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧',
-'🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🫖','🍵',
-'🧃','🥤','🧋','🍺','🍻','🥂','🍷','🥃','🍸','🍹',
-'🧉','🍾','⚽','🏀','🏈','⚾','🎾','🏐','🏉','🥏','🎱','🏓',
-'🏸','🥅','⛳','🪁','🎣','🤿','🥊','🥋','🎽','🛹',
-'🛼','🛷','⛷️','🏂','🪂','🏋️','🤼','🤸','⛹️',
-'🤺','🏌️','🏇','🧘','🏄','🏊','🚴','🚵','🎮','🕹️',
-'🎲','🧩','🎭','🎨','🎤','🎧','🎼','🎷','🎸','🎹',
-'🥁','📱','💻','🖥️','⌨️','🖱️','📷','📸','🎥','📽️',
-'📞','☎️','📺','📻','🧭','⏰','⌚','🔋','🪫','💡',
-'🔦','🕯️','🧯','🛢️','💸','💰','💳','💎','⚙️','🔧',
-'🔨','🧰','🔩','🧲','🧪','🧫','🧬','🔬','🔭','📡',
-'📚','📖','✏️','🖊️','📌','📍','📎','🗂️','🗑️'
-];
-
-function populateEmojis() {
-    emojis.forEach(emoji => {
-        const span = document.createElement('span');
-        span.className = 'emoji';
-        span.textContent = emoji;
-        span.onclick = () => insertEmoji(emoji);
-        emojiPanel.appendChild(span);
+    currentRoomRef.push({
+        name: userName,
+        uid: userId,
+        text: text,
+        time: firebase.database.ServerValue.TIMESTAMP
     });
-}
-
-function insertEmoji(emoji) {
-    messageInput.value += emoji;
-    messageInput.focus();
-    emojiPanel.classList.remove('active');
-    sendTypingStatus(true); 
-}
-
-function toggleEmojiPanel() {
-    emojiPanel.classList.toggle('active');
-}
-
-let typingTimeout = null;
-
-function sendTypingStatus(isTyping) {
-    if (!userId || !userName) return; 
-
-    const userTypingRef = typingRef.child(currentRoomId).child(userId);
-
-    if (!userName) return; 
-
-    if (isTyping) {
-        userTypingRef.set({ name: userName }); 
-        
-        if (typingTimeout) clearTimeout(typingTimeout);
-
-        typingTimeout = setTimeout(() => {
-            userTypingRef.remove();
-            typingTimeout = null;
-        }, 3000); 
-        
-    } else {
-        userTypingRef.remove();
-        if (typingTimeout) clearTimeout(typingTimeout);
-    }
-}
-
-function handleInputKey(event) {
-    if (event.key === 'Enter') {
-        send();
-    } else {
-        if (messageInput.value.trim().length > 0 || event.key.length === 1) {
-            sendTypingStatus(true);
-        }
-    }
-}
-
-
-// --- CHAT SEND LOGIC (Updated to handle /whisper) ---
-
-function send(){
-    let name = userName; 
-    let msg = messageInput.value.trim();
     
-    if (!name) {
-        showNameModal();
-        return;
-    }
-    
-    if (!userId) {
-        console.error("Authentication error. Please refresh.");
-        return;
-    }
-    
-    setupPresence(); 
-
-    if(!msg) return;
-
-    if (msg.length > MAX_MESSAGE_LENGTH) {
-        alert(`Message is too long. Maximum length is ${MAX_MESSAGE_LENGTH} characters.`);
-        messageInput.focus();
-        return;
-    }
-
-    if (checkRateLimit()) {
-        alert(`Please slow down! You can send up to ${MAX_MESSAGES_IN_WINDOW} messages every ${TIME_WINDOW_MS / 1000} seconds.`);
-        messageInput.value = "";
-        sendTypingStatus(false);
-        return;
-    }
-
-    // 🔥 NEW: Check for whisper command: /whisper "Username" Message
-    const whisperRegex = /^\/whisper\s+"([^"]+)"\s+(.+)$/i;
-    const match = msg.match(whisperRegex);
-
-    if (match) {
-        const targetUsername = match[1];
-        const privateMsg = match[2].trim();
-        const targetUserId = userMap[targetUsername]; // Look up UID from map
-
-        if (!targetUserId) {
-            alert(`User "${targetUsername}" not found. Check the spelling (case-sensitive) or if they are online.`);
-            messageInput.value = ""; // Clear message input
-            sendTypingStatus(false);
-            return;
-        }
-
-        if (targetUserId === userId) {
-            alert("You cannot whisper to yourself.");
-            messageInput.value = ""; // Clear message input
-            sendTypingStatus(false);
-            return;
-        }
-
-        if (privateMsg.length === 0) {
-            alert("Whisper message cannot be empty.");
-            messageInput.value = ""; // Clear message input
-            sendTypingStatus(false);
-            return;
-        }
-
-        const messageData = {
-            name: name,
-            msg: privateMsg,
-            userId: userId,
-            time: Date.now(),
-            recipientId: targetUserId,
-            recipientName: targetUsername,
-            private: true 
-        };
-
-        // 1. Send to the recipient's private queue
-        const recipientPushRef = privateMessageRef.child(targetUserId).push(messageData);
-        const privateMessageKey = recipientPushRef.key;
-
-        // 2. Send to the sender's own private queue using the SAME key so they see it
-        // This ensures the sender and recipient have the same message ID for display/deletion
-        privateMessageRef.child(userId).child(privateMessageKey).set(messageData);
-
-        console.log(`Whisper sent to ${targetUsername} with key ${privateMessageKey}`);
-
-    } else {
-        // Normal public message
-        currentRoomRef.push({
-            name,
-            msg,
-            userId, 
-            time: Date.now(),
-            room: currentRoomId // Add room for context
-        });
-    }
-
-
-    messageInput.value = "";
-    emojiPanel.classList.remove('active'); 
+    messageInput.value = '';
     sendTypingStatus(false);
 }
 
-// --- MESSAGE RENDERING (Completed with update and render logic) ---
-
-/**
- * Creates and attaches a message element to the chat.
- * @param {object} snap The Firebase DataSnapshot.
- */
-function renderMessage(snap) {
-    const key = snap.key;
-    const m = snap.val();
-    
-    // Check if the message is for the current room or a private message to/from this user
-    const isPublicMessage = !m.private && m.room === currentRoomId;
-    const isPrivateMessage = m.private && (m.userId === userId || m.recipientId === userId);
-
-    if (!isPublicMessage && !isPrivateMessage) {
-        return;
-    }
-    
-    // Skip rendering if sender is muted and we are not the sender
-    if (mutedUserIds[m.userId] && m.userId !== userId) {
-        return;
-    }
-    
-    let div = document.getElementById(key);
-    if (div) return; // Prevent duplicates
-
-    div = document.createElement('div');
-    div.id = key;
-    div.className = 'msg';
-    
-    // Add classes
-    if (m.userId === userId) {
-        div.classList.add('me');
-    }
-    if (isAdmin) {
-        div.classList.add('admin');
-    }
-    if (isPrivateMessage) {
-        div.classList.add('private');
-    }
-    
-    // Action Buttons Container
-    const actionButtons = document.createElement('div');
-    actionButtons.className = 'action-buttons';
-    
-    // Delete Button
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'action-btn delete-btn';
-    deleteBtn.textContent = 'Delete';
-    deleteBtn.onclick = () => deleteMessage(key, m.private);
-    actionButtons.appendChild(deleteBtn);
-    
-    // Edit Button (Only for own messages)
-    if (m.userId === userId && !m.private) { // Allow editing public messages only
-        const editBtn = document.createElement('button');
-        editBtn.className = 'action-btn edit-btn';
-        editBtn.textContent = 'Edit';
-        editBtn.onclick = () => editMessage(key, m.msg);
-        actionButtons.appendChild(editBtn);
-    }
-    
-    // Bubble Wrapper
-    const bubbleWrapper = document.createElement('div');
-    bubbleWrapper.className = 'bubble-wrapper';
-    
-    // Name Element
-    const nameSpan = document.createElement('div');
-    nameSpan.className = 'name';
-    if (isPrivateMessage) {
-        const sender = m.userId === userId ? 'You' : m.name;
-        const recipient = m.recipientId === userId ? 'You' : m.recipientName;
-        nameSpan.innerHTML = `<span class="whisper-name">${sender}</span> &gt; <span class="whisper-name">${recipient}</span>`;
-    } else {
-        nameSpan.textContent = m.name;
-    }
-
-    // Bubble Element
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = m.msg;
-    
-    // Edit Input Wrapper (Initially hidden)
-    const editInputWrapper = document.createElement('div');
-    editInputWrapper.className = 'edit-input-wrapper';
-    editInputWrapper.id = `edit-wrapper-${key}`;
-    editInputWrapper.style.display = 'none';
-
-    const editInput = document.createElement('input');
-    editInput.id = `edit-input-${key}`;
-    editInput.value = m.msg;
-
-    const saveButton = document.createElement('button');
-    saveButton.textContent = 'Save';
-    saveButton.onclick = () => saveEdit(key, bubble.id);
-
-    editInputWrapper.appendChild(editInput);
-    editInputWrapper.appendChild(saveButton);
-
-    // Assembly
-    bubbleWrapper.appendChild(nameSpan);
-    bubbleWrapper.appendChild(bubble);
-    bubbleWrapper.appendChild(editInputWrapper);
-
-    // Order elements based on 'me'
-    if (m.userId === userId) {
-        div.appendChild(actionButtons);
-        div.appendChild(bubbleWrapper);
-    } else {
-        div.appendChild(bubbleWrapper);
-        div.appendChild(actionButtons);
-    }
-
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-}
-
-/**
- * Updates an existing message element when the data changes in Firebase.
- * @param {object} snap The Firebase DataSnapshot.
- */
-function updateMessage(snap) {
-    const key = snap.key;
-    const m = snap.val();
-    const messageDiv = document.getElementById(key);
-    
-    if (messageDiv) {
-        // Find the bubble element inside the messageDiv (assuming it's the second child in the wrapper)
-        const bubbleWrapper = messageDiv.querySelector('.bubble-wrapper');
-        if (bubbleWrapper) {
-            const bubble = bubbleWrapper.querySelector('.bubble');
-            if (bubble) {
-                // Check if the edit input is active
-                const editInputWrapper = document.getElementById(`edit-wrapper-${key}`);
-                if (editInputWrapper && editInputWrapper.style.display !== 'none') {
-                    // If the edit is active, do not overwrite the bubble's content
-                    // The user is currently editing or has just finished.
-                    // Instead, we just hide the edit wrapper in case the update was from a successful save.
-                    editInputWrapper.style.display = 'none';
-                } else {
-                    bubble.textContent = m.msg;
-                }
+function handleCommand(text) {
+    if (text.startsWith('/whisper')) {
+        const parts = text.match(/\/whisper\s+"([^"]+)"\s+(.+)/);
+        if (parts) {
+            const targetName = parts[1];
+            const msg = parts[2];
+            const targetUid = userMap[targetName];
+            if (targetUid) {
+                const payload = { from: userName, fromId: userId, text: msg, time: Date.now() };
+                privateMessageRef.child(targetUid).push(payload);
+                renderPrivateMessage(payload, true); // show to sender
+            } else {
+                alert("User not found in this room.");
             }
         }
     }
 }
 
+// Rendering
+function renderMessage(snapshot) {
+    const msg = snapshot.val();
+    const key = snapshot.key;
+    const isMe = msg.uid === userId;
+    
+    const div = document.createElement("div");
+    div.className = `msg ${isMe ? "me" : ""} ${isAdmin ? "admin" : ""}`;
+    div.id = key;
 
-// --- ADMIN FUNCTIONS ---
+    // RESTORED: Edit Button and Delete Button logic
+    let buttonsHtml = '';
+    if (isMe || isAdmin) {
+        buttonsHtml = `<div class="action-buttons">`;
+        if (isMe) {
+            // Escape single quotes for the onclick handler
+            const safeText = msg.text.replace(/'/g, "&#39;");
+            buttonsHtml += `<button class="action-btn edit-btn" onclick="toggleEditInput('${key}', '${safeText}')">Edit</button>`;
+        }
+        buttonsHtml += `<button class="action-btn delete-btn" onclick="deleteMessage('${key}')">Del</button></div>`;
+    }
 
+    div.innerHTML = `
+        ${buttonsHtml}
+        <div class="bubble-wrapper">
+            <div class="name">${msg.name}</div>
+            <div class="bubble" id="text-${key}">${escapeHtml(msg.text)}</div>
+            
+            <div id="edit-wrapper-${key}" class="edit-input-wrapper">
+                <input id="edit-input-${key}" type="text">
+                <button onclick="submitEdit('${key}')">Save</button>
+                <button onclick="toggleEditInput('${key}')" style="background:#e63946">X</button>
+            </div>
+        </div>
+    `;
+
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// RESTORED: Update existing message (Real-time)
+function updateMessage(snapshot) {
+    const val = snapshot.val();
+    const textDiv = document.getElementById(`text-${snapshot.key}`);
+    if (textDiv) {
+        textDiv.textContent = val.text;
+    }
+}
+
+// RESTORED: Edit Functions
+function toggleEditInput(key, currentText) {
+    const wrapper = document.getElementById(`edit-wrapper-${key}`);
+    const input = document.getElementById(`edit-input-${key}`);
+    const textBubble = document.getElementById(`text-${key}`);
+    
+    if (wrapper.style.display === 'flex') {
+        wrapper.style.display = 'none';
+        textBubble.style.display = 'block';
+    } else {
+        wrapper.style.display = 'flex';
+        textBubble.style.display = 'none';
+        if (currentText) input.value = currentText; // Populate
+        input.focus();
+    }
+}
+
+function submitEdit(key) {
+    const input = document.getElementById(`edit-input-${key}`);
+    const newText = input.value.trim();
+    if (newText) {
+        currentRoomRef.child(key).update({ text: newText });
+        toggleEditInput(key); // Close input
+    }
+}
+
+function deleteMessage(key) {
+    if(confirm("Delete this message?")) currentRoomRef.child(key).remove();
+}
+
+function renderPrivateMessage(msg, isMe) {
+    const div = document.createElement("div");
+    div.className = `msg private ${isMe ? "me" : ""}`;
+    div.innerHTML = `
+        <div class="bubble-wrapper">
+            <div class="name whisper-name">${isMe ? "To: " + userMap[Object.keys(userMap).find(k=>userMap[k]!==userId)] : "From: " + msg.from} 🔒</div>
+            <div class="bubble">${escapeHtml(msg.text)}</div>
+        </div>`;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+function setupPrivateMessageListener() {
+    privateMessageRef.child(userId).on('child_added', snap => {
+        renderPrivateMessage(snap.val(), false);
+        snap.ref.remove(); // Delete after reading
+    });
+}
+
+// Helpers
+function escapeHtml(text) {
+    if (!text) return "";
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function checkRateLimit() {
+    if (!MESSAGE_HISTORY[userId]) MESSAGE_HISTORY[userId] = [];
+    const now = Date.now();
+    const history = MESSAGE_HISTORY[userId].filter(t => now - t < TIME_WINDOW_MS);
+    history.push(now);
+    MESSAGE_HISTORY[userId] = history;
+    return history.length > MAX_MESSAGES_IN_WINDOW;
+}
+
+// Presence & UI
+function setupPresence() {
+    if (!userId) return;
+    const ref = totalOnlineRef.child(userId);
+    ref.onDisconnect().remove();
+    ref.set({ name: userName, room: currentRoomId });
+}
+
+function setupRoomPresenceListener() {
+    if (roomPresenceListener) totalOnlineRef.off('value', roomPresenceListener);
+    roomPresenceListener = totalOnlineRef.on('value', snap => {
+        let count = 0; userMap = {}; userList.innerHTML = '';
+        snap.forEach(c => {
+            const u = c.val();
+            userMap[u.name] = c.key;
+            if(u.room === currentRoomId) {
+                count++;
+                const div = document.createElement('div');
+                div.className = `user-item ${mutedUserIds[c.key] ? 'muted-user' : ''}`;
+                div.innerHTML = `<i class="fas fa-circle"></i> ${u.name} ${c.key===userId?'(You)':''}`;
+                if(isAdmin && c.key !== userId) {
+                    const btn = document.createElement('button');
+                    btn.className = 'action-btn';
+                    btn.textContent = mutedUserIds[c.key] ? 'Unmute' : 'Mute';
+                    btn.onclick = () => toggleMute(c.key, u.name, !!mutedUserIds[c.key]);
+                    btn.style.marginLeft = 'auto';
+                    btn.style.opacity = '1'; 
+                    btn.style.pointerEvents = 'auto';
+                    div.appendChild(btn);
+                }
+                userList.appendChild(div);
+            }
+        });
+        roomUserVal.textContent = count;
+    });
+}
+
+function setupGlobalListeners() {
+    totalOnlineRef.on('value', s => totalOnlineVal.textContent = s.numChildren());
+    if (typingListener) typingRef.child(currentRoomId).off('value', typingListener);
+    typingListener = typingRef.child(currentRoomId).on('value', s => {
+        const names = [];
+        s.forEach(c => { if(c.key !== userId) names.push(c.val().name); });
+        typingIndicator.textContent = names.length ? `${names.join(', ')} is typing...` : '';
+    });
+    MUTED_USERS_REF.on('value', s => mutedUserIds = s.val() || {});
+}
+
+// Admin / Input Handlers
 function toggleAdminMode() {
     if (userId === ADMIN_UID) {
-        isAdmin = !isAdmin;
-        adminBanner.style.display = isAdmin ? 'flex' : 'none';
-        console.log(`Admin mode set to: ${isAdmin}`);
-        // Re-render user list to show/hide admin buttons
-        setupRoomPresenceListener(); 
-        // Force a re-render of chat to apply admin class if needed
-        chat.innerHTML = '';
+        const isOn = adminBanner.style.display === 'flex';
+        adminBanner.style.display = isOn ? 'none' : 'flex';
         setupRoomConnection(currentRoomId);
+    }
+}
+function toggleMute(uid, name, isMuted) {
+    if(isMuted) MUTED_USERS_REF.child(uid).remove();
+    else MUTED_USERS_REF.child(uid).set(true);
+}
+function showConfirmClear() { document.getElementById('clear-confirm-modal-overlay').style.display = 'flex'; document.getElementById('clear-room-name').textContent = currentRoomId; }
+function confirmClear() { currentRoomRef.remove(); document.getElementById('clear-confirm-modal-overlay').style.display = 'none'; }
+function toggleCommandsModal() { const el = document.getElementById('commands-modal-overlay'); el.style.display = el.style.display==='flex'?'none':'flex'; }
+function toggleUserList() { userListContainer.classList.toggle('active'); }
+function handleInputKey(e) { if(e.key==='Enter') send(); else sendTypingStatus(true); }
+
+// Emoji
+const emojis = ['😀','😂','😍','😭','👍','🙏','🔥','🎉','❤️','🤔','😎','👀','💩','👻','💀','🤖','👽','🎃'];
+function populateEmojis() {
+    emojis.forEach(e => {
+        const s = document.createElement('span'); s.className='emoji'; s.textContent=e;
+        s.onclick = () => { messageInput.value += e; messageInput.focus(); emojiPanel.classList.remove('active'); };
+        emojiPanel.appendChild(s);
+    });
+}
+function toggleEmojiPanel() { emojiPanel.classList.toggle('active'); }
+let typingTimeout;
+function sendTypingStatus(isTyping) {
+    const ref = typingRef.child(currentRoomId).child(userId);
+    if(isTyping) {
+        ref.set({ name: userName });
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => ref.remove(), 3000);
     } else {
-        alert("You are not authorized to use Admin Mode.");
+        ref.remove(); clearTimeout(typingTimeout);
     }
 }
-
-/**
- * Shows the confirmation modal for clearing the chat.
- */
-function showConfirmClear() {
-    if (!isAdmin) return;
-    clearRoomNameSpan.textContent = currentRoomId;
-    clearConfirmModalOverlay.style.display = 'flex';
-}
-
-/**
- * 🔥 FIX: Clears all messages from the current room.
- */
-function confirmClear() {
-    if (!isAdmin) {
-        alert("Authorization failed.");
-        return;
-    }
-    
-    // 1. Hide the modal
-    clearConfirmModalOverlay.style.display = 'none';
-
-    // 2. Perform the delete operation on the current room
-    currentRoomRef.set(null)
-        .then(() => {
-            console.log(`Successfully cleared all messages in room #${currentRoomId}`);
-            alert(`SUCCESS! All messages in room #${currentRoomId} have been cleared.`);
-            chat.innerHTML = ''; // Clear local chat display
-        })
-        .catch(error => {
-            console.error("FAILED to clear messages:", error);
-            alert(`FAILED TO CLEAR MESSAGES: ${error.message}`);
-        });
-
-    // We don't clear the input field as it wasn't used, but the `catch` block 
-    // is essential for providing feedback if the delete fails (e.g., due to security rules).
-}
-
-/**
- * Toggles a user's mute status.
- */
-function toggleMute(targetUserId, targetUsername, isMuted) {
-    if (!isAdmin) return;
-
-    const userMuteRef = MUTED_USERS_REF.child(targetUserId);
-
-    if (isMuted) {
-        userMuteRef.remove()
-            .then(() => alert(`User ${targetUsername} has been UNMUTED.`))
-            .catch(e => console.error("Unmute failed:", e));
-    } else {
-        userMuteRef.set({ name: targetUsername, mutedBy: userId })
-            .then(() => alert(`User ${targetUsername} has been MUTED.`))
-            .catch(e => console.error("Mute failed:", e));
-    }
-}
-
-
-// --- MESSAGE ACTION FUNCTIONS ---
-
-function deleteMessage(key, isPrivate) {
-    const isMe = document.getElementById(key).classList.contains('me');
-    if (!isAdmin && !isMe) return;
-
-    if (!confirm(`Are you sure you want to delete this message (ID: ${key})?`)) return;
-
-    let targetRef;
-    if (isPrivate) {
-        // For private messages, delete only from the current user's private queue
-        targetRef = privateMessageRef.child(userId).child(key);
-    } else {
-        // For public messages, delete from the room
-        targetRef = currentRoomRef.child(key);
-    }
-
-    targetRef.remove()
-        .then(() => console.log(`Message ${key} deleted successfully.`))
-        .catch(error => alert(`Deletion failed: ${error.message}`));
-}
-
-function editMessage(key, currentMsg) {
-    const messageDiv = document.getElementById(key);
-    const bubble = messageDiv.querySelector('.bubble');
-    const editWrapper = document.getElementById(`edit-wrapper-${key}`);
-    const editInput = document.getElementById(`edit-input-${key}`);
-    
-    // Only allow editing if it's the user's own message and not currently editing
-    if (messageDiv.classList.contains('me') && editWrapper.style.display === 'none') {
-        bubble.style.display = 'none';
-        editInput.value = currentMsg; // Set current message for editing
-        editWrapper.style.display = 'flex';
-        editInput.focus();
-        // Hide action buttons while editing
-        messageDiv.querySelector('.action-buttons').style.opacity = '0';
-    }
-}
-
-function saveEdit(key) {
-    const messageDiv = document.getElementById(key);
-    const editWrapper = document.getElementById(`edit-wrapper-${key}`);
-    const editInput = document.getElementById(`edit-input-${key}`);
-    
-    const newMsg = editInput.value.trim();
-
-    if (!newMsg) {
-        alert("Edited message cannot be empty.");
-        editInput.focus();
-        return;
-    }
-
-    if (newMsg.length > MAX_MESSAGE_LENGTH) {
-        alert(`Message is too long. Max is ${MAX_MESSAGE_LENGTH} characters.`);
-        editInput.focus();
-        return;
-    }
-
-    // Update the message in Firebase
-    currentRoomRef.child(key).update({ msg: newMsg, edited: Date.now() })
-        .then(() => {
-            console.log(`Message ${key} edited successfully.`);
-            // The 'updateMessage' listener handles the actual UI change
-            // Fallback: hide edit controls manually
-            editWrapper.style.display = 'none';
-            messageDiv.querySelector('.bubble').style.display = 'inline-block';
-            messageDiv.querySelector('.action-buttons').style.opacity = '1';
-        })
-        .catch(error => alert(`Edit failed: ${error.message}`));
-}
-
-// --- INITIALIZATION ---
-window.onload = setupAuthAndInit;
 </script>
-
 </body>
 </html>
