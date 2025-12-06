@@ -396,29 +396,37 @@ h1 {
 <script>
 function openGame(url) {
 
-  // ALLOW DISCORD TO OPEN NORMALLY
-  if (url.includes("discord.gg") || url.includes("discord.com")) {
+  // EXCLUSIONS (OPEN NORMALLY)
+  if (
+    url.includes("discord.gg") ||
+    url.includes("discord.com") ||
+    url.includes("chatroom.html")
+  ) {
     window.open(url, "_blank");
     return;
   }
 
   // OPEN EVERYTHING ELSE IN OVERLAY
-  document.getElementById("gameOverlay").style.display = "flex";
-  document.getElementById("gameFrame").src = url;
+  let overlay = document.getElementById("gameOverlay");
+  let frame = document.getElementById("gameFrame");
 
-  // find button information
+  overlay.style.display = "flex";
+  frame.src = url;
+
+  // FIND BUTTON DATA
   let btn = [...document.querySelectorAll(".game-buttons button")]
-              .find(b => b.getAttribute("onclick") === `openGame('${url}')`);
+              .find(b => b.getAttribute("onclick")?.includes(url));
 
   if (btn) {
-  let name = btn.innerText.trim();
-  let img = btn.querySelector("img").src;
-  addRecentGame(name, url, img);
+    let name = btn.innerText.trim();
+    let img = btn.querySelector("img")?.src;
 
-  // Update top bar game title
-  document.getElementById("gameTitle").innerText = name;
+    addRecentGame(name, url, img);
+
+    // UPDATE TOP BAR TITLE
+    document.getElementById("gameTitle").innerText = name;
+  }
 }
-
 
 
 // CLOSE GAME
