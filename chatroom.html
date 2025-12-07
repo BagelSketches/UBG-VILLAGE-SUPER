@@ -649,10 +649,8 @@ const auth = firebase.auth();
 const chat = document.getElementById("chat");
 const messageInput = document.getElementById("message");
 const adminBanner = document.getElementById("admin-banner");
-// ADMIN ROOM LIST ELEMENTS/VARIABLES
 const activeRoomsContent = document.getElementById("active-rooms-content"); 
 let adminRoomListListener = null; 
-// END ADMIN VARIABLES
 const emojiPanel = document.getElementById("emoji-panel");
 const roomInput = document.getElementById("room-code-input");
 const roomDisplay = document.getElementById("current-room-display");
@@ -709,7 +707,6 @@ function saveUsername() {
 
 function finishInitialization() {
     isAdmin = (userId === ADMIN_UID);
-    // REMOVED: Initial adminBanner.style.display = 'flex'
     populateEmojis(); 
     setupRoomConnection(currentRoomId); 
     setupGlobalListeners();
@@ -876,12 +873,10 @@ function deleteMessage(key) {
     if(confirm("Delete this message?")) currentRoomRef.child(key).remove();
 }
 
-// FIX: Added targetUsername argument and logic
 function renderPrivateMessage(msg, isMe, targetUsername = null) { 
     const div = document.createElement("div");
     div.className = `msg private ${isMe ? "me" : ""}`;
     
-    // Use targetUsername when sending, use msg.from when receiving
     const senderToRecipientName = isMe ? "To: " + targetUsername : "From: " + msg.from;
 
     div.innerHTML = `
@@ -920,6 +915,7 @@ function setupPresence() {
     if (!userId) return;
     const ref = totalOnlineRef.child(userId);
     ref.onDisconnect().remove();
+    // Ensures the user's current room is always written
     ref.set({ name: userName, room: currentRoomId, time: firebase.database.ServerValue.TIMESTAMP });
 }
 
@@ -930,8 +926,11 @@ function setupRoomPresenceListener() {
         snap.forEach(c => {
             const u = c.val();
             userMap[u.name] = c.key; 
+            
+            // FIX: Use fallback to 'global' if u.room is missing or null
+            const userRoom = u.room || 'global';
 
-            if(u.room === currentRoomId) {
+            if(userRoom === currentRoomId) { 
                 count++;
                 const div = document.createElement('div');
                 div.className = `user-item ${mutedUserIds[c.key] ? 'muted-user' : ''}`;
@@ -966,7 +965,6 @@ function setupGlobalListeners() {
 
 // ADMIN FEATURE: Room List
 function updateAdminRoomList() {
-    // Stop the previous listener if it's running
     if (adminRoomListListener) totalOnlineRef.off('value', adminRoomListListener);
 
     adminRoomListListener = totalOnlineRef.on('value', snapshot => {
@@ -976,7 +974,7 @@ function updateAdminRoomList() {
             const user = child.val();
             const uid = child.key;
 
-            if (uid === userId) return; // Exclude the admin itself
+            if (uid === userId) return; 
 
             const room = user.room || 'global';
             
