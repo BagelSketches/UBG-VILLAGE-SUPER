@@ -328,7 +328,6 @@ header > span {
     display: none;
     animation: fadeIn 0.3s ease-out;
     box-shadow: 0 3px 5px rgba(0,0,0,0.2);
-    /* MODIFIED: Stack content vertically */
     flex-direction: column; 
     align-items: center;
 }
@@ -338,7 +337,6 @@ header > span {
     border: none;
     border-radius: 4px;
     padding: 5px 10px;
-    /* MODIFIED: Adjust margin for new layout */
     margin: 5px 5px; 
     cursor: pointer;
     font-weight: normal;
@@ -348,7 +346,7 @@ header > span {
     background: #8a1f29;
 }
 
-/* NEW: Admin Room List Styling */
+/* Admin Room List Styling */
 #active-rooms-list-container {
     width: 100%;
     margin-top: 10px; 
@@ -369,7 +367,6 @@ header > span {
     color: #00e6b1;
     font-weight: bold;
 }
-/* END NEW STYLES */
 
 @keyframes fadeIn {
     from { opacity: 0; }
@@ -398,7 +395,6 @@ header > span {
 .delete-btn:hover {
     background: #cc2936;
 }
-/* RESTORED: Edit button styling */
 .edit-btn {
     background: #2a7e78; 
 }
@@ -413,13 +409,12 @@ header > span {
     pointer-events: auto;
 }
 
-/* RESTORED: Edit Input Wrapper */
 .edit-input-wrapper {
     background: #1f2d57;
     padding: 10px;
     border-radius: 12px;
     margin-top: 5px;
-    display: none; /* Hide by default */
+    display: none; 
     gap: 5px;
     align-items: center;
 }
@@ -654,9 +649,10 @@ const auth = firebase.auth();
 const chat = document.getElementById("chat");
 const messageInput = document.getElementById("message");
 const adminBanner = document.getElementById("admin-banner");
-// NEW ADMIN ROOM LIST ELEMENTS
+// ADMIN ROOM LIST ELEMENTS/VARIABLES
 const activeRoomsContent = document.getElementById("active-rooms-content"); 
-// END NEW ELEMENTS
+let adminRoomListListener = null; 
+// END ADMIN VARIABLES
 const emojiPanel = document.getElementById("emoji-panel");
 const roomInput = document.getElementById("room-code-input");
 const roomDisplay = document.getElementById("current-room-display");
@@ -681,7 +677,6 @@ let chatListener = null;
 let chatEditListener = null; 
 let roomPresenceListener = null; 
 let typingListener = null; 
-let adminRoomListListener = null; // NEW LISTENER VARIABLE
 let userMap = {}; 
 
 const totalOnlineRef = db.ref('online'); 
@@ -714,7 +709,7 @@ function saveUsername() {
 
 function finishInitialization() {
     isAdmin = (userId === ADMIN_UID);
-    // REMOVED: if(isAdmin) adminBanner.style.display = 'flex'; - Now controlled by toggleAdminMode click
+    // REMOVED: Initial adminBanner.style.display = 'flex'
     populateEmojis(); 
     setupRoomConnection(currentRoomId); 
     setupGlobalListeners();
@@ -788,7 +783,9 @@ function handleCommand(text) {
             if (targetUid) {
                 const payload = { from: userName, fromId: userId, text: msg, time: Date.now() };
                 privateMessageRef.child(targetUid).push(payload);
-                renderPrivateMessage(payload, true); // show to sender
+                
+                // FIX: Pass the targetName so the sender sees the username
+                renderPrivateMessage(payload, true, targetName); 
             } else {
                 alert("User not found in this room.");
             }
@@ -808,12 +805,10 @@ function renderMessage(snapshot) {
     div.className = `msg ${isMe ? "me" : ""} ${isAdmin ? "admin" : ""}`;
     div.id = key;
 
-    // RESTORED: Edit Button and Delete Button logic
     let buttonsHtml = '';
     if (isMe || isAdmin) {
         buttonsHtml = `<div class="action-buttons">`;
         if (isMe) {
-            // Escape single quotes for the onclick handler
             const safeText = msg.text ? msg.text.replace(/'/g, "&#39;") : '';
             buttonsHtml += `<button class="action-btn edit-btn" onclick="toggleEditInput('${key}', '${safeText}')">Edit</button>`;
         }
@@ -838,17 +833,14 @@ function renderMessage(snapshot) {
     chat.scrollTop = chat.scrollHeight;
 }
 
-// RESTORED: Update existing message (Real-time)
 function updateMessage(snapshot) {
     const val = snapshot.val();
     const textDiv = document.getElementById(`text-${snapshot.key}`);
     if (textDiv) {
-        // Simple update: assumes the message object structure is minimal
         textDiv.textContent = val.text;
     }
 }
 
-// RESTORED: Edit Functions
 function toggleEditInput(key, currentText) {
     const wrapper = document.getElementById(`edit-wrapper-${key}`);
     const input = document.getElementById(`edit-input-${key}`);
@@ -870,13 +862,13 @@ function toggleEditInput(key, currentText) {
 function submitEdit(key) {
     const input = document.getElementById(`edit-input-${key}`);
     const newText = input.value.trim();
-    const MAX_MESSAGE_LENGTH = 500; // Define max length for safety
+    const MAX_MESSAGE_LENGTH = 500; 
     
     if (newText.length > MAX_MESSAGE_LENGTH) return alert(`Message is too long. Max ${MAX_MESSAGE_LENGTH} characters.`);
 
     if (newText) {
         currentRoomRef.child(key).update({ text: newText });
-        toggleEditInput(key); // Close input
+        toggleEditInput(key); 
     }
 }
 
@@ -884,19 +876,17 @@ function deleteMessage(key) {
     if(confirm("Delete this message?")) currentRoomRef.child(key).remove();
 }
 
-function renderPrivateMessage(msg, isMe) {
+// FIX: Added targetUsername argument and logic
+function renderPrivateMessage(msg, isMe, targetUsername = null) { 
     const div = document.createElement("div");
     div.className = `msg private ${isMe ? "me" : ""}`;
     
-    let targetName = 'User'; // Default for safety
-    if (isMe) {
-        // Find the target name from userMap (can be complex, simplify for display)
-        targetName = Object.keys(userMap).find(name => userMap[name] !== userId) || 'Recipient';
-    }
-    
+    // Use targetUsername when sending, use msg.from when receiving
+    const senderToRecipientName = isMe ? "To: " + targetUsername : "From: " + msg.from;
+
     div.innerHTML = `
         <div class="bubble-wrapper">
-            <div class="name whisper-name">${isMe ? "To: " + targetName : "From: " + msg.from} 🔒</div>
+            <div class="name whisper-name">${senderToRecipientName} 🔒</div>
             <div class="bubble">${escapeHtml(msg.text)}</div>
         </div>`;
     chat.appendChild(div);
@@ -904,11 +894,7 @@ function renderPrivateMessage(msg, isMe) {
 }
 
 function setupPrivateMessageListener() {
-    // Note: The previous handleCommand logic assumed the 'targetId' was available on the sender's local copy, 
-    // which is not guaranteed by the original implementation. A full fix would require a more robust private message structure, 
-    // but for now, we render the message received by the listener.
     privateMessageRef.child(userId).on('child_added', snap => {
-        // Render the message received (which is always 'not me')
         renderPrivateMessage(snap.val(), false);
         snap.ref.remove(); // Delete after reading
     });
@@ -934,8 +920,7 @@ function setupPresence() {
     if (!userId) return;
     const ref = totalOnlineRef.child(userId);
     ref.onDisconnect().remove();
-    // ADDED time to presence for more stable admin list sort/display
-    ref.set({ name: userName, room: currentRoomId, time: firebase.database.ServerValue.TIMESTAMP }); 
+    ref.set({ name: userName, room: currentRoomId, time: firebase.database.ServerValue.TIMESTAMP });
 }
 
 function setupRoomPresenceListener() {
@@ -944,7 +929,7 @@ function setupRoomPresenceListener() {
         let count = 0; userMap = {}; userList.innerHTML = '';
         snap.forEach(c => {
             const u = c.val();
-            userMap[u.name] = c.key; // Populate userMap for /whisper
+            userMap[u.name] = c.key; 
 
             if(u.room === currentRoomId) {
                 count++;
@@ -984,7 +969,6 @@ function updateAdminRoomList() {
     // Stop the previous listener if it's running
     if (adminRoomListListener) totalOnlineRef.off('value', adminRoomListListener);
 
-    // Set up a new listener to fetch all online users and group them by room
     adminRoomListListener = totalOnlineRef.on('value', snapshot => {
         const usersByRoom = {};
         
