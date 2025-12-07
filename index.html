@@ -321,8 +321,8 @@ h1 {
 
 
 <div class="game-buttons">
-  <button onclick="openGame('Chatroom.html')"> <img src="whatsapp.jpg">Launch_Chat</button>
-<button onclick="openGame('https://padlet.com/aidyndmello1/chat-room-24cgu4gx03ubczes')"> <img src="img/596-uu.png">Launch_Comments</button>
+      <button onclick="openGame('chatroom.html')"> <img src="whatsapp.jpg">Launch_Chat</button>
+      <button onclick="openGame('https://padlet.com/aidyndmello1/chat-room-24cgu4gx03ubczes')"> <img src="img/596-uu.png">Launch_Comments</button>
       <button onclick="openGame('https://discord.gg/qDrefFBQUs')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/dc.png">Join_Discord</button>
       <button onclick="openGame('https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit?usp=sharing')"> <img src="camera.png">Launch_Movies/TV</button>
       <button onclick="openGame('GAMES/bloons5.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/75.png">Launch_Bloons_Tower_Defense_5</button>
@@ -396,28 +396,38 @@ h1 {
 <script>
 function openGame(url) {
 
-  // ALLOW DISCORD TO OPEN NORMALLY
-  if (url.includes("discord.gg") || url.includes("discord.com")) {
+  // EXCLUSIONS (OPEN NORMALLY)
+  if (
+    url.includes("discord.gg") ||
+    url.includes("discord.com") ||
+    url.includes("chatroom.html")
+  ) {
     window.open(url, "_blank");
     return;
   }
 
   // OPEN EVERYTHING ELSE IN OVERLAY
-  document.getElementById("gameOverlay").style.display = "flex";
-  document.getElementById("gameFrame").src = url;
+  let overlay = document.getElementById("gameOverlay");
+  let frame = document.getElementById("gameFrame");
 
-  // find button information
+  overlay.style.display = "flex";
+  frame.src = url;
+
+  // FIND BUTTON DATA
   let btn = [...document.querySelectorAll(".game-buttons button")]
-              .find(b => b.getAttribute("onclick") === `openGame('${url}')`);
+              .find(b => b.getAttribute("onclick")?.includes(url));
 
   if (btn) {
-  let name = btn.innerText.trim();
-  let img = btn.querySelector("img").src;
-  addRecentGame(name, url, img);
+    let name = btn.innerText.trim();
+    let img = btn.querySelector("img")?.src;
 
-  // Update top bar game title
-  document.getElementById("gameTitle").innerText = name;
+    addRecentGame(name, url, img);
+
+    // UPDATE TOP BAR TITLE
+    document.getElementById("gameTitle").innerText = name;
+  }
 }
+
 
 
 
@@ -428,8 +438,7 @@ document.getElementById("closeGame").onclick = () => {
   document.getElementById("gameTitle").innerText = "No game"; // reset
 };
 
-  
-};
+
 
 // FULLSCREEN TOGGLE
 document.getElementById("fullScreenBtn").onclick = () => {
