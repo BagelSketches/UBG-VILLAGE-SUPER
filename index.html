@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,324 +6,352 @@
 <title>UBG-Village-Pro</title>
 <link rel="icon" type="image/png" href="icon128.png">
 
-
 <style>
-  <style>
-#recentlyPlayedHeader {
-  opacity: 0;              /* hidden by default */
-  transition: opacity 0.3s ease; /* smooth fade */
-}
-
-#recentlyPlayedHeader.visible {
-  opacity: 1;              /* fully visible */
-}
-
-
-
-  /* RECENTLY PLAYED HEADER */
-#recentlyPlayedHeader {
-  color: var(--accent);
-  transition: 0.2s;
-}
-
+  /* --- CUSTOM PROPERTIES & ACCENTS --- */
   :root {
-  --accent: #00ff00;
-  --bgGlow: rgba(0,255,0,0.3);
-}
+    --accent: #00ff00;
+    --bgGlow: rgba(0,255,0,0.3);
+    --dark-bg: #0a0a0a;
+    --card-bg: rgba(0,255,0,0.05); /* Lighter background for game cards */
+  }
 
-/* APPLY TO BUTTONS */
-button {
-  border-color: var(--accent) !important;
-  color: var(--accent) !important;
-  box-shadow: 0 0 10px var(--bgGlow) !important;
-}
+  /* --- BASE & UTILITY --- */
+  body {
+    margin: 0;
+    background: var(--dark-bg);
+    color: white;
+    font-family: 'Consolas', 'Monospace', sans-serif; /* Hacker-style font */
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* DARK OVERLAY (IMPROVE READABILITY) */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: -1;
+  }
+  
+  /* MATRIX CANVAS */
+  #matrix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2; /* Put behind the overlay */
+  }
+  
+  /* --- NAVIGATION BAR --- */
+  #navbar {
+    position: sticky;
+    top: 0;
+    width: 98%;
+    background: rgba(0, 0, 0, 0.9);
+    border-bottom: 2px solid var(--accent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
 
-/* GAME BUTTON HOVER */
-.game-buttons button:hover {
-  background: var(--bgGlow) !important;
-}
+  #navbar-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--accent);
+    text-shadow: 0 0 5px var(--bgGlow);
+  }
 
-/* HEADER LINE */
-#topBar {
-  border-bottom-color: var(--accent) !important;
-}
+  #navbar-links button, #navbar-links a {
+    background: none;
+    border: none;
+    color: var(--accent);
+    padding: 8px 15px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+  
+  #navbar-links button:hover, #navbar-links a:hover {
+    color: white;
+    text-shadow: 0 0 8px var(--accent);
+  }
+  
+  /* --- SPLASH SCREEN --- */
+  #splashScreen {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    /* Ensure splash screen is visible initially */
+    display: flex; 
+  }
+  
+  #splashScreen h1 {
+    font-size: 6em;
+    color: var(--accent);
+    text-shadow: 0 0 20px var(--bgGlow);
+    margin-bottom: 0.1em;
+  }
+  
+  #splashScreen p {
+    font-size: 1.5em;
+    color: #ccc;
+    line-height: 1.5;
+    margin-top: 0;
+  }
 
-/* SELECT THEME DROPDOWN */
-#themeSelect {
-  background:black;
-  color:var(--accent);
-  border:2px solid var(--accent);
-  border-radius:8px;
-  padding:6px;
-}
-
-
-  #recentlyPlayed {
-  margin-bottom: 80px; /* adjust spacing */
-}
-
-#recentlyPlayed button {
-  background: rgba(0, 255, 0, 0.1);
-  border: 1px solid lime;
-}
-
-#recentlyPlayed button:hover {
-  background: rgba(0, 255, 0, 0.3);
-}
-
-
-  /* GAME OVERLAY */
-#gameOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: black;
-  display: none;
-  flex-direction: column;
-  z-index: 9999;
-}
-
-/* TOP BAR */
-#topBar {
-  width: 98%;
-  height: 50px;
-  background: #111;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 15px;
-  border-bottom: 2px solid #00ff00;
-}
-
-/* THEME-DEPENDENT ELEMENTS */
-#topBar button {
-  background: black;
-  color: var(--accent);
-  border: 2px solid var(--accent);
-  padding: 8px 14px;
-  border-radius: 15px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: 0.2s;
-}
-
-#topBar button:hover {
-  background: var(--accent);
-  color: black;
-}
-
-/* GAME FRAME */
-#gameFrame {
-  width: 100%;
-  height: calc(100vh - 50px);
-  border: none;
-}
-
+  /* --- MAIN CONTENT & GAME GRID --- */
+  #mainContent {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 30px;
+    display: none; /* Initially hidden, shown by showMainContent() */
+  }
 
   .site-logo {
-  display: block;
-  margin: 0 auto 15px;
-  width: 400px;     /* change size if needed */
-  max-width: 90%;
-  height: auto;
-  filter: drop-shadow(0 0 10px #00ff00); /* optional glow */
-}
+    display: block;
+    margin: 0 auto 15px;
+    width: 250px;
+    max-width: 90%;
+    height: auto;
+    filter: drop-shadow(0 0 10px var(--accent));
+  }
+  
+  #recentlyPlayedHeader {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: var(--accent);
+  }
+  
+  #recentlyPlayedHeader.visible {
+    opacity: 1;
+  }
 
- 
-  /* DARK OVERLAY TO IMPROVE READABILITY */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55); /* adjust 0.45–0.7 for brightness control */
-  z-index: -1;
-}
+  #randomGameBtn {
+    background: var(--dark-bg);
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--bgGlow);
+    transition: 0.2s;
+  }
 
+  #randomGameBtn:hover {
+    background: var(--card-bg);
+    box-shadow: 0 0 15px var(--bgGlow);
+  }
 
- 
-body {
-  margin: 0;
-  background: black;
-  color: white;
-  font-family: Arial, sans-serif;
-  overflow-x: hidden;
-}
+  #searchBar {
+    width: 100%;
+    max-width: 420px;
+    display: block;
+    margin: 20px auto;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 16px;
+    border: 2px solid var(--accent);
+    outline: none;
+    text-align: center;
+    background: rgba(0,0,0,0.9);
+    color: white;
+    transition: 0.2s;
+    box-shadow: 0 0 8px var(--bgGlow);
+  }
 
+  .game-buttons {
+    display: grid;
+    /* MODIFIED: Set to exactly 5 columns with equal width on large screens */
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 20px;
+    margin-top: 25px;
+  }
 
-/* MATRIX CANVAS */
-#matrix {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-}
+  .game-buttons button {
+    background: var(--card-bg);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 15px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+    box-shadow: 0 0 8px var(--bgGlow);
+    transition: 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 150px;
+  }
 
+  .game-buttons button:hover {
+    background: rgba(0, 255, 0, 0.15);
+    box-shadow: 0 0 15px var(--bgGlow);
+    transform: translateY(-2px);
+  }
 
-/* CONTENT */
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 30px;
-  position: relative;
-}
+  .game-buttons img {
+    width: 64px;
+    height: 64px;
+    display: block;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  
+  /* GAME OVERLAY */
+  #gameOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    display: none;
+    flex-direction: column;
+    z-index: 9999;
+  }
 
+  #topBar { /* Game Overlay Top Bar */
+    width: 98%;
+    height: 50px;
+    background: #111;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 15px;
+    border-bottom: 2px solid var(--accent);
+  }
 
-h1 {
-  text-align: center;
-  color: #04cb51;
-}
+  #topBar button {
+    background: black;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    padding: 8px 14px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+  }
 
+  #topBar button:hover {
+    background: var(--accent);
+    color: black;
+  }
+  
+  #gameFrame {
+    width: 100%;
+    height: calc(100vh - 82px); /* Adjusted height for the topBar */
+    border: none;
+  }
+  
+  #themeSelect {
+    background:var(--dark-bg);
+    color:var(--accent);
+    border:2px solid var(--accent);
+    border-radius:8px;
+    padding:6px;
+  }
 
-/* SEARCH BAR */
-#searchBar {
-  width: 100%;
-  max-width: 420px;
-  display: block;
-  margin: 20px auto;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 16px;
-  border: 2px solid var(--theme-color);
-  outline: none;
-  text-align: center;
-  background: rgba(0,0,0,0.9);
-  color: white;
-  transition: 0.2s;
-}
+  /* MEDIA QUERIES for smaller screens */
+  @media (max-width: 768px) {
+    #navbar {
+      padding: 10px 15px;
+      flex-direction: column;
+    }
+    #navbar-links {
+      margin-top: 10px;
+    }
+    #navbar-title {
+      font-size: 20px;
+    }
+    #splashScreen h1 {
+      font-size: 4em;
+    }
+    #splashScreen p {
+      font-size: 1.2em;
+    }
+    .game-buttons {
+      /* Scales down grid for mobile */
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
+    }
+  }
 
-
-
-/* RANDOM BUTTON */
-#randomGameBtn {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  background: black;
-  color: lime;
-  border: 2px solid lime;
-  padding: 10px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-
-.game-buttons button {
-  background: rgba(0, 200, 255, 0.15);
-  color: #eaffff;
-  border: 2px solid #00ffff;
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: center;
-  font-weight: 600;
-  box-shadow: 0 0 10px rgba(0,255,255,0.6);
-  text-shadow: 0 0 6px rgba(0,255,255,0.6);
-  transition: 0.2s;
-}
-
-
-.game-buttons button:hover {
-  background: rgba(0,255,255,0.5);
-  box-shadow: 0 0 18px rgba(0,255,255,0.9);
-}
-
-
-/* GAME GRID */
-.game-buttons {
-  display: grid;
-  grid-template-columns: repeat(5,1fr);
-  gap: 20px;
-  margin-top: 25px;
-}
-
-
-.game-buttons button {
-  background: rgba(0, 0, 0, 0.15);
-  color: rgb(0, 201, 67);
-  border: 1px solid rgb(0, 155, 67);
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: center;
-}
-
-
-.game-buttons button:hover {
-  background: rgba(0,255,255,0.3);
-}
-
-
-.game-buttons img {
-  width: 96px;
-  height: 96px;
-  display: block;
-  margin: auto;
-  margin-bottom: 8px;
-}
 </style>
 </head>
 
-<!-- GAME OVERLAY (hidden by default) -->
-<div id="gameOverlay">
-<div id="topBar">
-  <span id="gameTitle" style="color: var(--accent); font-weight:bold;">No game</span>
-  <div>
-    <button id="closeGame">✖ Close</button>
-    <button id="fullScreenBtn">⛶ Fullscreen</button>
+<body>
+<canvas id="matrix"></canvas>
+
+<div id="navbar">
+  <div id="navbar-title">UBG-Village-Pro</div>
+  <div id="navbar-links">
+    <button onclick="showMainContent()">GAMES</button> 
+    <a href="https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit?usp=sharing" target="_blank">MOVIES/TV</a>
+    <a href="https://discord.gg/qDrefFBQUs" target="_blank">DISCORD</a>
   </div>
 </div>
 
+<div id="gameOverlay">
+  <div id="topBar">
+    <span id="gameTitle" style="color: var(--accent); font-weight:bold;">No game</span>
+    <div>
+      <button id="closeGame">✖ Close</button>
+      <button id="fullScreenBtn">⛶ Fullscreen</button>
+    </div>
+  </div>
   <iframe id="gameFrame" src="" frameborder="0" allowfullscreen></iframe>
 </div>
 
-
-<body>
- 
-
-<canvas id="matrix"></canvas>
-
-
-<div class="container panel">
-<img src="UBP.png" alt="UBG Village Pro Logo" class="site-logo">
+<div id="splashScreen">
+  <h1>UBG-Village-Pro</h1>
+  <p>A curated collection of unblocked games and community tools. Access thousands of hours of fun, chat with friends, or dive into a movie or TV show—all in one place.</p>
+</div>
 
 
+<div id="mainContent" class="container panel">
+  <img src="UBP.png" alt="UBG Village Pro Logo" class="site-logo">
 
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random</button>
+    <select id="themeSelect" onchange="setTheme(this.value)">
+      <option value="green">Green</option>
+      <option value="blue">Blue</option>
+      <option value="red">Red</option>
+      <option value="purple">Purple</option>
+      <option value="gold">Gold</option>
+    </select>
+  </div>
 
+  <h1 id="recentlyPlayedHeader">Recently Played</h1>
+  <button id="clearRecentBtn" style="margin-bottom:15px; border:1px solid var(--accent); color:var(--accent); background: var(--dark-bg); padding:6px 12px; border-radius:8px; cursor:pointer;">
+    Clear Recently Played
+  </button>
+  <div id="recentlyPlayed" class="game-buttons"></div>
 
+  <input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames()">
 
-
-<button id="randomGameBtn" onclick="openRandomGame()">🎲 Random</button>
-
-<select id="themeSelect" onchange="setTheme(this.value)" style="margin-left:10px;">
-  <option value="green">Green</option>
-  <option value="blue">Blue</option>
-  <option value="red">Red</option>
-  <option value="purple">Purple</option>
-  <option value="gold">Gold</option>
-</select>
-
-
-
-<h1 id="recentlyPlayedHeader">Recently Played</h1>
-<button id="clearRecentBtn" style="margin-bottom:15px; border:1px solid var(--accent); color:var(--accent); background: rgba(0,0,0,0.2); padding:6px 12px; border-radius:8px; cursor:pointer;">
-  Clear Recently Played
-</button>
-<div id="recentlyPlayed" class="game-buttons"></div>
-
-
-<input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames()">
-
-
-
-<div class="game-buttons">
-      <button onclick="openGame('chatroom.html')"> <img src="whatsapp.jpg">Launch_Chat</button>
+  <div class="game-buttons" id="allGamesGrid">
+    <button onclick="openGame('chatroom.html')"> <img src="whatsapp.jpg">Launch_Chat</button>
       <button onclick="openGame('https://padlet.com/aidyndmello1/chat-room-24cgu4gx03ubczes')"> <img src="img/596-uu.png">Launch_Comments</button>
-      <button onclick="openGame('https://discord.gg/qDrefFBQUs')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/dc.png">Join_Discord</button>
-      <button onclick="openGame('https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit?usp=sharing')"> <img src="camera.png">Launch_Movies/TV</button>
       <button onclick="openGame('GAMES/bloons5.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/75.png">Launch_Bloons_Tower_Defense_5</button>
       <button onclick="openGame('bitlife/bitlife.html')"> <img src="img/3.webp">Launch_Bitlife</button>
       <button onclick="openGame('https://devilapig247.github.io/block-blast/')"> <img src="img/4.webp">Launch_Block_Blast</button>
@@ -373,7 +400,7 @@ h1 {
       <button onclick="openGame('GAMES/Spiral Roll.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/349.png">Launch_Spiral_Roll</button>
       <button onclick="openGame('GAMES/Thats Not My Neighbor.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/216.png">Launch_Thats_Not_My_Neighbor</button>
       <button onclick="openGame('GAMES/Vex 5.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/50.png">Launch_Vex_5</button>
-      <button onclick="openGame('GAMES/Gunblood.html')"> <img src="data:image/jpeg;base64,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">Launch_Gunblood</button>
+      <button onclick="openGame('GAMES/Gunblood.html')"> <img src="gunblood.png">Launch_Gunblood</button>
       <button onclick="openGame('GAMES/Slender.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/451.png">Launch_Senderman</button>
       <button onclick="openGame('GAMES/1v1.lol.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/58.png">Launch_1v1.lol</button>
       <button onclick="openGame('GAMES/Clustertruck.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/81.png">Launch_Clustertruck</button>
@@ -387,20 +414,24 @@ h1 {
       <button onclick="openGame('Celeste.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/623.png">Launch_Celeste</button>
       <button onclick="openGame('ULTRAKILL.html')"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/196.png">Launch_ULTRAKILL</button>
       <button onclick="openGame('Balatro.html')"> <img src="Balatro.jpg">Launch_Balatro</button>
-</div>
-
-
+  </div>
 </div>
 
 
 <script>
-function openGame(url) {
+// --- PAGE NAVIGATION LOGIC ---
+function showMainContent() {
+  document.getElementById("splashScreen").style.display = "none";
+  document.getElementById("mainContent").style.display = "block";
+}
 
+function openGame(url) {
   // EXCLUSIONS (OPEN NORMALLY)
   if (
     url.includes("discord.gg") ||
     url.includes("discord.com") ||
-    url.includes("chatroom.html")
+    url.includes("chatroom.html") ||
+    url.includes("docs.google.com")
   ) {
     window.open(url, "_blank");
     return;
@@ -414,11 +445,12 @@ function openGame(url) {
   frame.src = url;
 
   // FIND BUTTON DATA
-  let btn = [...document.querySelectorAll(".game-buttons button")]
+  let btn = [...document.querySelectorAll("#allGamesGrid button, #recentlyPlayed button")]
               .find(b => b.getAttribute("onclick")?.includes(url));
 
   if (btn) {
-    let name = btn.innerText.trim();
+    // Clean up the button text to just get the name (e.g., 'Launch_GameName' -> 'GameName')
+    let name = btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ');
     let img = btn.querySelector("img")?.src;
 
     addRecentGame(name, url, img);
@@ -429,16 +461,14 @@ function openGame(url) {
 }
 
 
-
+// --- EXISTING GAME/OVERLAY LOGIC (RETAINED) ---
 
 // CLOSE GAME
 document.getElementById("closeGame").onclick = () => {
   document.getElementById("gameOverlay").style.display = "none";
   document.getElementById("gameFrame").src = "";
-  document.getElementById("gameTitle").innerText = "No game"; // reset
+  document.getElementById("gameTitle").innerText = "No game";
 };
-
-
 
 // FULLSCREEN TOGGLE
 document.getElementById("fullScreenBtn").onclick = () => {
@@ -453,18 +483,23 @@ document.getElementById("fullScreenBtn").onclick = () => {
 
 
 // SEARCH FILTER
+const searchBar = document.getElementById("searchBar");
 function filterGames() {
   let search = searchBar.value.toLowerCase();
-  document.querySelectorAll(".game-buttons button").forEach(btn=>{
-    btn.style.display = btn.textContent.toLowerCase().includes(search) ? "block" : "none";
+  document.querySelectorAll("#allGamesGrid button, #recentlyPlayed button").forEach(btn=>{
+    // **FIX FOR GRID LAYOUT**: Clear the inline display style ("") instead of setting it to "block"
+    // This allows the CSS grid (display: grid) to take over and show the buttons in a 5-column layout.
+    btn.style.display = btn.textContent.toLowerCase().includes(search) ? "" : "none";
   });
 }
 
 
 // RANDOM PICK
 function openRandomGame(){
-  let visible = [...document.querySelectorAll(".game-buttons button")].filter(b=>b.style.display!="none");
-  visible[Math.floor(Math.random()*visible.length)]?.click();
+  let visible = [...document.querySelectorAll("#allGamesGrid button")].filter(b=>b.style.display!="none");
+  if (visible.length > 0) {
+    visible[Math.floor(Math.random()*visible.length)]?.click();
+  }
 }
 
 // SAVE RECENTLY PLAYED
@@ -488,13 +523,14 @@ function addRecentGame(name, url, img) {
 function displayRecentGames() {
   let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
   let container = document.getElementById("recentlyPlayed");
+  let header = document.getElementById("recentlyPlayedHeader");
   let clearBtn = document.getElementById("clearRecentBtn");
 
-  // Hide button if no recent games
   if (recent.length === 0) {
-    container.innerHTML = "";  // clear container
-    clearBtn.style.display = "none";  // hide button
-    container.style.marginBottom = "10px"; // smaller gap when empty
+    container.innerHTML = "";
+    clearBtn.style.display = "none";
+    header.classList.remove("visible");
+    container.style.marginBottom = "10px";
   } else {
     container.innerHTML = recent.map(g => `
       <button onclick="openGame('${g.url}')">
@@ -502,15 +538,23 @@ function displayRecentGames() {
         ${g.name}
       </button>
     `).join("");
-    clearBtn.style.display = "inline-block"; // show button
-    container.style.marginBottom = "80px"; // normal gap
+    clearBtn.style.display = "inline-block";
+    header.classList.add("visible");
+    container.style.marginBottom = "80px";
   }
 }
 
 
-
 // Load on page start
-displayRecentGames();
+window.addEventListener("DOMContentLoaded", () => {
+  // Theme Loading Logic
+  let savedTheme = localStorage.getItem("theme") || "green"; // default green
+  setTheme(savedTheme);
+  document.getElementById("themeSelect").value = savedTheme;
+
+  // Recent Games Logic
+  displayRecentGames();
+});
 
 // CLEAR RECENTLY PLAYED
 document.getElementById("clearRecentBtn").onclick = () => {
@@ -519,9 +563,28 @@ document.getElementById("clearRecentBtn").onclick = () => {
 };
 
 
+// --- THEME LOGIC (RETAINED) ---
+const themes = {
+  green:  { accent:"#00ff00", glow:"rgba(0,255,0,0.4)" },
+  blue:   { accent:"#00ffff", glow:"rgba(0,200,255,0.4)" },
+  red:    { accent:"#ff0033", glow:"rgba(255,0,0,0.4)" },
+  purple: { accent:"#b700ff", glow:"rgba(190,0,255,0.4)" },
+  gold:   { accent:"#ffcc00", glow:"rgba(255,204,0,0.4)" }
+};
+
+function setTheme(name){
+  let t = themes[name];
+  if(!t) return;
+
+  document.documentElement.style.setProperty("--accent", t.accent);
+  document.documentElement.style.setProperty("--bgGlow", t.glow);
+
+  // Save selected theme
+  localStorage.setItem("theme", name);
+}
 
 
-// MATRIX RAIN SETUP
+// --- MATRIX RAIN SETUP (RETAINED) ---
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 
@@ -541,8 +604,8 @@ function drawMatrix() {
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
 
- ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--accent");
- ctx.font = fontSize + "px monospace";
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--accent");
+  ctx.font = fontSize + "px monospace";
 
 
   for(let i=0;i<drops.length;i++){
@@ -565,45 +628,7 @@ window.onresize = ()=>{
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 };
-const themes = {
-  green:  { accent:"#00ff00", glow:"rgba(0,255,0,0.4)" },
-  blue:   { accent:"#00ffff", glow:"rgba(0,200,255,0.4)" },
-  red:    { accent:"#ff0033", glow:"rgba(255,0,0,0.4)" },
-  purple: { accent:"#b700ff", glow:"rgba(190,0,255,0.4)" },
-  gold:   { accent:"#ffcc00", glow:"rgba(255,204,0,0.4)" }
-};
-
-// SET THEME
-function setTheme(name){
-  let t = themes[name];
-  if(!t) return;
-
-  document.documentElement.style.setProperty("--accent", t.accent);
-  document.documentElement.style.setProperty("--bgGlow", t.glow);
-
-  // Save selected theme
-  localStorage.setItem("theme", name);
-}
-
-// LOAD THEME ON START
-window.addEventListener("DOMContentLoaded", () => {
-  let savedTheme = localStorage.getItem("theme") || "green"; // default green
-  setTheme(savedTheme);
-
-  // Also update the dropdown to match saved theme
-  document.getElementById("themeSelect").value = savedTheme;
-});
-
-if (recent.length === 0) {
-    container.style.marginBottom = "10px";
-    document.getElementById("searchBar").style.marginTop = "10px";
-} else {
-    container.style.marginBottom = "80px";
-    document.getElementById("searchBar").style.marginTop = "20px";
-}
-
 </script>
-
 
 </body>
 </html>
