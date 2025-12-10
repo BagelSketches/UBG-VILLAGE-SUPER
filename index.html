@@ -250,11 +250,26 @@
     cursor: pointer;
     font-size: 16px;
     transition: 0.2s;
+    margin-left: 5px; /* Added spacing between buttons */
   }
 
   #topBar button:hover {
     background: var(--accent);
     color: black;
+  }
+  
+  /* Specific style for the panic button for quick visual distinction */
+  #panicButton {
+    background: #ff0000 !important;
+    border-color: #ff0000 !important;
+    color: white !important;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  }
+  
+  #panicButton:hover {
+    background: #cc0000 !important;
+    color: white !important;
   }
   
   #gameFrame {
@@ -314,6 +329,8 @@
   <div id="topBar">
     <span id="gameTitle" style="color: var(--accent); font-weight:bold;">No game</span>
     <div>
+      <button id="panicButton">🚨 Panic!</button>
+      
       <button id="closeGame">✖ Close</button>
       <button id="fullScreenBtn">⛶ Fullscreen</button>
     </div>
@@ -459,6 +476,14 @@ function openGame(url) {
     document.getElementById("gameTitle").innerText = name;
   }
 }
+
+// ⭐ NEW PANIC BUTTON LOGIC ⭐
+const panicURL = "https://llv.instructure.com/"; // <--- CHANGE THIS URL TO YOUR DESIRED REDIRECTION SITE!
+
+document.getElementById("panicButton").onclick = () => {
+  // Use replace to prevent the user from hitting the back button to return to the site
+  window.location.replace(panicURL);
+};
 
 
 // --- EXISTING GAME/OVERLAY LOGIC (RETAINED) ---
