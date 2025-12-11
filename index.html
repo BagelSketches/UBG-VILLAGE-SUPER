@@ -52,6 +52,15 @@
     cursor: none !important;
   }
 
+  /* NEW CSS for cursor toggle: Re-enables system cursor and hides custom cursor */
+  body.system-cursor * {
+    cursor: default !important; 
+  }
+
+  body.system-cursor #customCursor {
+    display: none !important; 
+  }
+
   /* The actual custom cursor element */
   #customCursor {
     position: fixed;
@@ -496,20 +505,28 @@
       margin-top: 5px;
   }
   
-  /* Correctly scoped CSS for buttons, select, AND color picker input in settings modal */
+  /* Correctly scoped CSS for buttons, select, AND color picker/text input in settings modal */
   #settingsModal select, 
   #settingsModal button, 
-  #settingsModal input[type="color"] {
+  #settingsModal input[type="color"],
+  #settingsModal input[type="text"] { /* ADDED text input */
       background: var(--dark-bg);
       color: var(--accent);
       border: 2px solid var(--accent);
       border-radius: 8px;
       padding: 8px;
       width: 100%;
+      box-sizing: border-box; /* Ensures padding is inside the width */
       cursor: pointer;
       margin-top: 10px;
       transition: background 0.2s, color 0.2s;
   }
+  
+  /* Ensure the text input is still input-style when not hovered */
+  #settingsModal input[type="text"] {
+    cursor: text;
+  }
+
 
   /* Specific styling for the color input to make the swatch visible and styled */
   #settingsModal input[type="color"] {
@@ -579,6 +596,17 @@
     <div class="setting-group">
         <label for="themeColorPicker">Theme Color:</label>
         <input type="color" id="themeColorPicker" value="#00ff00" oninput="setTheme(this.value)">
+    </div>
+    
+    <div class="setting-group">
+        <label for="cursorToggleBtn">Custom Cursor:</label>
+        <button id="cursorToggleBtn" onclick="toggleCustomCursor()">Disable</button>
+    </div>
+
+    <div class="setting-group">
+        <label for="panicUrlInput">Panic Button URL:</label>
+        <input type="text" id="panicUrlInput" placeholder="https://llv.instructure.com">
+        <button onclick="savePanicUrl()">Save Panic URL</button>
     </div>
     
     <div class="setting-group">
@@ -727,9 +755,16 @@
 
 <script>
 // --- GLOBAL CONFIG ---
-const panicURL = "https://llv.instructure.com/";
+// MODIFIED: Use localStorage key for panic URL
+const PANIC_URL_KEY = "customPanicUrl";
+const DEFAULT_PANIC_URL = "https://llv.instructure.com/";
+let currentPanicURL; // Variable to hold the active URL
+
 let matrixInterval;
-const FAVORITES_KEY = "favoriteGames"; // Key for favorite games storage
+const FAVORITES_KEY = "favoriteGames"; 
+
+// Global variable for cursor state before game launch
+let wasCursorEnabledBeforeGame = true;
 
 // --- GAME DETAILS DATA (NEW) ---
 const gameDetails = {
@@ -837,6 +872,15 @@ function closeGameDetailsModal() {
 function launchGame(url) {
     // 1. Close the Details Modal
     closeGameDetailsModal(); 
+    
+    // --- NEW: Custom Cursor Disable Logic ---
+    // 1. Store the user's current preference before overriding it
+    wasCursorEnabledBeforeGame = localStorage.getItem("customCursorEnabled") !== "false";
+
+    // 2. Force system cursor for game by adding the system-cursor class
+    document.body.classList.add("system-cursor");
+    // ----------------------------------------
+
 
     let overlay = document.getElementById("gameOverlay");
     let frame = document.getElementById("gameFrame");
@@ -876,15 +920,17 @@ window.onclick = function(event) {
 }
 
 // ⭐ PANIC BUTTON LOGIC & AUTOPANIC KEYBINDING ⭐
+// MODIFIED: Use the dynamic currentPanicURL variable
 document.getElementById("panicButton").onclick = () => {
-  window.location.replace(panicURL);
+  window.location.replace(currentPanicURL);
 };
 
 document.addEventListener('keydown', (e) => {
     // Check for Ctrl+Shift+P (or Cmd+Shift+P on Mac)
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
         e.preventDefault(); // Prevent browser print dialog
-        window.location.replace(panicURL);
+        // MODIFIED: Use the dynamic currentPanicURL variable
+        window.location.replace(currentPanicURL);
     }
 });
 
@@ -896,6 +942,13 @@ document.getElementById("closeGame").onclick = () => {
   document.getElementById("gameOverlay").style.display = "none";
   document.getElementById("gameFrame").src = ""; // Clear iframe source
   document.getElementById("gameTitle").innerText = "No game";
+
+  // --- NEW: Restore Custom Cursor Logic ---
+  // Restore the user's preference state when closing the game
+  if (wasCursorEnabledBeforeGame) {
+      document.body.classList.remove("system-cursor"); // Re-enable custom cursor
+  } 
+  // ----------------------------------------
 };
 
 // FULLSCREEN TOGGLE
@@ -1013,7 +1066,7 @@ function displayRecentGames() {
 
 function clearRecentGames() {
   localStorage.removeItem("recentGames");
-  initializeGameGrids();
+  initializeGameGrids(); // Refresh grids
   alert("Recently Played list cleared!");
 }
 
@@ -1145,6 +1198,63 @@ function initializeGameGrids() {
 
 // --- THEME & SETTINGS LOGIC ---
 
+// NEW FUNCTION: Save the custom panic URL
+function savePanicUrl() {
+    const input = document.getElementById("panicUrlInput");
+    let newUrl = input.value.trim();
+
+    // Simple validation: ensure it looks like a URL, add https:// if missing
+    if (newUrl && !newUrl.startsWith("http")) {
+        newUrl = "https://" + newUrl;
+    }
+    
+    // If the input is empty, reset to default
+    if (!newUrl) {
+      newUrl = DEFAULT_PANIC_URL;
+    }
+    
+    localStorage.setItem(PANIC_URL_KEY, newUrl);
+    currentPanicURL = newUrl; // Update global variable immediately
+    input.value = newUrl; // Update input field with standardized URL
+    
+    alert("Panic URL saved successfully to: " + newUrl);
+}
+
+// Function to toggle the custom cursor
+function toggleCustomCursor() {
+    const isCurrentlyEnabled = localStorage.getItem("customCursorEnabled") !== "false";
+    const newState = !isCurrentlyEnabled;
+    
+    // Apply state
+    if (newState) {
+        document.body.classList.remove("system-cursor");
+    } else {
+        document.body.classList.add("system-cursor");
+    }
+    
+    // Save state
+    localStorage.setItem("customCursorEnabled", newState ? "true" : "false");
+
+    // Update button text
+    const toggleBtn = document.getElementById("cursorToggleBtn");
+    if (toggleBtn) {
+        toggleBtn.innerText = newState ? "Disable" : "Enable";
+    }
+}
+
+// NEW: Function to initialize cursor state from local storage
+function initializeCursorState() {
+    // Default is true. Only explicitly disable if saved as "false".
+    const isEnabled = localStorage.getItem("customCursorEnabled") !== "false"; 
+    
+    if (isEnabled) {
+        document.body.classList.remove("system-cursor");
+    } else {
+        document.body.classList.add("system-cursor");
+    }
+}
+
+
 // Helper function to convert hex to RGB
 function hexToRgb(hex) {
     // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
@@ -1203,6 +1313,14 @@ function toggleSettingsModal() {
       document.getElementById("matrixSpeed").value = localStorage.getItem("matrixSpeed") || "45";
       // Load and set the matrix text type value
       document.getElementById("matrixText").value = localStorage.getItem("matrixTextType") || "binary";
+      
+      // Load and set custom cursor state text on button
+      const isCursorEnabled = localStorage.getItem("customCursorEnabled") !== "false";
+      document.getElementById("cursorToggleBtn").innerText = isCursorEnabled ? "Disable" : "Enable";
+      
+      // NEW: Load panic URL into input
+      document.getElementById("panicUrlInput").value = currentPanicURL;
+
     }
     modal.style.display = modal.style.display === "block" ? "none" : "block";
 }
@@ -1264,6 +1382,9 @@ function initializeMatrix() {
 
 // Load on page start
 window.addEventListener("DOMContentLoaded", () => {
+  // Load the panic URL first
+  currentPanicURL = localStorage.getItem(PANIC_URL_KEY) || DEFAULT_PANIC_URL;
+
   // Theme Loading Logic
   let savedColor = localStorage.getItem("themeColor") || "#00ff00"; // default green hex
   setTheme(savedColor); // Use the color hex directly
@@ -1273,6 +1394,9 @@ window.addEventListener("DOMContentLoaded", () => {
   
   // Game Grid Initialization (handles Recents and Favorites)
   initializeGameGrids();
+  
+  // Custom Cursor Initialization
+  initializeCursorState();
 });
 
 </script>
