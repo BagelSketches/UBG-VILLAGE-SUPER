@@ -2,1403 +2,206 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>UBG-Village-Pro</title>
-<link rel="icon" type="image/png" href="icon128.png">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Academic Resource Center</title>
 <style>
-  /* --- CUSTOM PROPERTIES & ACCENTS --- */
-  :root {
-    --accent: #00ff00;
-    --bgGlow: rgba(0,255,0,0.3);
-    --dark-bg: #0a0a0a;
-    --card-bg: rgba(0,255,0,0.05); /* Lighter background for game cards */
-  }
-
-  /* --- BASE & UTILITY --- */
-  body {
-    margin: 0;
-    background: var(--dark-bg);
-    color: white;
-    font-family: 'Consolas', 'Monospace', sans-serif; /* Hacker-style font */
-    overflow-x: hidden;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* DARK OVERLAY (IMPROVE READABILITY) */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: -1;
-  }
-  
-  /* MATRIX CANVAS */
-  #matrix {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -2; /* Put behind the overlay */
-  }
-  
-  /* --- CUSTOM CURSOR STYLES --- */
-  /* Hide default cursor */
-  * {
-    cursor: none !important;
-  }
-
-  /* NEW CSS for cursor toggle: Re-enables system cursor and hides custom cursor */
-  body.system-cursor * {
-    cursor: default !important; 
-  }
-
-  body.system-cursor #customCursor {
-    display: none !important; 
-  }
-
-  /* The actual custom cursor element */
-  #customCursor {
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    /* Border is solid color defined by --accent */
-    border: 2px solid var(--accent); 
-    /* Ensure the inside is transparent by default */
-    background-color: transparent; 
-    pointer-events: none; /* Allows clicks to pass through to elements below */
-    transform: translate(-50%, -50%); /* Centers the cursor on the mouse point */
-    transition: all 0.1s ease-out; /* Smooth follow/hover effect */
-    z-index: 10002; /* Always on top */
-  }
-
-  /* Hover effect for buttons/links/interactive elements */
-  button:hover ~ #customCursor, 
-  a:hover ~ #customCursor, 
-  select:hover ~ #customCursor, 
-  input:hover ~ #customCursor {
-    /* Larger, filled, and glowing on hover */
-    width: 30px;
-    height: 30px;
-    /* Use an rgba background to keep the fill translucent (0.9 opacity) */
-    background-color: var(--bgGlow); 
-    border-width: 1px;
-    opacity: 1; /* Ensure border remains solid */
-    box-shadow: 0 0 10px var(--accent);
-  }
-  
-  /* --- NAVIGATION BAR --- */
-  #navbar {
-    position: sticky;
-    top: 0;
-    width: 98%;
-    background: rgba(0, 0, 0, 0.9);
-    border-bottom: 2px solid var(--accent);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 30px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-  }
-
-  #navbar-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--accent);
-    text-shadow: 0 0 5px var(--bgGlow);
-  }
-
-  #navbar-links button, #navbar-links a {
-    background: none;
-    border: none;
-    color: var(--accent);
-    padding: 8px 15px;
-    margin-left: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: color 0.2s, text-shadow 0.2s;
-  }
-  
-  #navbar-links button:hover, #navbar-links a:hover {
-    color: white;
-    text-shadow: 0 0 8px var(--accent);
-  }
-  
-  /* --- SPLASH SCREEN --- */
-  #splashScreen {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-    /* Ensure splash screen is visible initially */
-    display: flex; 
-  }
-  
-  #splashScreen h1 {
-    font-size: 6em;
-    color: var(--accent);
-    text-shadow: 0 0 20px var(--bgGlow);
-    margin-bottom: 0.1em;
-  }
-  
-  #splashScreen p {
-    font-size: 1.5em;
-    color: #ccc;
-    line-height: 1.5;
-    margin-top: 0;
-  }
-
-  /* --- MAIN CONTENT & GAME GRID --- */
-  #mainContent {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 30px;
-    display: none; /* Initially hidden, shown by showMainContent() */
-  }
-
-  .site-logo {
-    display: block;
-    margin: 0 auto 15px;
-    width: 400px;
-    max-width: 90%;
-    height: auto;
-    filter: drop-shadow(0 0 10px var(--accent));
-  }
-  
-  /* Headers for Favorites and Recents */
-  #favoritesHeader,
-  #recentlyPlayedHeader {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    color: var(--accent);
-    margin-top: 30px;
-    margin-bottom: 10px; /* NEW: Added margin-bottom for better header separation */
-  }
-  
-  #favoritesHeader.visible,
-  #recentlyPlayedHeader.visible {
-    opacity: 1;
-  }
-
-  #randomGameBtn {
-    background: var(--dark-bg);
-    color: var(--accent);
-    border: 2px solid var(--accent);
-    padding: 10px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 0 10px var(--bgGlow);
-    transition: 0.2s;
-  }
-
-  #randomGameBtn:hover {
-    background: var(--card-bg);
-    box-shadow: 0 0 15px var(--bgGlow);
-  }
-
-  #searchBar {
-    width: 100%;
-    max-width: 420px;
-    display: block;
-    margin: 20px auto 10px; /* Reduced bottom margin */
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 16px;
-    border: 2px solid var(--accent);
-    outline: none;
-    text-align: center;
-    background: rgba(0,0,0,0.9);
-    color: white;
-    transition: 0.2s;
-    box-shadow: 0 0 8px var(--bgGlow);
-  }
-  
-  /* Category Filter Buttons */
-  #categoryFilters button {
-    background: var(--dark-bg);
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 5px;
-    transition: 0.2s;
-  }
-  #categoryFilters button.active, #categoryFilters button:hover {
-    background: var(--accent);
-    color: var(--dark-bg);
-    box-shadow: 0 0 5px var(--bgGlow);
-  }
-  #noResultsMessage {
-    color: #ff5555;
-    text-align: center;
-    padding: 20px;
-    display: none;
-  }
-
-  .game-buttons {
-    display: grid;
-    /* MODIFIED: Set to exactly 5 columns with equal width on large screens */
-    grid-template-columns: repeat(5, 1fr); 
-    gap: 20px;
-    margin-top: 25px;
-  }
-  
-  /* NEW CSS for spacing fix */
-  #favoriteGames,
-  #recentlyPlayed {
-      margin-bottom: 40px; 
-  }
-
-
-  .game-buttons button {
-    background: var(--card-bg);
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    /* MODIFIED: Increased padding for bigger buttons */
-    padding: 20px 15px;
-    border-radius: 12px;
-    cursor: pointer;
-    text-align: center;
-    font-weight: 600;
-    box-shadow: 0 0 8px var(--bgGlow);
-    transition: 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    /* MODIFIED: Increased min-height for bigger buttons */
-    min-height: 180px; 
-    position: relative; 
-  }
-  
-  /* Favorite Button Styling */
-  .favorite-btn {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: none;
-      border: none;
-      color: #777; /* Default color: Grey/unfavorited */
-      font-size: 20px;
-      cursor: pointer;
-      line-height: 1;
-      padding: 5px;
-      z-index: 5; /* Above the image/text */
-      transition: color 0.2s, text-shadow 0.2s;
-      outline: none;
-  }
-  
-  .favorite-btn:hover {
-      color: yellow; 
-      text-shadow: 0 0 2px rgba(255, 255, 0, 0.5);
-  }
-  
-  .favorite-btn.active {
-      color: var(--accent); /* Theme color when favorited */
-      text-shadow: 0 0 5px var(--bgGlow);
-  }
-
-  .game-buttons button:hover {
-    background: rgba(0, 255, 0, 0.15);
-    box-shadow: 0 0 15px var(--bgGlow);
-    transform: translateY(-2px);
-  }
-
-  .game-buttons img {
-    /* MODIFIED: Increased size of game icon */
-    width: 80px;
-    height: 80px;
-    display: block;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    object-fit: cover;
-  }
-  
-  /* GAME OVERLAY */
-  #gameOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: black;
-    display: none;
-    flex-direction: column;
-    z-index: 9999;
-  }
-
-  #topBar { /* Game Overlay Top Bar */
-    width: 98%;
-    height: 50px;
-    background: #111;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 15px;
-    border-bottom: 2px solid var(--accent);
-  }
-
-  #topBar button {
-    background: black;
-    color: var(--accent);
-    border: 2px solid var(--accent);
-    padding: 8px 14px;
-    border-radius: 15px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: 0.2s;
-    margin-left: 5px; /* Added spacing between buttons */
-  }
-
-  #topBar button:hover {
-    background: var(--accent);
-    color: black;
-  }
-  
-  /* Specific style for the panic button for quick visual distinction */
-  #panicButton {
-    background: #ff0000 !important;
-    border-color: #ff0000 !important;
-    color: white !important;
-    font-weight: bold;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-  }
-  
-  #panicButton:hover {
-    background: #cc0000 !important;
-    color: white !important;
-  }
-
-  /* Loading Indicator */
-  #loadingIndicator {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--accent);
-    font-size: 2em;
-    font-weight: bold;
-    display: none;
-    z-index: 10000;
-  }
-  
-  #gameFrame {
-    width: 100%;
-    height: calc(100vh - 82px); /* Adjusted height for the topBar */
-    border: none;
-  }
-
-  /* --- Settings Modal/Panel (Existing) --- */
-  #settingsModal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.95);
-      border: 3px solid var(--accent);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 25px var(--bgGlow);
-      z-index: 10001;
-      display: none;
-      width: 300px;
-      color: white;
-  }
-  
-  /* --- Game Details Modal (NEW) --- */
-  #gameDetailsModal {
-      position: fixed;
-      z-index: 10001;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.85); /* Dark background */
-      display: none; /* Hidden by default */
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(5px);
-  }
-  
-  .modal-content {
-      background: rgba(0, 0, 0, 0.95);
-      border: 3px solid var(--accent);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 25px var(--bgGlow);
-      width: 80%;
-      max-width: 600px;
-      position: relative;
-      color: white;
-  }
-
-  .modal-body {
-      max-height: 400px;
-      overflow-y: auto;
-      padding-right: 15px; 
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 15px;
-  }
-  
-  .close-btn {
-      color: var(--accent);
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-      line-height: 1;
-  }
-  
-  .close-btn:hover,
-  .close-btn:focus {
-      color: white;
-      text-shadow: 0 0 5px var(--accent);
-      text-decoration: none;
-  }
-  
-  #modalLaunchBtn {
-      /* Style to match settings button but more prominent */
-      background: var(--accent);
-      color: var(--dark-bg);
-      border: 2px solid var(--accent);
-      padding: 12px 20px;
-      border-radius: 10px;
-      width: 100%;
-      font-weight: bold;
-      transition: all 0.2s;
-  }
-  
-  #modalLaunchBtn:hover {
-      background: var(--dark-bg);
-      color: var(--accent);
-      box-shadow: 0 0 10px var(--bgGlow);
-  }
-
-
-  #settingsModal h2 {
-      color: var(--accent);
-      margin-top: 0;
-      border-bottom: 1px solid var(--accent);
-      padding-bottom: 10px;
-  }
-  .setting-group {
-      margin-bottom: 20px;
-  }
-  .setting-group label, .setting-group select {
-      display: block;
-      margin-top: 5px;
-  }
-  
-  /* Correctly scoped CSS for buttons, select, AND color picker/text input in settings modal */
-  #settingsModal select, 
-  #settingsModal button, 
-  #settingsModal input[type="color"],
-  #settingsModal input[type="text"] { /* ADDED text input */
-      background: var(--dark-bg);
-      color: var(--accent);
-      border: 2px solid var(--accent);
-      border-radius: 8px;
-      padding: 8px;
-      width: 100%;
-      box-sizing: border-box; /* Ensures padding is inside the width */
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.2s, color 0.2s;
-  }
-  
-  /* Ensure the text input is still input-style when not hovered */
-  #settingsModal input[type="text"] {
-    cursor: text;
-  }
-
-
-  /* Specific styling for the color input to make the swatch visible and styled */
-  #settingsModal input[type="color"] {
-    height: 40px; /* Make it a decent size for the swatch */
-    padding: 2px;
-  }
-  /* Webkit-specific styling for the color swatch */
-  #settingsModal input[type="color"]::-webkit-color-swatch-wrapper {
-      padding: 0;
-  }
-  #settingsModal input[type="color"]::-webkit-color-swatch {
-      border: 1px solid var(--dark-bg); /* Use a darker border for contrast */
-      border-radius: 5px;
-  }
-
-  #settingsModal button:hover {
-    background: var(--accent);
-    color: var(--dark-bg);
-  }
-
-  /* MEDIA QUERIES for smaller screens */
-  @media (max-width: 768px) {
-    #navbar {
-      padding: 10px 15px;
-      flex-direction: column;
+    /* 1. Login Page Styling: WHITE BACKGROUND & GRID LAYOUT */
+    body {
+        margin: 0;
+        background-color: white; /* **ONLY ON LOGIN PAGE** */
+        color: #333; 
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        position: relative; 
+        
+        /* NEW: Grid Layout for side-by-side content */
+        display: grid;
+        /* Three columns: Left image (1fr), Login form (350px fixed), Right image (1fr) */
+        grid-template-columns: 1fr 350px 1fr; 
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; /* Prevent scrollbars from images */
     }
-    #navbar-links {
-      margin-top: 10px;
-    }
-    #navbar-title {
-      font-size: 20px;
-    }
-    #splashScreen h1 {
-      font-size: 4em;
-    }
-    #splashScreen p {
-      font-size: 1.2em;
-    }
-    .game-buttons {
-      /* Scales down grid for mobile */
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
-    }
-  }
 
+    /* 2. Login Form Container (Placed in the center column) */
+    .login-container {
+        grid-column: 2; /* Explicitly place in the center column */
+        background-color: #f8f8f8;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%; /* Take up the full 350px width of the column */
+        max-width: 90%;
+        text-align: center;
+        /* Center itself within the grid cell */
+        justify-self: center; 
+        align-self: center;
+    }
+
+    .login-container h1 {
+        color: #0056b3; 
+        margin-bottom: 25px;
+        font-size: 24px;
+    }
+
+    .login-container input[type="text"], 
+    .login-container input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box; 
+        font-size: 16px;
+    }
+
+    .login-container button {
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 18px;
+        transition: background-color 0.2s;
+    }
+
+    .login-container button:hover {
+        background-color: #0056b3;
+    }
+    
+    .disclaimer {
+        margin-top: 20px;
+        font-size: 0.9em;
+        color: #888;
+    }
+    
+    /* Error Message */
+    #errorMessage {
+        color: #cc0000;
+        margin-bottom: 15px;
+        font-weight: bold;
+        display: none; 
+    }
+    
+    /* Invisible Button */
+    #secretButton {
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+        width: 40px; 
+        height: 40px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        z-index: 100; /* Ensure it's above everything */
+        opacity: 0.01; 
+        padding: 0;
+        margin: 0;
+    }
+    #secretButton:hover {
+        opacity: 0.2; 
+        background-color: rgba(0, 0, 0, 0.05); 
+    }
+
+    /* --- NEW IMAGE STYLES --- */
+    .side-image-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .side-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures the image covers the container without distortion */
+        opacity: 0.8; /* Slightly desaturated/dimmed look */
+    }
+
+    /* Left image is in column 1 */
+    #imageLeft {
+        grid-column: 1;
+    }
+    /* Right image is in column 3 */
+    #imageRight {
+        grid-column: 3;
+    }
+    
+    /* Media Query: Remove images on small screens to prioritize the login form */
+    @media (max-width: 800px) {
+        body {
+            /* Change to a single column layout */
+            grid-template-columns: 1fr; 
+        }
+        .login-container {
+            grid-column: 1;
+            /* Give it a little margin on mobile */
+            margin: 20px;
+        }
+        .side-image-container {
+            /* Hide the image containers */
+            display: none; 
+        }
+    }
 </style>
 </head>
-
 <body>
-<div id="customCursor"></div> 
 
-<canvas id="matrix"></canvas>
 
-<div id="navbar">
-  <div id="navbar-title">UBG-Village-Pro</div>
-  <div id="navbar-links">
-    <button onclick="showMainContent()">GAMES</button> 
-    <button onclick="toggleSettingsModal()">⚙ SETTINGS</button>
-    <a href="chatroom.html" target="_blank">CHAT</a> 
-    <a href="https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit?usp=sharing" target="_blank">MOVIES/TV</a>
-    <a href="https://discord.gg/qDrefFBQUs" target="_blank">DISCORD</a>
-  </div>
-</div>
-
-<div id="settingsModal">
-    <h2>⚙ Site Settings</h2>
+<div class="login-container">
+    <h1>Welcome Back</h1>
+    <p style="color: #666; margin-bottom: 30px;">Sign in to access the student portal.</p>
     
-    <div class="setting-group">
-        <label for="themeColorPicker">Theme Color:</label>
-        <input type="color" id="themeColorPicker" value="#00ff00" oninput="setTheme(this.value)">
-    </div>
+    <p id="errorMessage" style="display: none;">Invalid Username or Password. Please try again.</p>
     
-    <div class="setting-group">
-        <label for="cursorToggleBtn">Custom Cursor:</label>
-        <button id="cursorToggleBtn" onclick="toggleCustomCursor()">Disable</button>
-    </div>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Student ID or Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        
+        <button type="submit">Log In</button>
+    </form>
 
-    <div class="setting-group">
-        <label for="panicUrlInput">Panic Button URL:</label>
-        <input type="text" id="panicUrlInput" placeholder="https://llv.instructure.com">
-        <button onclick="savePanicUrl()">Save Panic URL</button>
-    </div>
-    
-    <div class="setting-group">
-        <label for="matrixText">Matrix Text Type:</label>
-        <select id="matrixText" onchange="setMatrixText(this.value)">
-          <option value="binary">Binary (01)</option>
-          <option value="kanji">Kanji (Japanese)</option>
-        </select>
-    </div>
-    
-    <div class="setting-group">
-        <label for="matrixSpeed">Matrix Speed/Density:</label>
-        <select id="matrixSpeed" onchange="setMatrixSpeed(this.value)">
-          <option value="45">Normal</option>
-          <option value="25">Fast</option>
-          <option value="60">Slow</option>
-          <option value="1000">Off</option>
-        </select>
-    </div>
-    <button onclick="clearRecentGames()">Clear Recently Played</button>
-    <button onclick="clearFavoriteGames()">Clear Favorite Games</button> <button onclick="toggleSettingsModal()" style="margin-top: 20px; border-color: #555; color: #aaa;">Close Settings</button>
+    <p class="disclaimer">
+        Enter your credentials to proceed to the main resource page.
+    </p>
 </div>
 
-<div id="gameDetailsModal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeGameDetailsModal()">✖</span>
-        <h2 id="modalGameTitle" style="color: var(--accent); text-align: center;">Game Title</h2>
-        <div class="modal-body">
-            <p style="font-weight: bold; color: #aaa;">Description:</p>
-            <p id="modalGameDescription">Loading description...</p>
-            <p style="font-weight: bold; color: #aaa; margin-top: 15px;">Controls:</p>
-            <p id="modalGameControls">Loading controls...</p>
-        </div>
-        <button id="modalLaunchBtn" onclick="" style="margin-top: 20px;">▶ Launch Game</button>
-    </div>
-</div>
-<div id="gameOverlay">
-  <div id="loadingIndicator">Loading Game...</div> 
-
-  <div id="topBar">
-    <span id="gameTitle" style="color: var(--accent); font-weight:bold;">No game</span>
-    <div>
-      <button id="panicButton">🚨 Panic! (Ctrl+Shift+P)</button>
-      <button id="closeGame">✖ Close</button>
-      <button id="fullScreenBtn">⛶ Fullscreen</button>
-    </div>
-  </div>
-  <iframe id="gameFrame" src="" frameborder="0" allowfullscreen></iframe>
+<div id="imageRight" class="side-image-container">
+    <img src="learning1.jpg" alt="Students collaborating at a desk">
 </div>
 
-<div id="splashScreen">
-  <h1>UBG-Village-Pro</h1>
-  <p>A curated collection of unblocked games and community tools. Access thousands of hours of fun, chat with friends, or dive into a movie or TV show—all in one place.</p>
-</div>
-
-
-<div id="mainContent" class="container panel">
-  <img src="UBP.png" alt="UBG Village Pro Logo" class="site-logo">
-
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random</button>
-  </div>
-  
-  <h1 id="favoritesHeader">⭐ Favorite Games</h1> 
-  <div id="favoriteGames" class="game-buttons"></div> <h1 id="recentlyPlayedHeader">Recently Played</h1>
-  <div id="recentlyPlayed" class="game-buttons"></div> <input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames()">
-  
-  <div id="categoryFilters" style="text-align: center; margin-bottom: 20px;">
-      <button onclick="filterByCategory('all', this)" data-filter="all" class="active">All</button>
-      <button onclick="filterByCategory('action', this)" data-filter="action">Action/Shooter</button>
-      <button onclick="filterByCategory('io', this)" data-filter="io">.io Games</button>
-      <button onclick="filterByCategory('casual', this)" data-filter="casual">Casual/Clicker</button>
-      <button onclick="filterByCategory('sports', this)" data-filter="sports">Sports</button>
-      <button onclick="filterByCategory('horror', this)" data-filter="horror">Horror</button>
-      <button onclick="filterByCategory('utility', this)" data-filter="utility">Utilities</button>
-  </div>
-  
-  <p id="noResultsMessage">❌ No games match your search or filter criteria. Try a different term or category.</p>
-
-  <div class="game-buttons" id="allGamesGrid">
-    <button onclick="showGameDetails('GAMES/bloons5.html')" data-category="action" data-url="GAMES/bloons5.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/75.png">Bloons Tower Defense 5</button>
-    <button onclick="showGameDetails('bitlife/bitlife.html')" data-category="casual" data-url="bitlife/bitlife.html"> <img src="img/3.webp">Bitlife</button>
-    <button onclick="showGameDetails('https://devilapig247.github.io/block-blast/')" data-category="puzzle" data-url="https://devilapig247.github.io/block-blast/"> <img src="img/4.webp">Block Blast</button>
-    <button onclick="showGameDetails('CookieClicker/cookieclicker.html')" data-category="casual" data-url="CookieClicker/cookieclicker.html"> <img src="img/6.webp">Cookie Clicker</button>
-    <button onclick="showGameDetails('Coreball/coreball.html')" data-category="casual" data-url="Coreball/coreball.html"> <img src="img/7.webp">Coreball</button>
-    <button onclick="showGameDetails('Drive Mad.html')" data-category="sports" data-url="Drive Mad.html"> <img src="img/8.webp">Drive Mad</button>
-    <button onclick="showGameDetails('paperio2/paper.html')" data-category="io" data-url="paperio2/paper.html"> <img src="img/12.webp">Paper.io 2</button>
-    <button onclick="showGameDetails('polytrack.3-main/polytrack.html')" data-category="sports" data-url="polytrack.3-main/polytrack.html"> <img src="img/13.webp">PolyTrack</button>
-    <button onclick="showGameDetails('pvz/pvz.html')" data-category="action" data-url="pvz/pvz.html"> <img src="img/15.webp">PVZ</button>
-    <button onclick="showGameDetails('Retrobowl/retro.html')" data-category="sports" data-url="Retrobowl/retro.html"> <img src="img/17.webp">Retrobowl</button>
-    <button onclick="showGameDetails('Slope plus.html')" data-category="action" data-url="Slope plus.html"> <img src="img/19.webp">Slope</button>
-    <button onclick="showGameDetails('SubwaySurfers/subwaysurfers.html')" data-category="action" data-url="SubwaySurfers/subwaysurfers.html"> <img src="img/21.webp">Subway Surfers</button>
-    <button onclick="showGameDetails('TimeShooter/timeshooter.html')" data-category="action" data-url="TimeShooter/timeshooter.html"> <img src="img/23.webp">Time Shooter</button>
-    <button onclick="showGameDetails('Minecraft.html')" data-category="action" data-url="Minecraft.html"> <img src="img/minecraft.jpg">Minecraft</button>
-    <button onclick="showGameDetails('BasketballStarsUnblocked.github.io/index.html')" data-category="sports" data-url="BasketballStarsUnblocked.github.io/index.html"> <img src="img/basketball-stars.png">Basketball Stars</button>
-    <button onclick="showGameDetails('https://devilapig247.github.io/granny/')" data-category="horror" data-url="https://devilapig247.github.io/granny/"> <img src="img/granny logo.png">Granny</button>
-    <button onclick="showGameDetails('Baldi remaster/baldi.html')" data-category="horror" data-url="Baldi remaster/baldi.html"> <img src="img/466.png">Baldi</button>
-    <button onclick="showGameDetails('GAMES/CC3D.html')" data-category="action" data-url="GAMES/CC3D.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/164.png">Crazy Cattle 3D</button>
-    <button onclick="showGameDetails('DR3D/Dr3d.html')" data-category="action" data-url="DR3D/Dr3d.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/211.png">Death Run 3D</button>
-    <button onclick="showGameDetails('GAMES/Bacon May Die.html')" data-category="action" data-url="GAMES/Bacon May Die.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/268.png">Bacon May Die</button>
-    <button onclick="showGameDetails('GAMES/BlackJack.html')" data-category="casual" data-url="GAMES/BlackJack.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/312.png">BlackJack</button>
-    <button onclick="showGameDetails('https://devilapig247.github.io/backshot-roulette/')" data-category="horror" data-url="https://devilapig247.github.io/backshot-roulette/"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/205.png">Buckshot Roulette</button>
-    <button onclick="showGameDetails('GAMES/Crossy Road.html')" data-category="casual" data-url="GAMES/Crossy Road.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/24.png">Crossy Road</button>
-    <button onclick="showGameDetails('https://devilapig247.github.io/FANF/')" data-category="horror" data-url="https://devilapig247.github.io/FANF/"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/38.png">FNAF</button>
-    <button onclick="showGameDetails('GAMES/Fruit Ninja.html')" data-category="casual" data-url="GAMES/Fruit Ninja.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/261.png">Fruit Ninja</button>
-    <button onclick="showGameDetails('GAMES/Getaway Shootout.html')" data-category="action" data-url="GAMES/Getaway Shootout.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/338.png">Getaway Shootout</button>
-    <button onclick="showGameDetails('GAMES/Getting Over It with Bennett Foddy.html')" data-category="casual" data-url="GAMES/Getting Over It with Bennett Foddy.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/557.png">Getting over it</button>
-    <button onclick="showGameDetails('GAMES/Google Baseball.html')" data-category="sports" data-url="GAMES/Google Baseball.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/257.png">Google Baseball</button>
-    <button onclick="showGameDetails('GAMES/Granny 2.html')" data-category="horror" data-url="GAMES/Granny 2.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/125.png">Granny 2</button>
-    <button onclick="showGameDetails('GAMES/Gunspin.html')" data-category="action" data-url="GAMES/Gunspin.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/91.png">Gunspin</button>
-    <button onclick="showGameDetails('GAMES/Jetpack Joyride.html')" data-category="action" data-url="GAMES/Jetpack Joyride.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/7.png">Jetpack Joyride</button>
-    <button onclick="showGameDetails('GAMES/Monster Tracks.html')" data-category="sports" data-url="GAMES/Monster Tracks.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/36.png">Monster Tracks</button>
-    <button onclick="showGameDetails('GAMES/OvO 3 Dimensions.html')" data-category="action" data-url="GAMES/OvO 3 Dimensions.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/3.png">OvO 3</button>
-    <button onclick="showGameDetails('GAMES/Papas Pizeria.html')" data-category="casual" data-url="GAMES/Papas Pizeria.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/227.png">Papas Pizzeria</button>
-    <button onclick="showGameDetails('GAMES/Ragdoll Archers.html')" data-category="action" data-url="GAMES/Ragdoll Archers.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/186.png">Ragdoll Archers</button>
-    <button onclick="showGameDetails('GAMES/Ragdoll Hit.html')" data-category="action" data-url="GAMES/Ragdoll Hit.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/44.png">Ragdoll Hit</button>
-    <button onclick="showGameDetails('GAMES/Rainbow Obby.html')" data-category="action" data-url="GAMES/Rainbow Obby.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/307.png">Rainbow Obby</button>
-    <button onclick="showGameDetails('GAMES/Run 3.html')" data-category="action" data-url="GAMES/Run 3.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/177.png">Run 3</button>
-    <button onclick="showGameDetails('GAMES/Sandboxels.html')" data-category="casual" data-url="GAMES/Sandboxels.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/309.png">Sandboxels</button>
-    <button onclick="showGameDetails('GAMES/Slice it All.html')" data-category="casual" data-url="GAMES/Slice it All.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/128.png">Slice it All</button>
-    <button onclick="showGameDetails('GAMES/Slime Rancher.html')" data-category="casual" data-url="GAMES/Slime Rancher.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/591.png">Slime Rancher</button>
-    <button onclick="showGameDetails('GAMES/Slither.io.html')" data-category="io" data-url="GAMES/Slither.io.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/461.png">Slither.io</button>
-    <button onclick="showGameDetails('GAMES/Slowroads.html')" data-category="casual" data-url="GAMES/Slowroads.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/369.png">Slowroads</button>
-    <button onclick="showGameDetails('GAMES/Snow Rider 3D.html')" data-category="action" data-url="GAMES/Snow Rider 3D.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/119.png">Snow Rider 3D</button>
-    <button onclick="showGameDetails('GAMES/Soundboard.html')" data-category="utility" data-url="GAMES/Soundboard.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/179.png">Soundboard</button>
-    <button onclick="showGameDetails('GAMES/Spiral Roll.html')" data-category="casual" data-url="GAMES/Spiral Roll.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/349.png">Spiral Roll</button>
-    <button onclick="showGameDetails('GAMES/Thats Not My Neighbor.html')" data-category="horror" data-url="GAMES/Thats Not My Neighbor.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/216.png">That's Not My Neighbor</button>
-    <button onclick="showGameDetails('GAMES/Vex 5.html')" data-category="action" data-url="GAMES/Vex 5.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/50.png">Vex 5</button>
-    <button onclick="showGameDetails('GAMES/Gunblood.html')" data-category="action" data-url="GAMES/Gunblood.html"> <img src="gunblood.png">Gunblood</button>
-    <button onclick="showGameDetails('GAMES/Slender.html')" data-category="horror" data-url="GAMES/Slender.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/451.png">Slenderman</button>
-    <button onclick="showGameDetails('GAMES/1v1.lol.html')" data-category="action" data-url="GAMES/1v1.lol.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/58.png">1v1.lol</button>
-    <button onclick="showGameDetails('GAMES/Clustertruck.html')" data-category="action" data-url="GAMES/Clustertruck.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/81.png">Clustertruck</button>
-    <button onclick="showGameDetails('GAMES/Escape road.html')" data-category="action" data-url="GAMES/Escape road.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/264.png">Escape Road</button>
-    <button onclick="showGameDetails('GAMES/Rooftop Snipers.html')" data-category="action" data-url="GAMES/Rooftop Snipers.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/283.png">Rooftop Snipers</button>
-    <button onclick="showGameDetails('GAMES/Hollow Knight.html')" data-category="action" data-url="GAMES/Hollow Knight.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/468.png">Hollow Knight</button>
-    <button onclick="showGameDetails('GAMES/Plinko.html')" data-category="casual" data-url="GAMES/Plinko.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/544.png">Plinko</button>
-    <button onclick="showGameDetails('GAMES/R.E.P.O.html')" data-category="action" data-url="GAMES/R.E.P.O.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/195.png">R.E.P.O</button>
-    <button onclick="showGameDetails('GAMES/Sandtris.html')" data-category="casual" data-url="GAMES/Sandtris.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/311.png">Sandtris</button>
-    <button onclick="showGameDetails('GAMES/Tunnel Rush.html')" data-category="action" data-url="GAMES/Tunnel Rush.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/206.png">Tunnel Rush</button>
-    <button onclick="showGameDetails('Celeste.html')" data-category="action" data-url="Celeste.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/623.png">Celeste</button>
-    <button onclick="showGameDetails('ULTRAKILL.html')" data-category="action" data-url="ULTRAKILL.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/196.png">ULTRAKILL</button>
-    <button onclick="showGameDetails('Balatro.html')" data-category="casual" data-url="Balatro.html"> <img src="Balatro.jpg">Balatro</button>
-  </div>
-</div>
-
+<button id="secretButton" title="Hint"></button> 
 
 <script>
-// --- GLOBAL CONFIG ---
-// MODIFIED: Use localStorage key for panic URL
-const PANIC_URL_KEY = "customPanicUrl";
-const DEFAULT_PANIC_URL = "https://llv.instructure.com/";
-let currentPanicURL; // Variable to hold the active URL
+    // --- AUTHENTICATION LOGIC ---
+    const CORRECT_USERNAME = "gamer";
+    const CORRECT_PASSWORD = "gamer";
+    const GAME_PAGE_URL = 'game_portal.html'; 
 
-let matrixInterval;
-const FAVORITES_KEY = "favoriteGames"; 
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); 
 
-// Global variable for cursor state before game launch
-let wasCursorEnabledBeforeGame = true;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorMsg = document.getElementById('errorMessage');
 
-// --- GAME DETAILS DATA (NEW) ---
-const gameDetails = {
-    // Format: "data-url": { description: "...", controls: "..." }
-    "GAMES/bloons5.html": {
-        description: "A classic tower defense game where you place monkey towers to pop waves of incoming bloons (balloons). Upgrade your towers and use special agents to defend your base.",
-        controls: "Mouse (for placing and upgrading towers). Use hotkeys 1-5 for quick tower selection."
-    },
-    "CookieClicker/cookieclicker.html": {
-        description: "An incremental idle game where you start by clicking a giant cookie and then buy assets like grandmas and farms to automatically generate cookies. The goal is to accumulate astronomical numbers of cookies.",
-        controls: "Mouse (for clicking the cookie and purchasing upgrades). Click the main cookie as fast as you can!"
-    },
-    "Retrobowl/retro.html": {
-        description: "A retro-style American football game that blends simple arcade gameplay with management elements. You manage the team and play the offensive side of the game.",
-        controls: "Swipe up/down (Throw/Pass), Drag (Aim), Tap (Snap the ball), Mouse/Touch (Dive/Tackle)."
-    },
-    "Minecraft.html": {
-        description: "A sandbox survival game where players explore a blocky, procedurally-generated 3D world, mine materials, craft tools, and build structures. Play in survival or creative mode.",
-        controls: "W/A/S/D (Move), Space (Jump), Left Click (Break/Attack), Right Click (Place/Use), E (Inventory)."
-    },
-    "Slope plus.html": {
-        description: "Control a ball rolling down a slippery, randomized slope. Avoid obstacles and holes while trying to maintain balance and speed.",
-        controls: "Left Arrow/A (Move Left), Right Arrow/D (Move Right)."
-    },
-    "GAMES/Slither.io.html": {
-        description: "A multiplayer snake game where you eat pellets to grow longer. Try to cut off other players to eliminate them and absorb their mass, but don't let them touch your head!",
-        controls: "Mouse (Steering), Left Click (Boost/Speed up)."
-    },
-    "GAMES/Vex 5.html": {
-        description: "A fast-paced stickman platformer filled with challenging acts, spinning blades, and deadly traps. Run, jump, and slide your way to the exit.",
-        controls: "W/A/S/D or Arrow Keys (Move), Jump (W or Up Arrow), Slide (S or Down Arrow)."
-    },
-    // Add default detail for games not explicitly listed
-};
-// --- END GAME DETAILS DATA ---
-
-// --- GLOBAL MATRIX CHARS ---
-const BINARY_CHARS = "01";
-// Common characters from the original Matrix code
-const KANJI_CHARS = "日ﾓﾀﾝｸｱｲｽｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"; 
-let currentLetters = BINARY_CHARS; 
-
-
-// --- CUSTOM CURSOR LOGIC ADDED ---
-const customCursor = document.getElementById('customCursor');
-document.addEventListener('mousemove', (e) => {
-    // Moves the custom cursor element to follow the mouse position
-    customCursor.style.left = `${e.clientX}px`;
-    customCursor.style.top = `${e.clientY}px`;
-});
-
-
-// --- PAGE NAVIGATION LOGIC ---
-function showMainContent() {
-  document.getElementById("splashScreen").style.display = "none";
-  document.getElementById("mainContent").style.display = "block";
-}
-
-// NEW FUNCTION: Shows the game details modal
-function showGameDetails(url) {
-    // EXCLUSIONS (OPEN NORMALLY) - Check if URL is an external link
-    if (
-        url.includes("discord.gg") ||
-        url.includes("discord.com") ||
-        url.includes("docs.google.com") ||
-        url.includes("chatroom.html")
-    ) {
-        window.open(url, "_blank");
-        return;
-    }
-
-    // Get the button data for name/image from the main grid
-    let btn = [...document.querySelectorAll("#allGamesGrid button")]
-                .find(b => b.getAttribute("data-url") === url);
-
-    // Get game details from the dedicated object or use defaults
-    const details = gameDetails[url] || { 
-        // Use the innerText of the button if available, otherwise 'Game'
-        description: "Description not available. This game is provided as-is.", 
-        controls: "Controls may vary. Try using Arrow Keys, WASD, and Mouse/Click." 
-    };
-    
-    // Extract the name cleanly
-    let gameName = btn ? btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim() : 'Game Title';
-
-
-    // Update modal content
-    document.getElementById("modalGameTitle").innerText = gameName;
-    document.getElementById("modalGameDescription").innerText = details.description;
-    document.getElementById("modalGameControls").innerText = details.controls;
-    
-    // Update launch button to call the new launchGame function with the correct URL
-    document.getElementById("modalLaunchBtn").setAttribute("onclick", `launchGame('${url}')`);
-
-    // Show modal
-    document.getElementById("gameDetailsModal").style.display = "flex";
-}
-
-// NEW FUNCTION: Closes the game details modal
-function closeGameDetailsModal() {
-    document.getElementById("gameDetailsModal").style.display = "none";
-}
-
-// NEW FUNCTION: Launches the game in the iframe (old openGame logic)
-function launchGame(url) {
-    // 1. Close the Details Modal
-    closeGameDetailsModal(); 
-    
-    // --- NEW: Custom Cursor Disable Logic ---
-    // 1. Store the user's current preference before overriding it
-    wasCursorEnabledBeforeGame = localStorage.getItem("customCursorEnabled") !== "false";
-
-    // 2. Force system cursor for game by adding the system-cursor class
-    document.body.classList.add("system-cursor");
-    // ----------------------------------------
-
-
-    let overlay = document.getElementById("gameOverlay");
-    let frame = document.getElementById("gameFrame");
-    let loadingIndicator = document.getElementById("loadingIndicator");
-
-    // OPEN OVERLAY
-    overlay.style.display = "flex";
-    loadingIndicator.style.display = "block";
-    frame.src = url;
-
-    // HIDE LOADING INDICATOR ON LOAD
-    frame.onload = () => {
-        loadingIndicator.style.display = "none";
-    };
-    
-    // FIND BUTTON DATA and update recent games/title (keep this logic)
-    let btn = [...document.querySelectorAll(".game-buttons button")]
-                .find(b => b.getAttribute("data-url") === url);
-
-    if (btn) {
-        let name = btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim();
-        let img = btn.querySelector("img")?.src;
-
-        addRecentGame(name, url, img);
-
-        // UPDATE TOP BAR TITLE
-        document.getElementById("gameTitle").innerText = name;
-    }
-}
-
-// Close modal when clicking outside of the content area
-window.onclick = function(event) {
-    const modal = document.getElementById('gameDetailsModal');
-    if (event.target == modal) {
-        closeGameDetailsModal();
-    }
-}
-
-// ⭐ PANIC BUTTON LOGIC & AUTOPANIC KEYBINDING ⭐
-// MODIFIED: Use the dynamic currentPanicURL variable
-document.getElementById("panicButton").onclick = () => {
-  window.location.replace(currentPanicURL);
-};
-
-document.addEventListener('keydown', (e) => {
-    // Check for Ctrl+Shift+P (or Cmd+Shift+P on Mac)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
-        e.preventDefault(); // Prevent browser print dialog
-        // MODIFIED: Use the dynamic currentPanicURL variable
-        window.location.replace(currentPanicURL);
-    }
-});
-
-
-// --- GAME/OVERLAY LOGIC ---
-
-// CLOSE GAME
-document.getElementById("closeGame").onclick = () => {
-  document.getElementById("gameOverlay").style.display = "none";
-  document.getElementById("gameFrame").src = ""; // Clear iframe source
-  document.getElementById("gameTitle").innerText = "No game";
-
-  // --- NEW: Restore Custom Cursor Logic ---
-  // Restore the user's preference state when closing the game
-  if (wasCursorEnabledBeforeGame) {
-      document.body.classList.remove("system-cursor"); // Re-enable custom cursor
-  } 
-  // ----------------------------------------
-};
-
-// FULLSCREEN TOGGLE
-document.getElementById("fullScreenBtn").onclick = () => {
-  let frame = document.getElementById("gameFrame");
-
-  if (!document.fullscreenElement) {
-    frame.requestFullscreen().catch(err => console.log(err));
-  } else {
-    document.exitFullscreen();
-  }
-};
-
-
-// --- SEARCH & FILTER LOGIC ---
-const searchBar = document.getElementById("searchBar");
-const noResultsMessage = document.getElementById("noResultsMessage");
-
-function filterGames() {
-  let search = searchBar.value.toLowerCase();
-  let activeCategory = document.querySelector("#categoryFilters button.active")?.getAttribute("data-filter") || 'all';
-  let visibleCount = 0;
-
-  document.querySelectorAll("#allGamesGrid button").forEach(btn=>{
-    // Get text content excluding the star icon's content '⭐'
-    const textContent = btn.innerText.toLowerCase().replace('⭐', ''); 
-    const category = btn.getAttribute("data-category");
-    
-    // Check search term
-    const matchesSearch = textContent.includes(search);
-
-    // Check category filter
-    const matchesCategory = activeCategory === 'all' || category === activeCategory;
-
-    if (matchesSearch && matchesCategory) {
-      btn.style.display = ""; // Show
-      visibleCount++;
-    } else {
-      btn.style.display = "none"; // Hide
-    }
-  });
-
-  // Display 'No Results' message
-  noResultsMessage.style.display = (visibleCount === 0 && (search.length > 0 || activeCategory !== 'all')) ? "block" : "none";
-}
-
-function filterByCategory(category, element) {
-    // Update active filter button
-    document.querySelectorAll('#categoryFilters button').forEach(btn => btn.classList.remove('active'));
-    element.classList.add('active');
-    
-    // Set data-filter on the button that was clicked.
-    element.setAttribute('data-filter', category);
-
-    // Re-filter the games
-    filterGames();
-}
-
-
-// RANDOM PICK
-function openRandomGame(){
-  let visible = [...document.querySelectorAll("#allGamesGrid button")].filter(b=>b.style.display!="none");
-  if (visible.length > 0) {
-    // Trigger the click event, which now calls showGameDetails
-    visible[Math.floor(Math.random()*visible.length)]?.click(); 
-  }
-}
-
-
-// --- RECENTLY PLAYED LOGIC ---
-function addRecentGame(name, url, img) {
-  let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
-
-  // Remove duplicates
-  recent = recent.filter(g => g.url !== url);
-
-  // Add to top
-  recent.unshift({ name, url, img });
-
-  // Limit to 10 games
-  recent = recent.slice(0, 10);
-
-  localStorage.setItem("recentGames", JSON.stringify(recent));
-  initializeGameGrids(); // Refresh grids
-}
-
-function displayRecentGames() {
-  let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
-  let container = document.getElementById("recentlyPlayed");
-  let header = document.getElementById("recentlyPlayedHeader");
-  
-  if (recent.length === 0) {
-    container.innerHTML = "";
-    header.classList.remove("visible");
-  } else {
-    header.classList.add("visible");
-    container.innerHTML = recent.map(g => {
-        // Find the original game button for category
-        const button = [...document.querySelectorAll("#allGamesGrid button")].find(b => b.getAttribute('data-url') === g.url);
-        const category = button ? button.getAttribute('data-category') : 'casual'; 
-        
-        // MODIFIED: onclick calls showGameDetails()
-        return `
-          <button onclick="showGameDetails('${g.url}')" data-category="${category}" data-url="${g.url}">
-            <div class="favorite-btn" data-url="${g.url}" onclick="toggleFavorite(event, '${g.url}')">⭐</div>
-            <img src="${g.img}">
-            ${g.name}
-          </button>
-        `;
-    }).join("");
-    // Re-initialize favorite buttons for the newly rendered list
-    initializeFavoriteButtons();
-  }
-}
-
-function clearRecentGames() {
-  localStorage.removeItem("recentGames");
-  initializeGameGrids(); // Refresh grids
-  alert("Recently Played list cleared!");
-}
-
-// --- FAVORITES LOGIC ---
-
-// Helper to get all favorite games URLs from local storage
-function getFavoriteGames() {
-  return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
-}
-
-// Helper to save favorite games to local storage
-function saveFavoriteGames(favorites) {
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-}
-
-function toggleFavorite(event, url) {
-    // Stop the click from propagating to the parent button's onclick (which shows details)
-    event.stopPropagation();
-
-    let favorites = getFavoriteGames();
-    const isFavorite = favorites.includes(url);
-    
-    if (isFavorite) {
-        // Remove from favorites
-        favorites = favorites.filter(u => u !== url);
-    } else {
-        // Add to favorites
-        favorites.push(url);
-    }
-
-    saveFavoriteGames(favorites);
-    
-    // Refresh both grids and all star icons
-    initializeGameGrids();
-}
-
-function displayFavoriteGames() {
-    let favorites = getFavoriteGames();
-    let container = document.getElementById("favoriteGames");
-    let header = document.getElementById("favoritesHeader");
-    
-    if (favorites.length === 0) {
-        container.innerHTML = "";
-        header.classList.remove("visible");
-        return;
-    } 
-    
-    header.classList.add("visible");
-    
-    // Get all game data from the main grid
-    const allGameButtons = document.querySelectorAll("#allGamesGrid button");
-    
-    container.innerHTML = favorites.map(url => {
-        // Find the original button using the data-url attribute
-        const originalBtn = [...allGameButtons].find(b => b.getAttribute('data-url') === url);
-
-        if (originalBtn) {
-            // Reconstruct the favorite button using data from the original button
-            const category = originalBtn.getAttribute('data-category');
-            const img = originalBtn.querySelector("img")?.src;
-            // Extract name from innerText
-            const name = originalBtn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim();
-            
-            // MODIFIED: onclick calls showGameDetails()
-            return `
-              <button onclick="showGameDetails('${url}')" data-category="${category}" data-url="${url}">
-                <div class="favorite-btn active" data-url="${url}" onclick="toggleFavorite(event, '${url}')">⭐</div> 
-                <img src="${img}">
-                ${name}
-              </button>
-            `;
-        }
-        return ''; // Skip if original button not found
-    }).join("");
-    // Re-initialize favorite buttons for the newly rendered list
-    initializeFavoriteButtons();
-}
-
-// Function to attach the favorite button and set its initial state for ALL buttons
-function initializeFavoriteButtons() {
-    const favorites = getFavoriteGames();
-    // Select all game buttons in the main grid, recent list, and favorites list
-    const allGameButtons = document.querySelectorAll(".game-buttons button");
-    
-    allGameButtons.forEach(button => {
-        const url = button.getAttribute('data-url');
-        if (!url) return; // Skip if no URL found
-
-        // Find existing star button 
-        let starBtn = button.querySelector('.favorite-btn');
-        
-        if (!starBtn) {
-             // Create the star button dynamically if it wasn't added by displayFavoriteGames/displayRecentGames
-             starBtn = document.createElement('div');
-             starBtn.className = 'favorite-btn';
-             starBtn.innerHTML = '⭐';
-             starBtn.setAttribute('data-url', url);
-             starBtn.setAttribute('onclick', `toggleFavorite(event, '${url}')`);
-             
-             // Insert at the beginning of the button's content
-             button.prepend(starBtn);
-        }
-
-        // Set initial state (applies to all lists)
-        if (favorites.includes(url)) {
-            starBtn.classList.add('active');
+        if (username === CORRECT_USERNAME && password === CORRECT_PASSWORD) {
+            // Success: Redirect to game page
+            errorMsg.style.display = 'none';
+            window.location.href = GAME_PAGE_URL; 
         } else {
-            starBtn.classList.remove('active');
+            // Failure: Show error message
+            errorMsg.style.display = 'block';
         }
     });
-}
-
-function clearFavoriteGames() {
-    localStorage.removeItem(FAVORITES_KEY);
-    initializeGameGrids();
-    alert("Favorite Games list cleared!");
-}
-
-// Main function to initialize all game grids
-function initializeGameGrids() {
-    displayFavoriteGames();
-    displayRecentGames();
-    // initializeFavoriteButtons is called inside both display functions for generated buttons,
-    // but we call it here last to ensure the main grid buttons get their star added/updated.
-    initializeFavoriteButtons(); 
-    filterGames(); // Also run a filter check in case search bar has content
-}
-
-
-// --- THEME & SETTINGS LOGIC ---
-
-// NEW FUNCTION: Save the custom panic URL
-function savePanicUrl() {
-    const input = document.getElementById("panicUrlInput");
-    let newUrl = input.value.trim();
-
-    // Simple validation: ensure it looks like a URL, add https:// if missing
-    if (newUrl && !newUrl.startsWith("http")) {
-        newUrl = "https://" + newUrl;
-    }
     
-    // If the input is empty, reset to default
-    if (!newUrl) {
-      newUrl = DEFAULT_PANIC_URL;
-    }
-    
-    localStorage.setItem(PANIC_URL_KEY, newUrl);
-    currentPanicURL = newUrl; // Update global variable immediately
-    input.value = newUrl; // Update input field with standardized URL
-    
-    alert("Panic URL saved successfully to: " + newUrl);
-}
-
-// Function to toggle the custom cursor
-function toggleCustomCursor() {
-    const isCurrentlyEnabled = localStorage.getItem("customCursorEnabled") !== "false";
-    const newState = !isCurrentlyEnabled;
-    
-    // Apply state
-    if (newState) {
-        document.body.classList.remove("system-cursor");
-    } else {
-        document.body.classList.add("system-cursor");
-    }
-    
-    // Save state
-    localStorage.setItem("customCursorEnabled", newState ? "true" : "false");
-
-    // Update button text
-    const toggleBtn = document.getElementById("cursorToggleBtn");
-    if (toggleBtn) {
-        toggleBtn.innerText = newState ? "Disable" : "Enable";
-    }
-}
-
-// NEW: Function to initialize cursor state from local storage
-function initializeCursorState() {
-    // Default is true. Only explicitly disable if saved as "false".
-    const isEnabled = localStorage.getItem("customCursorEnabled") !== "false"; 
-    
-    if (isEnabled) {
-        document.body.classList.remove("system-cursor");
-    } else {
-        document.body.classList.add("system-cursor");
-    }
-}
-
-
-// Helper function to convert hex to RGB
-function hexToRgb(hex) {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-        return r + r + g + g + b + b;
+    // --- SECRET BUTTON LOGIC ---
+    document.getElementById('secretButton').addEventListener('click', function() {
+        alert(`🤫 Secret Credentials:\n\nUsername: ${CORRECT_USERNAME}\nPassword: ${CORRECT_PASSWORD}`);
     });
-
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-function setTheme(hexColor){
-  let rgb = hexToRgb(hexColor);
-  
-  // If conversion fails, default to green and stop
-  if (!rgb) {
-    hexColor = "#00ff00";
-    rgb = {r: 0, g: 255, b: 0};
-  } 
-
-  const glowRgba = `rgba(${rgb.r},${rgb.g},${rgb.b},0.4)`; // 40% opacity for glow
-
-  document.documentElement.style.setProperty("--accent", hexColor);
-  document.documentElement.style.setProperty("--bgGlow", glowRgba);
-
-  // Save selected theme (now a hex code)
-  localStorage.setItem("themeColor", hexColor);
-}
-
-function setMatrixSpeed(delay) {
-    clearInterval(matrixInterval);
-    localStorage.setItem("matrixSpeed", delay);
-
-    if (delay != 1000) { // 1000ms = "Off"
-        matrixInterval = setInterval(drawMatrix, parseInt(delay));
-    }
-}
-
-// Set Matrix Text Type
-function setMatrixText(type) {
-    localStorage.setItem("matrixTextType", type);
-    initializeMatrix(); // Re-initializes the matrix with new settings
-}
-
-function toggleSettingsModal() {
-    const modal = document.getElementById("settingsModal");
-    // Reload state when opening
-    if (modal.style.display !== "block") {
-      // Load saved hex color or default green
-      document.getElementById("themeColorPicker").value = localStorage.getItem("themeColor") || "#00ff00"; 
-      document.getElementById("matrixSpeed").value = localStorage.getItem("matrixSpeed") || "45";
-      // Load and set the matrix text type value
-      document.getElementById("matrixText").value = localStorage.getItem("matrixTextType") || "binary";
-      
-      // Load and set custom cursor state text on button
-      const isCursorEnabled = localStorage.getItem("customCursorEnabled") !== "false";
-      document.getElementById("cursorToggleBtn").innerText = isCursorEnabled ? "Disable" : "Enable";
-      
-      // NEW: Load panic URL into input
-      document.getElementById("panicUrlInput").value = currentPanicURL;
-
-    }
-    modal.style.display = modal.style.display === "block" ? "none" : "block";
-}
-
-
-// --- MATRIX RAIN SETUP ---
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
-
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-
-const fontSize = 14;
-const columns = canvas.width / fontSize;
-const drops = Array(Math.floor(columns)).fill(0);
-
-
-function drawMatrix() {
-  ctx.fillStyle = "rgba(0,0,0,0.05)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-
-  // Use computed style property for dynamic color change
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--accent");
-  ctx.font = fontSize + "px monospace";
-
-
-  for(let i=0;i<drops.length;i++){
-    // Use the dynamically set currentLetters
-    let text = currentLetters[Math.floor(Math.random()*currentLetters.length)];
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-
-    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975){
-      drops[i] = 0;
-    }
-    drops[i]++;
-  }
-}
-
-
-window.onresize = ()=>{
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-};
-
-// Function to load settings and start the matrix
-function initializeMatrix() {
-    const type = localStorage.getItem("matrixTextType") || 'binary';
-    currentLetters = (type === 'kanji') ? KANJI_CHARS : BINARY_CHARS;
-    
-    // Re-starts the interval with the potentially new speed and new characters
-    const savedSpeed = localStorage.getItem("matrixSpeed") || "45"; 
-    setMatrixSpeed(savedSpeed);
-}
-
-
-// Load on page start
-window.addEventListener("DOMContentLoaded", () => {
-  // Load the panic URL first
-  currentPanicURL = localStorage.getItem(PANIC_URL_KEY) || DEFAULT_PANIC_URL;
-
-  // Theme Loading Logic
-  let savedColor = localStorage.getItem("themeColor") || "#00ff00"; // default green hex
-  setTheme(savedColor); // Use the color hex directly
-
-  // Matrix Initialization (handles speed and character set)
-  initializeMatrix();
-  
-  // Game Grid Initialization (handles Recents and Favorites)
-  initializeGameGrids();
-  
-  // Custom Cursor Initialization
-  initializeCursorState();
-});
-
 </script>
 
 </body>
