@@ -132,15 +132,41 @@
     text-shadow: 0 0 8px var(--accent);
   }
   
-  /* --- SPLASH SCREEN (REMOVED) --- */
-  /* This block is no longer needed as the splash screen is removed */
+  /* --- SPLASH SCREEN --- */
+  #splashScreen {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    /* Ensure splash screen is visible initially */
+    display: flex; 
+  }
   
+  #splashScreen h1 {
+    font-size: 6em;
+    color: var(--accent);
+    text-shadow: 0 0 20px var(--bgGlow);
+    margin-bottom: 0.1em;
+  }
+  
+  #splashScreen p {
+    font-size: 1.5em;
+    color: #ccc;
+    line-height: 1.5;
+    margin-top: 0;
+  }
+
   /* --- MAIN CONTENT & GAME GRID --- */
   #mainContent {
     max-width: 1200px;
     margin: 20px auto;
     padding: 30px;
-    display: block; /* **MODIFIED: Now visible by default** */
+    display: none; /* Initially hidden, shown by showMainContent() */
   }
 
   .site-logo {
@@ -152,17 +178,15 @@
     filter: drop-shadow(0 0 10px var(--accent));
   }
   
-  /* Headers for Favorites and Recents */
-  #favoritesHeader,
+  /* Headers for Recents */
   #recentlyPlayedHeader {
     opacity: 0;
     transition: opacity 0.3s ease;
     color: var(--accent);
     margin-top: 30px;
-    margin-bottom: 10px; /* NEW: Added margin-bottom for better header separation */
+    margin-bottom: 10px; 
   }
   
-  #favoritesHeader.visible,
   #recentlyPlayedHeader.visible {
     opacity: 1;
   }
@@ -232,7 +256,6 @@
   }
   
   /* NEW CSS for spacing fix */
-  #favoriteGames,
   #recentlyPlayed {
       margin-bottom: 40px; 
   }
@@ -260,33 +283,6 @@
     position: relative; 
   }
   
-  /* Favorite Button Styling */
-  .favorite-btn {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: none;
-      border: none;
-      color: #777; /* Default color: Grey/unfavorited */
-      font-size: 20px;
-      cursor: pointer;
-      line-height: 1;
-      padding: 5px;
-      z-index: 5; /* Above the image/text */
-      transition: color 0.2s, text-shadow 0.2s;
-      outline: none;
-  }
-  
-  .favorite-btn:hover {
-      color: yellow; 
-      text-shadow: 0 0 2px rgba(255, 255, 0, 0.5);
-  }
-  
-  .favorite-btn.active {
-      color: var(--accent); /* Theme color when favorited */
-      text-shadow: 0 0 5px var(--bgGlow);
-  }
-
   .game-buttons button:hover {
     background: rgba(0, 255, 0, 0.15);
     box-shadow: 0 0 15px var(--bgGlow);
@@ -533,7 +529,12 @@
     #navbar-title {
       font-size: 20px;
     }
-    /* Removed splash screen specific media queries */
+    #splashScreen h1 {
+      font-size: 4em;
+    }
+    #splashScreen p {
+      font-size: 1.2em;
+    }
     .game-buttons {
       /* Scales down grid for mobile */
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
@@ -551,7 +552,7 @@
 <div id="navbar">
   <div id="navbar-title">UBG-Village-Pro</div>
   <div id="navbar-links">
-    <button onclick="window.location.href='game_portal.html'">GAMES</button> 
+    <button onclick="showMainContent()">GAMES</button> 
     <button onclick="toggleSettingsModal()">⚙ SETTINGS</button>
     <a href="chatroom.html" target="_blank">CHAT</a> 
     <a href="https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit?usp=sharing" target="_blank">MOVIES/TV</a>
@@ -595,8 +596,8 @@
           <option value="1000">Off</option>
         </select>
     </div>
-    <button onclick="clearRecentGames()">Clear Recently Played</button>
-    <button onclick="clearFavoriteGames()">Clear Favorite Games</button> <button onclick="toggleSettingsModal()" style="margin-top: 20px; border-color: #555; color: #aaa;">Close Settings</button>
+    <button onclick="clearRecentGames()">Clear Recently Played</button> 
+    <button onclick="toggleSettingsModal()" style="margin-top: 20px; border-color: #555; color: #aaa;">Close Settings</button>
 </div>
 
 <div id="gameDetailsModal">
@@ -626,6 +627,12 @@
   <iframe id="gameFrame" src="" frameborder="0" allowfullscreen></iframe>
 </div>
 
+<div id="splashScreen">
+  <h1>UBG-Village-Pro</h1>
+  <p>A curated collection of unblocked games and community tools. Access thousands of hours of fun, chat with friends, or dive into a movie or TV show—all in one place.</p>
+</div>
+
+
 <div id="mainContent" class="container panel">
   <img src="UBP.png" alt="UBG Village Pro Logo" class="site-logo">
 
@@ -633,9 +640,10 @@
     <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random</button>
   </div>
   
-  <h1 id="favoritesHeader">⭐ Favorite Games</h1> 
-  <div id="favoriteGames" class="game-buttons"></div> <h1 id="recentlyPlayedHeader">Recently Played</h1>
-  <div id="recentlyPlayed" class="game-buttons"></div> <input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames()">
+  <h1 id="recentlyPlayedHeader">Recently Played</h1>
+  <div id="recentlyPlayed" class="game-buttons"></div> 
+  
+  <input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames()">
   
   <div id="categoryFilters" style="text-align: center; margin-bottom: 20px;">
       <button onclick="filterByCategory('all', this)" data-filter="all" class="active">All</button>
@@ -718,13 +726,11 @@
 
 <script>
 // --- GLOBAL CONFIG ---
-// MODIFIED: Use localStorage key for panic URL
 const PANIC_URL_KEY = "customPanicUrl";
 const DEFAULT_PANIC_URL = "https://llv.instructure.com/";
-let currentPanicURL; // Variable to hold the active URL
+let currentPanicURL; 
 
 let matrixInterval;
-const FAVORITES_KEY = "favoriteGames"; 
 
 // Global variable for cursor state before game launch
 let wasCursorEnabledBeforeGame = true;
@@ -781,7 +787,10 @@ document.addEventListener('mousemove', (e) => {
 
 
 // --- PAGE NAVIGATION LOGIC ---
-// REMOVED function showMainContent() {} since the mainContent is now visible by default
+function showMainContent() {
+  document.getElementById("splashScreen").style.display = "none";
+  document.getElementById("mainContent").style.display = "block";
+}
 
 // NEW FUNCTION: Shows the game details modal
 function showGameDetails(url) {
@@ -880,16 +889,14 @@ window.onclick = function(event) {
 }
 
 // ⭐ PANIC BUTTON LOGIC & AUTOPANIC KEYBINDING ⭐
-// MODIFIED: Use the dynamic currentPanicURL variable
 document.getElementById("panicButton").onclick = () => {
   window.location.replace(currentPanicURL);
 };
 
 document.addEventListener('keydown', (e) => {
-    // Check for Ctrl+Shift+P (or Cmd+Shift+P on Mac)
+    // Check for Ctrl+Shift+P (Windows/Linux) or Cmd+Shift+P (Mac)
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
-        e.preventDefault(); // Prevent browser print dialog
-        // MODIFIED: Use the dynamic currentPanicURL variable
+        e.preventDefault(); // Prevent browser print dialog/system shortcuts
         window.location.replace(currentPanicURL);
     }
 });
@@ -933,8 +940,8 @@ function filterGames() {
   let visibleCount = 0;
 
   document.querySelectorAll("#allGamesGrid button").forEach(btn=>{
-    // Get text content excluding the star icon's content '⭐'
-    const textContent = btn.innerText.toLowerCase().replace('⭐', ''); 
+    // Get text content
+    const textContent = btn.innerText.toLowerCase(); 
     const category = btn.getAttribute("data-category");
     
     // Check search term
@@ -978,7 +985,7 @@ function openRandomGame(){
 }
 
 
-// --- RECENTLY PLAYED LOGIC ---
+// --- RECENTLY PLAYED LOGIC (MODIFIED: REMOVED FAVORITES REFERENCES) ---
 function addRecentGame(name, url, img) {
   let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
 
@@ -1010,17 +1017,14 @@ function displayRecentGames() {
         const button = [...document.querySelectorAll("#allGamesGrid button")].find(b => b.getAttribute('data-url') === g.url);
         const category = button ? button.getAttribute('data-category') : 'casual'; 
         
-        // MODIFIED: onclick calls showGameDetails()
+        // MODIFIED: Removed favorite button logic
         return `
           <button onclick="showGameDetails('${g.url}')" data-category="${category}" data-url="${g.url}">
-            <div class="favorite-btn" data-url="${g.url}" onclick="toggleFavorite(event, '${g.url}')">⭐</div>
             <img src="${g.img}">
             ${g.name}
           </button>
         `;
     }).join("");
-    // Re-initialize favorite buttons for the newly rendered list
-    initializeFavoriteButtons();
   }
 }
 
@@ -1030,128 +1034,12 @@ function clearRecentGames() {
   alert("Recently Played list cleared!");
 }
 
-// --- FAVORITES LOGIC ---
-
-// Helper to get all favorite games URLs from local storage
-function getFavoriteGames() {
-  return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
-}
-
-// Helper to save favorite games to local storage
-function saveFavoriteGames(favorites) {
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-}
-
-function toggleFavorite(event, url) {
-    // Stop the click from propagating to the parent button's onclick (which shows details)
-    event.stopPropagation();
-
-    let favorites = getFavoriteGames();
-    const isFavorite = favorites.includes(url);
-    
-    if (isFavorite) {
-        // Remove from favorites
-        favorites = favorites.filter(u => u !== url);
-    } else {
-        // Add to favorites
-        favorites.push(url);
-    }
-
-    saveFavoriteGames(favorites);
-    
-    // Refresh both grids and all star icons
-    initializeGameGrids();
-}
-
-function displayFavoriteGames() {
-    let favorites = getFavoriteGames();
-    let container = document.getElementById("favoriteGames");
-    let header = document.getElementById("favoritesHeader");
-    
-    if (favorites.length === 0) {
-        container.innerHTML = "";
-        header.classList.remove("visible");
-        return;
-    } 
-    
-    header.classList.add("visible");
-    
-    // Get all game data from the main grid
-    const allGameButtons = document.querySelectorAll("#allGamesGrid button");
-    
-    container.innerHTML = favorites.map(url => {
-        // Find the original button using the data-url attribute
-        const originalBtn = [...allGameButtons].find(b => b.getAttribute('data-url') === url);
-
-        if (originalBtn) {
-            // Reconstruct the favorite button using data from the original button
-            const category = originalBtn.getAttribute('data-category');
-            const img = originalBtn.querySelector("img")?.src;
-            // Extract name from innerText
-            const name = originalBtn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim();
-            
-            // MODIFIED: onclick calls showGameDetails()
-            return `
-              <button onclick="showGameDetails('${url}')" data-category="${category}" data-url="${url}">
-                <div class="favorite-btn active" data-url="${url}" onclick="toggleFavorite(event, '${url}')">⭐</div> 
-                <img src="${img}">
-                ${name}
-              </button>
-            `;
-        }
-        return ''; // Skip if original button not found
-    }).join("");
-    // Re-initialize favorite buttons for the newly rendered list
-    initializeFavoriteButtons();
-}
-
-// Function to attach the favorite button and set its initial state for ALL buttons
-function initializeFavoriteButtons() {
-    const favorites = getFavoriteGames();
-    // Select all game buttons in the main grid, recent list, and favorites list
-    const allGameButtons = document.querySelectorAll(".game-buttons button");
-    
-    allGameButtons.forEach(button => {
-        const url = button.getAttribute('data-url');
-        if (!url) return; // Skip if no URL found
-
-        // Find existing star button 
-        let starBtn = button.querySelector('.favorite-btn');
-        
-        if (!starBtn) {
-             // Create the star button dynamically if it wasn't added by displayFavoriteGames/displayRecentGames
-             starBtn = document.createElement('div');
-             starBtn.className = 'favorite-btn';
-             starBtn.innerHTML = '⭐';
-             starBtn.setAttribute('data-url', url);
-             starBtn.setAttribute('onclick', `toggleFavorite(event, '${url}')`);
-             
-             // Insert at the beginning of the button's content
-             button.prepend(starBtn);
-        }
-
-        // Set initial state (applies to all lists)
-        if (favorites.includes(url)) {
-            starBtn.classList.add('active');
-        } else {
-            starBtn.classList.remove('active');
-        }
-    });
-}
-
-function clearFavoriteGames() {
-    localStorage.removeItem(FAVORITES_KEY);
-    initializeGameGrids();
-    alert("Favorite Games list cleared!");
-}
+// --- FAVORITES LOGIC REMOVED ---
+// All favorites-related functions and constants have been deleted.
 
 // Main function to initialize all game grids
 function initializeGameGrids() {
-    displayFavoriteGames();
     displayRecentGames();
-    // initializeFavoriteButtons is called inside both display functions for generated buttons,
-    // but we call it here last to ensure the main grid buttons get their star added/updated.
-    initializeFavoriteButtons(); 
     filterGames(); // Also run a filter check in case search bar has content
 }
 
@@ -1352,7 +1240,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // Matrix Initialization (handles speed and character set)
   initializeMatrix();
   
-  // Game Grid Initialization (handles Recents and Favorites)
+  // Game Grid Initialization (handles Recents only)
   initializeGameGrids();
   
   // Custom Cursor Initialization
