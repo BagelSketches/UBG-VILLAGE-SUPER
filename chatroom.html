@@ -248,6 +248,9 @@ header > span {
     font-weight: bold;
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
+    display: flex; /* Added for icon centering */
+    align-items: center;
+    justify-content: center;
 }
 #input .action-button:hover {
     background: #00c99a;
@@ -492,20 +495,6 @@ header > span {
     color: #e63946;
 }
 
-@media (max-width: 600px) {
-    #user-list-toggle {
-        display: none;
-    }
-    #user-list-container.active {
-        position: absolute;
-        right: 0;
-        top: 0;
-        height: 100%;
-        z-index: 100;
-        width: 70%;
-    }
-}
-
 /* Modals */
 #username-modal-overlay, #commands-modal-overlay, #clear-confirm-modal-overlay {
     position: fixed;
@@ -542,6 +531,85 @@ header > span {
 #clear-confirm-modal button.confirm { background: #e63946; color: white; border: none; }
 #clear-confirm-modal button.cancel { background: #1f2d57; color: white; border: none; }
 
+
+/* New CSS for smaller, iframe-specific layout to fix overflow */
+@media (max-width: 400px) { 
+    header {
+        padding: 8px 10px; 
+    }
+    #status-info {
+        gap: 5px; 
+        font-size: 12px;
+    }
+    #status-info i {
+        font-size: 10px;
+    }
+    header > span {
+        font-size: 16px; 
+    }
+    
+    #room-controls {
+        padding: 8px 5px; /* Aggressively reduced horizontal padding */
+        gap: 4px; /* Reduced gap between elements */
+    }
+    
+    #room-controls input {
+        padding: 6px; /* Smaller input padding */
+        font-size: 13px; /* Smaller input font */
+    }
+    
+    /* Make all room control buttons smaller */
+    #room-controls button {
+        padding: 6px 8px; /* Reduced button padding */
+        font-size: 11px; /* Smaller button font */
+        min-width: 20px; /* Ensure small buttons don't shrink too much */
+    }
+
+    /* Input area compaction */
+    #input {
+        gap: 4px; /* Reduced gap */
+    }
+    #input input {
+        padding: 8px; /* Slightly more room for typing */
+        font-size: 14px;
+    }
+    
+    /* Apply aggressive padding to icon buttons in input wrapper */
+    #input .action-button {
+        padding: 8px 8px; /* Reduced padding for icons */
+        font-size: 14px; 
+    }
+    
+    /* Ensure the icons themselves are appropriately sized */
+    #commands-toggle-btn i, 
+    #input .action-button i {
+        font-size: 14px; 
+    }
+
+    #emoji-toggle-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+    
+    /* Ensure user list is still usable and narrower */
+    #user-list-container.active {
+        width: 150px; 
+    }
+}
+/* End new CSS */
+
+@media (max-width: 600px) {
+    #user-list-container.active {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        z-index: 100;
+        width: 70%;
+    }
+}
+
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -562,9 +630,9 @@ header > span {
 
     <div id="room-controls">
         <span id="current-room-display">Room: #global</span>
-        <input id="room-code-input" placeholder="Enter Room Code">
-        <button onclick="joinRoom()">Join/Create Room</button>
-        <button id="user-list-toggle" onclick="toggleUserList()">Users</button>
+        <input id="room-code-input" placeholder="Enter Code">
+        <button onclick="joinRoom()" title="Join or Create Room">Join</button>
+        <button id="user-list-toggle" onclick="toggleUserList()" title="Toggle User List"><i class="fas fa-users"></i></button>
     </div>
 
     <div id="main-content">
@@ -590,10 +658,10 @@ header > span {
         <div id="emoji-panel"></div>
         <div id="typing-indicator"></div>
         <div id="input">
-            <button id="commands-toggle-btn" class="action-button" onclick="toggleCommandsModal()">?</button>
+            <button id="commands-toggle-btn" class="action-button" onclick="toggleCommandsModal()" title="View Commands"><i class="fas fa-question-circle"></i></button>
             <input id="message" placeholder="Message" onkeydown="handleInputKey(event)">
-            <button id="emoji-toggle-btn" onclick="toggleEmojiPanel()">&#x1F60A;</button>
-            <button class="action-button" onclick="send()">Send</button>
+            <button id="emoji-toggle-btn" onclick="toggleEmojiPanel()" title="Emojis">&#x1F60A;</button>
+            <button class="action-button" onclick="send()" title="Send"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 </div>

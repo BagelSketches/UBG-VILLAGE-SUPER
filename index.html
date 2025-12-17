@@ -13,6 +13,7 @@
     --bgGlow: rgba(0,255,0,0.3);
     --dark-bg: #0a0a0a;
     --card-bg: rgba(0,255,0,0.05); /* Lighter background for game cards */
+    --scanline-opacity: 0.05; /* NEW: Global property for scanline effect */
   }
 
   /* --- BASE & UTILITY --- */
@@ -25,6 +26,11 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    /* NEW: Custom Background Image Style */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    transition: background-image 0.5s ease;
   }
   
   /* DARK OVERLAY (IMPROVE READABILITY) */
@@ -44,6 +50,53 @@
     width: 100vw;
     height: 100vh;
     z-index: -2; /* Put behind the overlay */
+  }
+
+  /* NEW (Feature 19): Scanline/Noise Effect */
+  #mainContent {
+      position: relative;
+      /* Include existing styles */
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 30px;
+      display: none; 
+      /* Enable 3D transform for better rendering of noise */
+      transform: translateZ(0);
+  }
+
+  #mainContent::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; /* Allows clicks to pass through */
+      z-index: 1; /* Above content, below custom cursor */
+      opacity: var(--scanline-opacity);
+      /* Scanline pattern (subtle horizontal lines) */
+      background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.6) 0,
+          rgba(255, 255, 255, 0.1) 1px,
+          transparent 2px,
+          transparent 4px
+      );
+      /* Subtle TV static animation (optional but cool) */
+      animation: noise 5s infinite step-end;
+  }
+
+  @keyframes noise {
+      0%, 100% { clip-path: inset(0 0 99% 0); }
+      10% { clip-path: inset(0 0 96% 0); }
+      20% { clip-path: inset(0 0 93% 0); }
+      30% { clip-path: inset(0 0 90% 0); }
+      40% { clip-path: inset(0 0 87% 0); }
+      50% { clip-path: inset(0 0 84% 0); }
+      60% { clip-path: inset(0 0 81% 0); }
+      70% { clip-path: inset(0 0 78% 0); }
+      80% { clip-path: inset(0 0 75% 0); }
+      90% { clip-path: inset(0 0 72% 0); }
   }
   
   /* --- CUSTOM CURSOR STYLES --- */
@@ -81,7 +134,8 @@
   button:hover ~ #customCursor, 
   a:hover ~ #customCursor, 
   select:hover ~ #customCursor, 
-  input:hover ~ #customCursor {
+  input:hover ~ #customCursor,
+  #themeCycleBtn:hover ~ #customCursor {
     /* Larger, filled, and glowing on hover */
     width: 30px;
     height: 30px;
@@ -112,6 +166,35 @@
     font-weight: bold;
     color: var(--accent);
     text-shadow: 0 0 5px var(--bgGlow);
+  }
+  
+  /* Clock Style */
+  #navbar-clock {
+    color: var(--accent);
+    font-size: 18px;
+    font-weight: 600;
+    margin-right: 20px;
+    text-shadow: 0 0 3px var(--bgGlow);
+  }
+
+  /* NEW (Feature 11): Quick Theme Cycle Button */
+  #themeCycleBtn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    padding: 8px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 20px; /* Bigger icon */
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+  
+  #themeCycleBtn:hover {
+    color: white;
+    text-shadow: 0 0 10px var(--accent);
+    transform: rotate(360deg);
   }
 
   #navbar-links button, #navbar-links a {
@@ -162,13 +245,6 @@
   }
 
   /* --- MAIN CONTENT & GAME GRID --- */
-  #mainContent {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 30px;
-    display: none; /* Initially hidden, shown by showMainContent() */
-  }
-
   .site-logo {
     display: block;
     margin: 0 auto 15px;
@@ -190,6 +266,43 @@
   #recentlyPlayedHeader.visible {
     opacity: 1;
   }
+  
+  /* Featured Game Banner */
+  #featuredGameBanner {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 3px solid var(--accent);
+    border-radius: 15px;
+    background: var(--card-bg);
+    box-shadow: 0 0 15px var(--bgGlow);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #featuredGameBanner h2 {
+    color: white;
+    margin: 0;
+    font-size: 1.8em;
+  }
+  #featuredGameBanner span {
+    color: var(--accent);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--bgGlow);
+  }
+  #featuredGameBanner button {
+    background: var(--accent);
+    color: var(--dark-bg);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  #featuredGameBanner button:hover {
+    background: white;
+    box-shadow: 0 0 15px var(--bgGlow);
+  }
 
   #randomGameBtn {
     background: var(--dark-bg);
@@ -207,12 +320,18 @@
     box-shadow: 0 0 15px var(--bgGlow);
   }
 
-  #searchBar {
+  /* Search Bar Wrapper for Clear Button */
+  .search-container {
+    position: relative;
     width: 100%;
     max-width: 420px;
-    display: block;
-    margin: 20px auto 10px; /* Reduced bottom margin */
+    margin: 20px auto 10px;
+  }
+  
+  #searchBar {
+    width: 100%;
     padding: 12px;
+    padding-right: 40px; /* Space for the clear button */
     border-radius: 10px;
     font-size: 16px;
     border: 2px solid var(--accent);
@@ -222,7 +341,59 @@
     color: white;
     transition: 0.2s;
     box-shadow: 0 0 8px var(--bgGlow);
+    box-sizing: border-box;
   }
+  
+  /* Clear Search Button Style */
+  #clearSearchBtn {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #ff5555;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+    display: none; /* Initially hidden */
+  }
+  #clearSearchBtn:hover {
+      color: white;
+      text-shadow: 0 0 5px var(--accent);
+  }
+
+  /* NEW (Feature 18): Search Suggestions */
+  #searchSuggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid var(--accent);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      max-height: 150px;
+      overflow-y: auto;
+      z-index: 50;
+  }
+  .suggestion-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      color: white;
+      font-size: 0.9em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .suggestion-item:last-child {
+      border-bottom: none;
+  }
+  .suggestion-item:hover {
+      background: var(--card-bg);
+      color: var(--accent);
+  }
+
   
   /* Category Filter Buttons */
   #categoryFilters button {
@@ -263,34 +434,34 @@
 
   .game-buttons button {
     background: var(--card-bg);
-    color: var(--accent);
+    color: white; /* Changed to white for better contrast with the tag */
     border: 1px solid var(--accent);
-    /* MODIFIED: Increased padding for bigger buttons */
     padding: 20px 15px;
+    padding-top: 35px; /* Added space for the new tag */
     border-radius: 12px;
     cursor: pointer;
     text-align: center;
     font-weight: 600;
     box-shadow: 0 0 8px var(--bgGlow);
-    transition: 0.2s;
+    transition: all 0.3s ease-out; /* NEW: Added transition for hover effect */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
-    /* MODIFIED: Increased min-height for bigger buttons */
     min-height: 180px; 
     position: relative; 
   }
   
+  /* NEW (Feature 13): Hover Zoom and Glow Effect */
   .game-buttons button:hover {
     background: rgba(0, 255, 0, 0.15);
-    box-shadow: 0 0 15px var(--bgGlow);
-    transform: translateY(-2px);
+    box-shadow: 0 0 20px var(--bgGlow); /* Increased glow */
+    transform: translateY(-5px) scale(1.03); /* Lifts and scales */
+    color: var(--accent); /* Change text color on hover */
   }
 
   .game-buttons img {
-    /* MODIFIED: Increased size of game icon */
     width: 80px;
     height: 80px;
     display: block;
@@ -299,6 +470,20 @@
     object-fit: cover;
   }
   
+  /* NEW (Feature 12): Game Card Tag Style */
+  .game-card-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--accent);
+    color: var(--dark-bg);
+    padding: 3px 10px;
+    font-size: 0.75em;
+    font-weight: bold;
+    border-radius: 12px 0 10px 0;
+    text-transform: uppercase;
+  }
+
   /* GAME OVERLAY */
   #gameOverlay {
     position: fixed;
@@ -321,6 +506,12 @@
     align-items: center;
     padding: 15px 15px;
     border-bottom: 2px solid var(--accent);
+    transition: opacity 0.3s ease; /* NEW: Transition for auto-hide */
+  }
+  /* Class to apply when bar is hidden */
+  #topBar.hidden {
+      opacity: 0;
+      pointer-events: none; /* Make buttons unclickable when hidden */
   }
 
   #topBar button {
@@ -338,6 +529,17 @@
   #topBar button:hover {
     background: var(--accent);
     color: black;
+  }
+  
+  /* FPS Counter Style */
+  #fpsDisplay {
+    color: var(--accent);
+    font-weight: bold;
+    margin-right: 15px;
+    font-size: 14px;
+    border: 1px solid var(--accent);
+    padding: 4px 8px;
+    border-radius: 5px;
   }
   
   /* Specific style for the panic button for quick visual distinction */
@@ -373,7 +575,7 @@
     border: none;
   }
 
-  /* --- Settings Modal/Panel (Existing) --- */
+  /* --- Settings Modal/Panel --- */
   #settingsModal {
       position: fixed;
       top: 50%;
@@ -387,11 +589,53 @@
       z-index: 10001;
       display: none;
       width: 300px;
+      max-height: 80vh; /* Added max height */
+      overflow-y: auto; /* Added scrolling */
       color: white;
   }
   
-  /* --- Game Details Modal (NEW) --- */
-  #gameDetailsModal {
+  /* Style for Range Input */
+  .range-container {
+    margin-top: 10px;
+  }
+  .range-container input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    background: var(--dark-bg);
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+  }
+  .range-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 5px var(--accent);
+  }
+
+  /* Checkbox style for Matrix Cycle */
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--accent);
+  }
+  
+  /* --- Game Details Modal (Confirmation Modal uses this base) --- */
+  #gameDetailsModal, #launchConfirmModal {
       position: fixed;
       z-index: 10001;
       left: 0;
@@ -417,6 +661,39 @@
       position: relative;
       color: white;
   }
+  
+  /* NEW (Feature 14) Confirmation Modal Specific Styles */
+  #launchConfirmModal .modal-content {
+      max-width: 400px;
+      text-align: center;
+  }
+  #confirmLaunchBtn, #cancelLaunchBtn {
+      width: 48%;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-top: 15px;
+  }
+  #confirmLaunchBtn {
+      background: var(--accent);
+      color: var(--dark-bg);
+      border: 2px solid var(--accent);
+      margin-right: 4%;
+  }
+  #cancelLaunchBtn {
+      background: var(--dark-bg);
+      color: #ff5555;
+      border: 2px solid #ff5555;
+  }
+  #confirmLaunchBtn:hover {
+      background: white;
+      color: black;
+  }
+  #cancelLaunchBtn:hover {
+      background: #ff5555;
+      color: white;
+  }
+
 
   .modal-body {
       max-height: 400px;
@@ -473,20 +750,21 @@
   .setting-group label, .setting-group select {
       display: block;
       margin-top: 5px;
+      font-size: 0.9em;
   }
   
   /* Correctly scoped CSS for buttons, select, AND color picker/text input in settings modal */
   #settingsModal select, 
   #settingsModal button, 
   #settingsModal input[type="color"],
-  #settingsModal input[type="text"] { /* ADDED text input */
+  #settingsModal input[type="text"] { 
       background: var(--dark-bg);
       color: var(--accent);
       border: 2px solid var(--accent);
       border-radius: 8px;
       padding: 8px;
       width: 100%;
-      box-sizing: border-box; /* Ensures padding is inside the width */
+      box-sizing: border-box; 
       cursor: pointer;
       margin-top: 10px;
       transition: background 0.2s, color 0.2s;
@@ -496,25 +774,48 @@
   #settingsModal input[type="text"] {
     cursor: text;
   }
-
+  /* NEW (Feature 20) Style for Custom Hotkey Input */
+  #customPanicKeyInput {
+      width: 50px; /* Small size for single letter */
+      text-align: center;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-left: 10px;
+  }
 
   /* Specific styling for the color input to make the swatch visible and styled */
   #settingsModal input[type="color"] {
-    height: 40px; /* Make it a decent size for the swatch */
+    height: 40px; 
     padding: 2px;
-  }
-  /* Webkit-specific styling for the color swatch */
-  #settingsModal input[type="color"]::-webkit-color-swatch-wrapper {
-      padding: 0;
-  }
-  #settingsModal input[type="color"]::-webkit-color-swatch {
-      border: 1px solid var(--dark-bg); /* Use a darker border for contrast */
-      border-radius: 5px;
   }
 
   #settingsModal button:hover {
     background: var(--accent);
     color: var(--dark-bg);
+  }
+  
+  /* Go To Top Button */
+  #goToTopBtn {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 99;
+      border: 2px solid var(--accent);
+      background-color: rgba(0, 0, 0, 0.7);
+      color: var(--accent);
+      cursor: pointer;
+      padding: 10px 15px;
+      border-radius: 50%;
+      font-size: 18px;
+      box-shadow: 0 0 10px var(--bgGlow);
+      transition: all 0.3s;
+  }
+  #goToTopBtn:hover {
+      background-color: var(--accent);
+      color: var(--dark-bg);
+      box-shadow: 0 0 15px var(--bgGlow);
   }
 
   /* MEDIA QUERIES for smaller screens */
@@ -539,6 +840,10 @@
       /* Scales down grid for mobile */
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
     }
+    /* Hide clock on small screens for space */
+    #navbar-clock {
+      display: none;
+    }
   }
 
 </style>
@@ -551,12 +856,16 @@
 
 <div id="navbar">
   <div id="navbar-title">UBG-Village-Pro</div>
-  <div id="navbar-links">
-    <button onclick="showMainContent()">GAMES</button> 
-    <button onclick="toggleSettingsModal()">⚙ SETTINGS</button>
-    <a href="chatroom.html" target="_blank">CHAT</a> 
-    <a href="https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit?usp=sharing" target="_blank">MOVIES/TV</a>
-    <a href="https://discord.gg/qDrefFBQUs" target="_blank">DISCORD</a>
+  <div style="display: flex; align-items: center;">
+      <span id="navbar-clock"></span>
+      <button id="themeCycleBtn" onclick="quickCycleTheme()" title="Quick Theme Cycle">🎨</button>
+      <div id="navbar-links">
+        <button onclick="showMainContent()">GAMES</button> 
+        <button onclick="toggleSettingsModal()">⚙ SETTINGS</button>
+        <a href="chatroom.html" target="_blank">CHAT</a> 
+        <a href="https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit?usp=sharing" target="_blank">MOVIES/TV</a>
+        <a href="https://discord.gg/qDrefFBQUs" target="_blank">DISCORD</a>
+      </div>
   </div>
 </div>
 
@@ -564,8 +873,27 @@
     <h2>⚙ Site Settings</h2>
     
     <div class="setting-group">
+        <label for="siteTitleInput">Site Title (Browser Tab):</label>
+        <input type="text" id="siteTitleInput" placeholder="UBG-Village-Pro">
+        <button onclick="saveSiteTitle()">Save Site Title</button>
+    </div>
+    
+    <div class="setting-group">
+        <label for="customBgUrlInput">Custom Background URL (Image/Video):</label>
+        <input type="text" id="customBgUrlInput" placeholder="https://example.com/bg.jpg">
+        <button onclick="saveCustomBgUrl()">Apply Background</button>
+    </div>
+    
+    <div class="setting-group">
         <label for="themeColorPicker">Theme Color:</label>
         <input type="color" id="themeColorPicker" value="#00ff00" oninput="setTheme(this.value)">
+    </div>
+    
+    <div class="setting-group">
+        <label for="accentOpacityRange">Accent Glow Opacity:</label>
+        <div class="range-container">
+            <input type="range" id="accentOpacityRange" min="0.1" max="1.0" step="0.05" oninput="setAccentOpacity(this.value)">
+        </div>
     </div>
     
     <div class="setting-group">
@@ -574,12 +902,21 @@
     </div>
 
     <div class="setting-group">
+        <label>Panic Hotkey: Ctrl+Shift+</label>
+        <input type="text" id="customPanicKeyInput" maxlength="1" oninput="this.value = this.value.toUpperCase()">
+        <button onclick="savePanicKey()">Set Custom Panic Key</button>
+    </div>
+
+    <div class="setting-group">
         <label for="panicUrlInput">Panic Button URL:</label>
         <input type="text" id="panicUrlInput" placeholder="https://llv.instructure.com">
         <button onclick="savePanicUrl()">Save Panic URL</button>
     </div>
     
+    <h3>Matrix Rain Settings</h3>
     <div class="setting-group">
+        <button id="matrixToggleBtn" onclick="toggleMatrixRain()">Stop Rain</button>
+        
         <label for="matrixText">Matrix Text Type:</label>
         <select id="matrixText" onchange="setMatrixText(this.value)">
           <option value="binary">Binary (01)</option>
@@ -596,8 +933,33 @@
           <option value="1000">Off</option>
         </select>
     </div>
-    <button onclick="clearRecentGames()">Clear Recently Played</button> 
+    
+    <div class="setting-group">
+        <label for="matrixCycleCheckbox">Matrix Color Cycle Mode:</label>
+        <div class="checkbox-group">
+            <span>Enable Rainbow Cycle</span>
+            <input type="checkbox" id="matrixCycleCheckbox" onchange="toggleMatrixCycle(this.checked)">
+        </div>
+    </div>
+
+    <h3>Data Utilities</h3>
+    <button onclick="exportSettings()">💾 Export Settings</button>
+    <button onclick="document.getElementById('importFile').click()">📤 Import Settings</button>
+    <input type="file" id="importFile" accept="application/json" style="display: none;" onchange="importSettings(event)">
+
+    <button onclick="clearRecentGames()" style="margin-top: 20px;">Clear Recently Played</button> 
     <button onclick="toggleSettingsModal()" style="margin-top: 20px; border-color: #555; color: #aaa;">Close Settings</button>
+</div>
+
+<div id="launchConfirmModal">
+    <div class="modal-content">
+        <h2 id="confirmGameTitle" style="color: var(--accent); text-align: center; margin-top: 0;">Launch Game?</h2>
+        <p>Are you sure you want to launch <strong id="gameNameConfirm">Game Title</strong>?</p>
+        <div style="text-align: center;">
+            <button id="confirmLaunchBtn" data-url="" onclick="">▶ Launch</button>
+            <button id="cancelLaunchBtn" onclick="document.getElementById('launchConfirmModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
 </div>
 
 <div id="gameDetailsModal">
@@ -613,15 +975,18 @@
         <button id="modalLaunchBtn" onclick="" style="margin-top: 20px;">▶ Launch Game</button>
     </div>
 </div>
+
 <div id="gameOverlay">
   <div id="loadingIndicator">Loading Game...</div> 
 
   <div id="topBar">
     <span id="gameTitle" style="color: var(--accent); font-weight:bold;">No game</span>
-    <div>
-      <button id="panicButton">🚨 Panic! (Ctrl+Shift+P)</button>
+    <div style="display: flex; align-items: center;">
+      <span id="fpsDisplay">FPS: --</span>
+      <button id="panicButton">🚨 Panic! (<span id="hotkeyDisplay">Ctrl+Shift+P</span>)</button>
       <button id="closeGame">✖ Close</button>
-      <button id="fullScreenBtn">⛶ Fullscreen</button>
+      <button onclick="toggleFullscreen('frame')" style="margin-left: 10px;">⛶ Frame FS</button>
+      <button onclick="toggleFullscreen('window')">⛶ Window FS</button>
     </div>
   </div>
   <iframe id="gameFrame" src="" frameborder="0" allowfullscreen></iframe>
@@ -636,6 +1001,11 @@
 <div id="mainContent" class="container panel">
   <img src="UBP.png" alt="UBG Village Pro Logo" class="site-logo">
 
+  <div id="featuredGameBanner">
+      <h2>FEATURED GAME: <span id="featuredGameName">Loading...</span></h2>
+      <button id="featuredGameLaunchBtn" onclick="">▶ Play Now</button>
+  </div>
+  
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <button id="randomGameBtn" onclick="openRandomGame()">🎲 Random</button>
   </div>
@@ -643,7 +1013,11 @@
   <h1 id="recentlyPlayedHeader">Recently Played</h1>
   <div id="recentlyPlayed" class="game-buttons"></div> 
   
-  <input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames()">
+  <div class="search-container">
+      <input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames(event)" oninput="toggleClearButton(); showSuggestions()">
+      <button id="clearSearchBtn" onclick="clearSearch()">✖</button>
+      <div id="searchSuggestions" style="display: none;"></div>
+  </div>
   
   <div id="categoryFilters" style="text-align: center; margin-bottom: 20px;">
       <button onclick="filterByCategory('all', this)" data-filter="all" class="active">All</button>
@@ -658,70 +1032,72 @@
   <p id="noResultsMessage">❌ No games match your search or filter criteria. Try a different term or category.</p>
 
   <div class="game-buttons" id="allGamesGrid">
-    <button onclick="showGameDetails('GAMES/bloons5.html')" data-category="action" data-url="GAMES/bloons5.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/75.png">Bloons Tower Defense 5</button>
-    <button onclick="showGameDetails('bitlife/bitlife.html')" data-category="casual" data-url="bitlife/bitlife.html"> <img src="img/3.webp">Bitlife</button>
-    <button onclick="showGameDetails('https://devilapig247.github.io/block-blast/')" data-category="puzzle" data-url="https://devilapig247.github.io/block-blast/"> <img src="img/4.webp">Block Blast</button>
-    <button onclick="showGameDetails('CookieClicker/cookieclicker.html')" data-category="casual" data-url="CookieClicker/cookieclicker.html"> <img src="img/6.webp">Cookie Clicker</button>
-    <button onclick="showGameDetails('Coreball/coreball.html')" data-category="casual" data-url="Coreball/coreball.html"> <img src="img/7.webp">Coreball</button>
-    <button onclick="showGameDetails('Drive Mad.html')" data-category="sports" data-url="Drive Mad.html"> <img src="img/8.webp">Drive Mad</button>
-    <button onclick="showGameDetails('paperio2/paper.html')" data-category="io" data-url="paperio2/paper.html"> <img src="img/12.webp">Paper.io 2</button>
-    <button onclick="showGameDetails('polytrack.3-main/polytrack.html')" data-category="sports" data-url="polytrack.3-main/polytrack.html"> <img src="img/13.webp">PolyTrack</button>
-    <button onclick="showGameDetails('pvz/pvz.html')" data-category="action" data-url="pvz/pvz.html"> <img src="img/15.webp">PVZ</button>
-    <button onclick="showGameDetails('Retrobowl/retro.html')" data-category="sports" data-url="Retrobowl/retro.html"> <img src="img/17.webp">Retrobowl</button>
-    <button onclick="showGameDetails('Slope plus.html')" data-category="action" data-url="Slope plus.html"> <img src="img/19.webp">Slope</button>
-    <button onclick="showGameDetails('SubwaySurfers/subwaysurfers.html')" data-category="action" data-url="SubwaySurfers/subwaysurfers.html"> <img src="img/21.webp">Subway Surfers</button>
-    <button onclick="showGameDetails('TimeShooter/timeshooter.html')" data-category="action" data-url="TimeShooter/timeshooter.html"> <img src="img/23.webp">Time Shooter</button>
-    <button onclick="showGameDetails('Minecraft.html')" data-category="action" data-url="Minecraft.html"> <img src="img/minecraft.jpg">Minecraft</button>
-    <button onclick="showGameDetails('BasketballStarsUnblocked.github.io/index.html')" data-category="sports" data-url="BasketballStarsUnblocked.github.io/index.html"> <img src="img/basketball-stars.png">Basketball Stars</button>
-    <button onclick="showGameDetails('https://devilapig247.github.io/granny/')" data-category="horror" data-url="https://devilapig247.github.io/granny/"> <img src="img/granny logo.png">Granny</button>
-    <button onclick="showGameDetails('Baldi remaster/baldi.html')" data-category="horror" data-url="Baldi remaster/baldi.html"> <img src="img/466.png">Baldi</button>
-    <button onclick="showGameDetails('GAMES/CC3D.html')" data-category="action" data-url="GAMES/CC3D.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/164.png">Crazy Cattle 3D</button>
-    <button onclick="showGameDetails('DR3D/Dr3d.html')" data-category="action" data-url="DR3D/Dr3d.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/211.png">Death Run 3D</button>
-    <button onclick="showGameDetails('GAMES/Bacon May Die.html')" data-category="action" data-url="GAMES/Bacon May Die.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/268.png">Bacon May Die</button>
-    <button onclick="showGameDetails('GAMES/BlackJack.html')" data-category="casual" data-url="GAMES/BlackJack.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/312.png">BlackJack</button>
-    <button onclick="showGameDetails('https://devilapig247.github.io/backshot-roulette/')" data-category="horror" data-url="https://devilapig247.github.io/backshot-roulette/"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/205.png">Buckshot Roulette</button>
-    <button onclick="showGameDetails('GAMES/Crossy Road.html')" data-category="casual" data-url="GAMES/Crossy Road.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/24.png">Crossy Road</button>
-    <button onclick="showGameDetails('https://devilapig247.github.io/FANF/')" data-category="horror" data-url="https://devilapig247.github.io/FANF/"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/38.png">FNAF</button>
-    <button onclick="showGameDetails('GAMES/Fruit Ninja.html')" data-category="casual" data-url="GAMES/Fruit Ninja.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/261.png">Fruit Ninja</button>
-    <button onclick="showGameDetails('GAMES/Getaway Shootout.html')" data-category="action" data-url="GAMES/Getaway Shootout.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/338.png">Getaway Shootout</button>
-    <button onclick="showGameDetails('GAMES/Getting Over It with Bennett Foddy.html')" data-category="casual" data-url="GAMES/Getting Over It with Bennett Foddy.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/557.png">Getting over it</button>
-    <button onclick="showGameDetails('GAMES/Google Baseball.html')" data-category="sports" data-url="GAMES/Google Baseball.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/257.png">Google Baseball</button>
-    <button onclick="showGameDetails('GAMES/Granny 2.html')" data-category="horror" data-url="GAMES/Granny 2.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/125.png">Granny 2</button>
-    <button onclick="showGameDetails('GAMES/Gunspin.html')" data-category="action" data-url="GAMES/Gunspin.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/91.png">Gunspin</button>
-    <button onclick="showGameDetails('GAMES/Jetpack Joyride.html')" data-category="action" data-url="GAMES/Jetpack Joyride.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/7.png">Jetpack Joyride</button>
-    <button onclick="showGameDetails('GAMES/Monster Tracks.html')" data-category="sports" data-url="GAMES/Monster Tracks.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/36.png">Monster Tracks</button>
-    <button onclick="showGameDetails('GAMES/OvO 3 Dimensions.html')" data-category="action" data-url="GAMES/OvO 3 Dimensions.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/3.png">OvO 3</button>
-    <button onclick="showGameDetails('GAMES/Papas Pizeria.html')" data-category="casual" data-url="GAMES/Papas Pizeria.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/227.png">Papas Pizzeria</button>
-    <button onclick="showGameDetails('GAMES/Ragdoll Archers.html')" data-category="action" data-url="GAMES/Ragdoll Archers.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/186.png">Ragdoll Archers</button>
-    <button onclick="showGameDetails('GAMES/Ragdoll Hit.html')" data-category="action" data-url="GAMES/Ragdoll Hit.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/44.png">Ragdoll Hit</button>
-    <button onclick="showGameDetails('GAMES/Rainbow Obby.html')" data-category="action" data-url="GAMES/Rainbow Obby.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/307.png">Rainbow Obby</button>
-    <button onclick="showGameDetails('GAMES/Run 3.html')" data-category="action" data-url="GAMES/Run 3.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/177.png">Run 3</button>
-    <button onclick="showGameDetails('GAMES/Sandboxels.html')" data-category="casual" data-url="GAMES/Sandboxels.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/309.png">Sandboxels</button>
-    <button onclick="showGameDetails('GAMES/Slice it All.html')" data-category="casual" data-url="GAMES/Slice it All.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/128.png">Slice it All</button>
-    <button onclick="showGameDetails('GAMES/Slime Rancher.html')" data-category="casual" data-url="GAMES/Slime Rancher.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/591.png">Slime Rancher</button>
-    <button onclick="showGameDetails('GAMES/Slither.io.html')" data-category="io" data-url="GAMES/Slither.io.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/461.png">Slither.io</button>
-    <button onclick="showGameDetails('GAMES/Slowroads.html')" data-category="casual" data-url="GAMES/Slowroads.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/369.png">Slowroads</button>
-    <button onclick="showGameDetails('GAMES/Snow Rider 3D.html')" data-category="action" data-url="GAMES/Snow Rider 3D.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/119.png">Snow Rider 3D</button>
-    <button onclick="showGameDetails('GAMES/Soundboard.html')" data-category="utility" data-url="GAMES/Soundboard.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/179.png">Soundboard</button>
-    <button onclick="showGameDetails('GAMES/Spiral Roll.html')" data-category="casual" data-url="GAMES/Spiral Roll.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/349.png">Spiral Roll</button>
-    <button onclick="showGameDetails('GAMES/Thats Not My Neighbor.html')" data-category="horror" data-url="GAMES/Thats Not My Neighbor.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/216.png">That's Not My Neighbor</button>
-    <button onclick="showGameDetails('GAMES/Vex 5.html')" data-category="action" data-url="GAMES/Vex 5.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/50.png">Vex 5</button>
-    <button onclick="showGameDetails('GAMES/Gunblood.html')" data-category="action" data-url="GAMES/Gunblood.html"> <img src="gunblood.png">Gunblood</button>
-    <button onclick="showGameDetails('GAMES/Slender.html')" data-category="horror" data-url="GAMES/Slender.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/451.png">Slenderman</button>
-    <button onclick="showGameDetails('GAMES/1v1.lol.html')" data-category="action" data-url="GAMES/1v1.lol.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/58.png">1v1.lol</button>
-    <button onclick="showGameDetails('GAMES/Clustertruck.html')" data-category="action" data-url="GAMES/Clustertruck.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/81.png">Clustertruck</button>
-    <button onclick="showGameDetails('GAMES/Escape road.html')" data-category="action" data-url="GAMES/Escape road.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/264.png">Escape Road</button>
-    <button onclick="showGameDetails('GAMES/Rooftop Snipers.html')" data-category="action" data-url="GAMES/Rooftop Snipers.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/283.png">Rooftop Snipers</button>
-    <button onclick="showGameDetails('GAMES/Hollow Knight.html')" data-category="action" data-url="GAMES/Hollow Knight.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/468.png">Hollow Knight</button>
-    <button onclick="showGameDetails('GAMES/Plinko.html')" data-category="casual" data-url="GAMES/Plinko.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/544.png">Plinko</button>
-    <button onclick="showGameDetails('GAMES/R.E.P.O.html')" data-category="action" data-url="GAMES/R.E.P.O.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/195.png">R.E.P.O</button>
-    <button onclick="showGameDetails('GAMES/Sandtris.html')" data-category="casual" data-url="GAMES/Sandtris.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/311.png">Sandtris</button>
-    <button onclick="showGameDetails('GAMES/Tunnel Rush.html')" data-category="action" data-url="GAMES/Tunnel Rush.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/206.png">Tunnel Rush</button>
-    <button onclick="showGameDetails('Celeste.html')" data-category="action" data-url="Celeste.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/623.png">Celeste</button>
-    <button onclick="showGameDetails('ULTRAKILL.html')" data-category="action" data-url="ULTRAKILL.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/196.png">ULTRAKILL</button>
-    <button onclick="showGameDetails('Balatro.html')" data-category="casual" data-url="Balatro.html"> <img src="Balatro.jpg">Balatro</button>
+    <button onclick="showLaunchConfirm('GAMES/bloons5.html')" data-category="action" data-url="GAMES/bloons5.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/75.png">Bloons Tower Defense 5</button>
+    <button onclick="showLaunchConfirm('bitlife/bitlife.html')" data-category="casual" data-url="bitlife/bitlife.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="img/3.webp">Bitlife</button>
+    <button onclick="showLaunchConfirm('https://devilapig247.github.io/block-blast/')" data-category="puzzle" data-url="https://devilapig247.github.io/block-blast/"> <span class="game-card-tag" data-category-text="casual">Puzzle</span> <img src="img/4.webp">Block Blast</button>
+    <button onclick="showLaunchConfirm('CookieClicker/cookieclicker.html')" data-category="casual" data-url="CookieClicker/cookieclicker.html"> <span class="game-card-tag" data-category-text="casual">Clicker</span> <img src="img/6.webp">Cookie Clicker</button>
+    <button onclick="showLaunchConfirm('Coreball/coreball.html')" data-category="casual" data-url="Coreball/coreball.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="img/7.webp">Coreball</button>
+    <button onclick="showLaunchConfirm('Drive Mad.html')" data-category="sports" data-url="Drive Mad.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="img/8.webp">Drive Mad</button>
+    <button onclick="showLaunchConfirm('paperio2/paper.html')" data-category="io" data-url="paperio2/paper.html"> <span class="game-card-tag" data-category-text="io">.io Game</span> <img src="img/12.webp">Paper.io 2</button>
+    <button onclick="showLaunchConfirm('polytrack.3-main/polytrack.html')" data-category="sports" data-url="polytrack.3-main/polytrack.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="img/13.webp">PolyTrack</button>
+    <button onclick="showLaunchConfirm('pvz/pvz.html')" data-category="action" data-url="pvz/pvz.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="img/15.webp">PVZ</button>
+    <button onclick="showLaunchConfirm('Retrobowl/retro.html')" data-category="sports" data-url="Retrobowl/retro.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="img/17.webp">Retrobowl</button>
+    <button onclick="showLaunchConfirm('Slope plus.html')" data-category="action" data-url="Slope plus.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="img/19.webp">Slope</button>
+    <button onclick="showLaunchConfirm('SubwaySurfers/subwaysurfers.html')" data-category="action" data-url="SubwaySurfers/subwaysurfers.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="img/21.webp">Subway Surfers</button>
+    <button onclick="showLaunchConfirm('TimeShooter/timeshooter.html')" data-category="action" data-url="TimeShooter/timeshooter.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="img/23.webp">Time Shooter</button>
+    <button onclick="showLaunchConfirm('Minecraft.html')" data-category="action" data-url="Minecraft.html"> <span class="game-card-tag" data-category-text="action">Sandbox</span> <img src="img/minecraft.jpg">Minecraft</button>
+    <button onclick="showLaunchConfirm('BasketballStarsUnblocked.github.io/index.html')" data-category="sports" data-url="BasketballStarsUnblocked.github.io/index.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="img/basketball-stars.png">Basketball Stars</button>
+    <button onclick="showLaunchConfirm('https://devilapig247.github.io/granny/')" data-category="horror" data-url="https://devilapig247.github.io/granny/"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="img/granny logo.png">Granny</button>
+    <button onclick="showLaunchConfirm('Baldi remaster/baldi.html')" data-category="horror" data-url="Baldi remaster/baldi.html"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="img/466.png">Baldi</button>
+    <button onclick="showLaunchConfirm('GAMES/CC3D.html')" data-category="action" data-url="GAMES/CC3D.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/164.png">Crazy Cattle 3D</button>
+    <button onclick="showLaunchConfirm('DR3D/Dr3d.html')" data-category="action" data-url="DR3D/Dr3d.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/211.png">Death Run 3D</button>
+    <button onclick="showLaunchConfirm('GAMES/Bacon May Die.html')" data-category="action" data-url="GAMES/Bacon May Die.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/268.png">Bacon May Die</button>
+    <button onclick="showLaunchConfirm('GAMES/BlackJack.html')" data-category="casual" data-url="GAMES/BlackJack.html"> <span class="game-card-tag" data-category-text="casual">Card</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/312.png">BlackJack</button>
+    <button onclick="showLaunchConfirm('https://devilapig247.github.io/backshot-roulette/')" data-category="horror" data-url="https://devilapig247.github.io/backshot-roulette/"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/205.png">Buckshot Roulette</button>
+    <button onclick="showLaunchConfirm('GAMES/Crossy Road.html')" data-category="casual" data-url="GAMES/Crossy Road.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/24.png">Crossy Road</button>
+    <button onclick="showLaunchConfirm('https://devilapig247.github.io/FANF/')" data-category="horror" data-url="https://devilapig247.github.io/FANF/"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/38.png">FNAF</button>
+    <button onclick="showLaunchConfirm('GAMES/Fruit Ninja.html')" data-category="casual" data-url="GAMES/Fruit Ninja.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/261.png">Fruit Ninja</button>
+    <button onclick="showLaunchConfirm('GAMES/Getaway Shootout.html')" data-category="action" data-url="GAMES/Getaway Shootout.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/338.png">Getaway Shootout</button>
+    <button onclick="showLaunchConfirm('GAMES/Getting Over It with Bennett Foddy.html')" data-category="casual" data-url="GAMES/Getting Over It with Bennett Foddy.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/557.png">Getting over it</button>
+    <button onclick="showLaunchConfirm('GAMES/Google Baseball.html')" data-category="sports" data-url="GAMES/Google Baseball.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/257.png">Google Baseball</button>
+    <button onclick="showLaunchConfirm('GAMES/Granny 2.html')" data-category="horror" data-url="GAMES/Granny 2.html"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/125.png">Granny 2</button>
+    <button onclick="showLaunchConfirm('GAMES/Gunspin.html')" data-category="action" data-url="GAMES/Gunspin.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/91.png">Gunspin</button>
+    <button onclick="showLaunchConfirm('GAMES/Jetpack Joyride.html')" data-category="action" data-url="GAMES/Jetpack Joyride.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/7.png">Jetpack Joyride</button>
+    <button onclick="showLaunchConfirm('GAMES/Monster Tracks.html')" data-category="sports" data-url="GAMES/Monster Tracks.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/36.png">Monster Tracks</button>
+    <button onclick="showLaunchConfirm('GAMES/OvO 3 Dimensions.html')" data-category="action" data-url="GAMES/OvO 3 Dimensions.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/3.png">OvO 3</button>
+    <button onclick="showLaunchConfirm('GAMES/Papas Pizeria.html')" data-category="casual" data-url="GAMES/Papas Pizeria.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/227.png">Papas Pizzeria</button>
+    <button onclick="showLaunchConfirm('GAMES/Ragdoll Archers.html')" data-category="action" data-url="GAMES/Ragdoll Archers.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/186.png">Ragdoll Archers</button>
+    <button onclick="showLaunchConfirm('GAMES/Ragdoll Hit.html')" data-category="action" data-url="GAMES/Ragdoll Hit.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/44.png">Ragdoll Hit</button>
+    <button onclick="showLaunchConfirm('GAMES/Rainbow Obby.html')" data-category="action" data-url="GAMES/Rainbow Obby.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/307.png">Rainbow Obby</button>
+    <button onclick="showLaunchConfirm('GAMES/Run 3.html')" data-category="action" data-url="GAMES/Run 3.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/177.png">Run 3</button>
+    <button onclick="showLaunchConfirm('GAMES/Sandboxels.html')" data-category="casual" data-url="GAMES/Sandboxels.html"> <span class="game-card-tag" data-category-text="utility">Sandbox</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/309.png">Sandboxels</button>
+    <button onclick="showLaunchConfirm('GAMES/Slice it All.html')" data-category="casual" data-url="GAMES/Slice it All.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/128.png">Slice it All</button>
+    <button onclick="showLaunchConfirm('GAMES/Slime Rancher.html')" data-category="casual" data-url="GAMES/Slime Rancher.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/591.png">Slime Rancher</button>
+    <button onclick="showLaunchConfirm('GAMES/Slither.io.html')" data-category="io" data-url="GAMES/Slither.io.html"> <span class="game-card-tag" data-category-text="io">.io Game</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/461.png">Slither.io</button>
+    <button onclick="showLaunchConfirm('GAMES/Slowroads.html')" data-category="casual" data-url="GAMES/Slowroads.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/369.png">Slowroads</button>
+    <button onclick="showLaunchConfirm('GAMES/Snow Rider 3D.html')" data-category="action" data-url="GAMES/Snow Rider 3D.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/119.png">Snow Rider 3D</button>
+    <button onclick="showLaunchConfirm('GAMES/Soundboard.html')" data-category="utility" data-url="GAMES/Soundboard.html"> <span class="game-card-tag" data-category-text="utility">Utility</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/179.png">Soundboard</button>
+    <button onclick="showLaunchConfirm('GAMES/Spiral Roll.html')" data-category="casual" data-url="GAMES/Spiral Roll.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/349.png">Spiral Roll</button>
+    <button onclick="showLaunchConfirm('GAMES/Thats Not My Neighbor.html')" data-category="horror" data-url="GAMES/Thats Not My Neighbor.html"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/216.png">That's Not My Neighbor</button>
+    <button onclick="showLaunchConfirm('GAMES/Vex 5.html')" data-category="action" data-url="GAMES/Vex 5.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/50.png">Vex 5</button>
+    <button onclick="showLaunchConfirm('GAMES/Gunblood.html')" data-category="action" data-url="GAMES/Gunblood.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="gunblood.png">Gunblood</button>
+    <button onclick="showLaunchConfirm('GAMES/Slender.html')" data-category="horror" data-url="GAMES/Slender.html"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/451.png">Slenderman</button>
+    <button onclick="showLaunchConfirm('GAMES/1v1.lol.html')" data-category="action" data-url="GAMES/1v1.lol.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/58.png">1v1.lol</button>
+    <button onclick="showLaunchConfirm('GAMES/Clustertruck.html')" data-category="action" data-url="GAMES/Clustertruck.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/81.png">Clustertruck</button>
+    <button onclick="showLaunchConfirm('GAMES/Escape road.html')" data-category="action" data-url="GAMES/Escape road.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/264.png">Escape Road</button>
+    <button onclick="showLaunchConfirm('GAMES/Rooftop Snipers.html')" data-category="action" data-url="GAMES/Rooftop Snipers.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/283.png">Rooftop Snipers</button>
+    <button onclick="showLaunchConfirm('GAMES/Hollow Knight.html')" data-category="action" data-url="GAMES/Hollow Knight.html"> <span class="game-card-tag" data-category-text="action">Platformer</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/468.png">Hollow Knight</button>
+    <button onclick="showLaunchConfirm('GAMES/Plinko.html')" data-category="casual" data-url="GAMES/Plinko.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/544.png">Plinko</button>
+    <button onclick="showLaunchConfirm('GAMES/R.E.P.O.html')" data-category="action" data-url="GAMES/R.E.P.O.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/195.png">R.E.P.O</button>
+    <button onclick="showLaunchConfirm('GAMES/Sandtris.html')" data-category="casual" data-url="GAMES/Sandtris.html"> <span class="game-card-tag" data-category-text="casual">Puzzle</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/311.png">Sandtris</button>
+    <button onclick="showLaunchConfirm('GAMES/Tunnel Rush.html')" data-category="action" data-url="GAMES/Tunnel Rush.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/206.png">Tunnel Rush</button>
+    <button onclick="showLaunchConfirm('Celeste.html')" data-category="action" data-url="Celeste.html"> <span class="game-card-tag" data-category-text="action">Platformer</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/623.png">Celeste</button>
+    <button onclick="showLaunchConfirm('ULTRAKILL.html')" data-category="action" data-url="ULTRAKILL.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/196.png">ULTRAKILL</button>
+    <button onclick="showLaunchConfirm('Balatro.html')" data-category="casual" data-url="Balatro.html"> <span class="game-card-tag" data-category-text="casual">Card</span> <img src="Balatro.jpg">Balatro</button>
   </div>
 </div>
+
+<button onclick="document.documentElement.scrollTop = 0;" id="goToTopBtn" title="Go to top">▲</button>
 
 
 <script>
@@ -730,14 +1106,44 @@ const PANIC_URL_KEY = "customPanicUrl";
 const DEFAULT_PANIC_URL = "https://llv.instructure.com/";
 let currentPanicURL; 
 
+const SITE_TITLE_KEY = "customSiteTitle";
+const DEFAULT_SITE_TITLE = "UBG-Village-Pro";
+let originalDocumentTitle = DEFAULT_SITE_TITLE;
+
+const BG_URL_KEY = "customBgUrl";
+
+const THEME_COLORS = ["#00ff00", "#00bfff", "#ff0000", "#ffff00", "#00ffff"]; // Green, Blue, Red, Yellow, Cyan
+let themeIndex = 0;
+
+// NEW (Feature 20): Custom Panic Hotkey
+const PANIC_KEY_CODE_KEY = "customPanicKeyCode";
+let currentPanicKeyCode = "P"; // Default to P
+
 let matrixInterval;
+let isMatrixRunning = true; // NEW (Feature 15)
 
 // Global variable for cursor state before game launch
 let wasCursorEnabledBeforeGame = true;
 
-// --- GAME DETAILS DATA (NEW) ---
+// Matrix Cycle
+let isMatrixCycleEnabled = false;
+let colorCycleHue = 0;
+
+// FPS Counter Globals
+let lastFrameTime = performance.now();
+const fpsDisplay = document.getElementById('fpsDisplay');
+
+// NEW (Feature 17): In-Game Overlay Auto-Hide Timer
+let mouseMoveTimer;
+
+// NEW (Feature 18): Search History
+const SEARCH_HISTORY_KEY = "searchHistory";
+const MAX_SEARCH_HISTORY = 5;
+
+
+// --- GAME DETAILS DATA ---
+// ... (Game details data is omitted for brevity but should be included here) ...
 const gameDetails = {
-    // Format: "data-url": { description: "...", controls: "..." }
     "GAMES/bloons5.html": {
         description: "A classic tower defense game where you place monkey towers to pop waves of incoming bloons (balloons). Upgrade your towers and use special agents to defend your base.",
         controls: "Mouse (for placing and upgrading towers). Use hotkeys 1-5 for quick tower selection."
@@ -770,17 +1176,16 @@ const gameDetails = {
 };
 // --- END GAME DETAILS DATA ---
 
+
 // --- GLOBAL MATRIX CHARS ---
 const BINARY_CHARS = "01";
-// Common characters from the original Matrix code
 const KANJI_CHARS = "日ﾓﾀﾝｸｱｲｽｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"; 
 let currentLetters = BINARY_CHARS; 
 
 
-// --- CUSTOM CURSOR LOGIC ADDED ---
+// --- CUSTOM CURSOR LOGIC ---
 const customCursor = document.getElementById('customCursor');
 document.addEventListener('mousemove', (e) => {
-    // Moves the custom cursor element to follow the mouse position
     customCursor.style.left = `${e.clientX}px`;
     customCursor.style.top = `${e.clientY}px`;
 });
@@ -790,11 +1195,29 @@ document.addEventListener('mousemove', (e) => {
 function showMainContent() {
   document.getElementById("splashScreen").style.display = "none";
   document.getElementById("mainContent").style.display = "block";
+  setFeaturedGame(); 
 }
 
-// NEW FUNCTION: Shows the game details modal
-function showGameDetails(url) {
-    // EXCLUSIONS (OPEN NORMALLY) - Check if URL is an external link
+// Fullscreen Modes
+function toggleFullscreen(mode) {
+    let frame = document.getElementById("gameFrame");
+    
+    if (mode === 'frame') {
+        if (!document.fullscreenElement) {
+            frame.requestFullscreen().catch(err => console.log("Fullscreen failed:", err));
+        } else {
+            document.exitFullscreen();
+        }
+    } else if (mode === 'window') {
+        if (frame.src) {
+            window.open(frame.src, '_blank');
+        }
+    }
+}
+
+// NEW (Feature 14): Shows the launch confirmation modal
+function showLaunchConfirm(url) {
+    // Exclusion: Open external links immediately
     if (
         url.includes("discord.gg") ||
         url.includes("discord.com") ||
@@ -804,52 +1227,40 @@ function showGameDetails(url) {
         window.open(url, "_blank");
         return;
     }
-
-    // Get the button data for name/image from the main grid
-    let btn = [...document.querySelectorAll("#allGamesGrid button")]
+    
+    // Find button and game name
+    let btn = [...document.querySelectorAll("#allGamesGrid button, #recentlyPlayed button")]
                 .find(b => b.getAttribute("data-url") === url);
-
-    // Get game details from the dedicated object or use defaults
-    const details = gameDetails[url] || { 
-        // Use the innerText of the button if available, otherwise 'Game'
-        description: "Description not available. This game is provided as-is.", 
-        controls: "Controls may vary. Try using Arrow Keys, WASD, and Mouse/Click." 
-    };
+    let gameName = btn ? btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim() : 'The Game';
     
-    // Extract the name cleanly
-    let gameName = btn ? btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim() : 'Game Title';
-
-
-    // Update modal content
-    document.getElementById("modalGameTitle").innerText = gameName;
-    document.getElementById("modalGameDescription").innerText = details.description;
-    document.getElementById("modalGameControls").innerText = details.controls;
+    // Set up modal
+    document.getElementById("gameNameConfirm").innerText = gameName;
     
-    // Update launch button to call the new launchGame function with the correct URL
-    document.getElementById("modalLaunchBtn").setAttribute("onclick", `launchGame('${url}')`);
-
+    // Configure launch button to call launchGame with the URL
+    const confirmBtn = document.getElementById("confirmLaunchBtn");
+    confirmBtn.setAttribute("onclick", `launchGame('${url}')`);
+    
     // Show modal
-    document.getElementById("gameDetailsModal").style.display = "flex";
+    document.getElementById("launchConfirmModal").style.display = "flex";
 }
 
-// NEW FUNCTION: Closes the game details modal
-function closeGameDetailsModal() {
-    document.getElementById("gameDetailsModal").style.display = "none";
-}
-
-// NEW FUNCTION: Launches the game in the iframe (old openGame logic)
+// NEW FUNCTION: Launches the game in the iframe (original logic now wrapped)
 function launchGame(url) {
-    // 1. Close the Details Modal
+    // 1. Close Modals
     closeGameDetailsModal(); 
+    document.getElementById("launchConfirmModal").style.display = "none";
     
-    // --- NEW: Custom Cursor Disable Logic ---
-    // 1. Store the user's current preference before overriding it
+    // Get game info
+    let btn = [...document.querySelectorAll(".game-buttons button")]
+                .find(b => b.getAttribute("data-url") === url);
+    let gameName = btn ? btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim() : 'Game In Progress';
+    
+    document.title = gameName; 
+    document.getElementById("gameTitle").innerText = gameName; 
+
+    // Custom Cursor Disable Logic
     wasCursorEnabledBeforeGame = localStorage.getItem("customCursorEnabled") !== "false";
-
-    // 2. Force system cursor for game by adding the system-cursor class
     document.body.classList.add("system-cursor");
-    // ----------------------------------------
-
 
     let overlay = document.getElementById("gameOverlay");
     let frame = document.getElementById("gameFrame");
@@ -865,38 +1276,80 @@ function launchGame(url) {
         loadingIndicator.style.display = "none";
     };
     
-    // FIND BUTTON DATA and update recent games/title (keep this logic)
-    let btn = [...document.querySelectorAll(".game-buttons button")]
+    // Start auto-hide timer
+    setupOverlayAutoHide();
+
+    // Find button data and update recent games/title (keep this logic)
+    if (btn) {
+        let img = btn.querySelector("img")?.src;
+        addRecentGame(gameName, url, img);
+    }
+}
+
+// Opens the Game Details Modal. The Launch button in this modal calls showLaunchConfirm.
+function showGameDetails(url) {
+    if (
+        url.includes("discord.gg") ||
+        url.includes("discord.com") ||
+        url.includes("docs.google.com") ||
+        url.includes("chatroom.html")
+    ) {
+        window.open(url, "_blank");
+        return;
+    }
+
+    let btn = [...document.querySelectorAll("#allGamesGrid button")]
                 .find(b => b.getAttribute("data-url") === url);
 
-    if (btn) {
-        let name = btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim();
-        let img = btn.querySelector("img")?.src;
+    const details = gameDetails[url] || { 
+        description: "Description not available. This game is provided as-is.", 
+        controls: "Controls may vary. Try using Arrow Keys, WASD, and Mouse/Click." 
+    };
+    
+    let gameName = btn ? btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim() : 'Game Title';
 
-        addRecentGame(name, url, img);
+    document.getElementById("modalGameTitle").innerText = gameName;
+    document.getElementById("modalGameDescription").innerText = details.description;
+    document.getElementById("modalGameControls").innerText = details.controls;
+    
+    // The details modal launch button now calls the confirmation modal
+    document.getElementById("modalLaunchBtn").setAttribute("onclick", `document.getElementById('gameDetailsModal').style.display='none'; showLaunchConfirm('${url}')`);
 
-        // UPDATE TOP BAR TITLE
-        document.getElementById("gameTitle").innerText = name;
-    }
+    document.getElementById("gameDetailsModal").style.display = "flex";
+}
+
+
+function closeGameDetailsModal() {
+    document.getElementById("gameDetailsModal").style.display = "none";
 }
 
 // Close modal when clicking outside of the content area
 window.onclick = function(event) {
-    const modal = document.getElementById('gameDetailsModal');
-    if (event.target == modal) {
+    const detailModal = document.getElementById('gameDetailsModal');
+    const confirmModal = document.getElementById('launchConfirmModal');
+    if (event.target == detailModal) {
         closeGameDetailsModal();
+    }
+    if (event.target == confirmModal) {
+        document.getElementById('launchConfirmModal').style.display = 'none';
     }
 }
 
 // ⭐ PANIC BUTTON LOGIC & AUTOPANIC KEYBINDING ⭐
+
+// NEW (Feature 20): Updates the visible hotkey display
+function updateHotkeyDisplay() {
+    document.getElementById("hotkeyDisplay").innerText = `Ctrl+Shift+${currentPanicKeyCode}`;
+}
+
 document.getElementById("panicButton").onclick = () => {
   window.location.replace(currentPanicURL);
 };
 
 document.addEventListener('keydown', (e) => {
-    // Check for Ctrl+Shift+P (Windows/Linux) or Cmd+Shift+P (Mac)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
-        e.preventDefault(); // Prevent browser print dialog/system shortcuts
+    // Check for Ctrl+Shift+<Custom Key>
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toUpperCase() === currentPanicKeyCode) {
+        e.preventDefault(); 
         window.location.replace(currentPanicURL);
     }
 });
@@ -904,50 +1357,153 @@ document.addEventListener('keydown', (e) => {
 
 // --- GAME/OVERLAY LOGIC ---
 
+// NEW (Feature 17): Auto-hide logic for top bar
+function setupOverlayAutoHide() {
+    const topBar = document.getElementById("topBar");
+    const overlay = document.getElementById("gameOverlay");
+    
+    // Function to hide the bar
+    function hideBar() {
+        topBar.classList.add('hidden');
+    }
+    
+    // Function to show the bar and reset timer
+    function resetTimer() {
+        topBar.classList.remove('hidden');
+        clearTimeout(mouseMoveTimer);
+        // Hide after 3 seconds of inactivity
+        mouseMoveTimer = setTimeout(hideBar, 3000); 
+    }
+
+    // Clear existing listeners to prevent duplicates
+    overlay.removeEventListener('mousemove', resetTimer);
+    overlay.removeEventListener('mouseenter', resetTimer);
+    overlay.removeEventListener('mouseleave', hideBar);
+
+    // Add new listeners
+    overlay.addEventListener('mousemove', resetTimer);
+    overlay.addEventListener('mouseenter', resetTimer);
+    overlay.addEventListener('mouseleave', hideBar);
+
+    // Initial call to hide it if no movement occurs immediately
+    resetTimer();
+}
+
 // CLOSE GAME
 document.getElementById("closeGame").onclick = () => {
   document.getElementById("gameOverlay").style.display = "none";
   document.getElementById("gameFrame").src = ""; // Clear iframe source
   document.getElementById("gameTitle").innerText = "No game";
+  
+  // Restore site title
+  document.title = originalDocumentTitle;
 
-  // --- NEW: Restore Custom Cursor Logic ---
-  // Restore the user's preference state when closing the game
+  // Restore Custom Cursor Logic
   if (wasCursorEnabledBeforeGame) {
       document.body.classList.remove("system-cursor"); // Re-enable custom cursor
   } 
-  // ----------------------------------------
+  
+  // Clear auto-hide timer on close
+  clearTimeout(mouseMoveTimer);
 };
 
-// FULLSCREEN TOGGLE
-document.getElementById("fullScreenBtn").onclick = () => {
-  let frame = document.getElementById("gameFrame");
+// FPS Counter (Feature 4)
+function updateFPS() {
+    const now = performance.now();
+    const delta = now - lastFrameTime;
+    const fps = Math.round(1000 / delta);
+    lastFrameTime = now;
+    
+    if (document.getElementById("gameOverlay").style.display === "flex") {
+        fpsDisplay.innerText = `FPS: ${fps}`;
+    }
+    window.requestAnimationFrame(updateFPS);
+}
+// Start the FPS loop immediately
+window.requestAnimationFrame(updateFPS);
 
-  if (!document.fullscreenElement) {
-    frame.requestFullscreen().catch(err => console.log(err));
-  } else {
-    document.exitFullscreen();
-  }
-};
 
-
-// --- SEARCH & FILTER LOGIC ---
+// --- SEARCH & FILTER LOGIC (Features 9, 18) ---
 const searchBar = document.getElementById("searchBar");
+const clearSearchBtn = document.getElementById("clearSearchBtn");
 const noResultsMessage = document.getElementById("noResultsMessage");
+const searchSuggestions = document.getElementById("searchSuggestions");
 
-function filterGames() {
-  let search = searchBar.value.toLowerCase();
+function toggleClearButton() {
+    clearSearchBtn.style.display = searchBar.value.length > 0 ? "block" : "none";
+}
+
+function clearSearch() {
+    searchBar.value = "";
+    toggleClearButton();
+    filterGames();
+    searchSuggestions.style.display = "none";
+}
+
+// NEW (Feature 18): Show search suggestions
+function showSuggestions() {
+    const search = searchBar.value.toLowerCase().trim();
+    const history = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || "[]");
+    
+    searchSuggestions.innerHTML = '';
+    searchSuggestions.style.display = 'none';
+
+    // Show only if search bar is focused and empty
+    if (search === '' && document.activeElement === searchBar && history.length > 0) {
+        history.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.textContent = item;
+            div.onclick = () => {
+                searchBar.value = item;
+                toggleClearButton();
+                filterGames();
+                searchSuggestions.style.display = 'none';
+            };
+            searchSuggestions.appendChild(div);
+        });
+        searchSuggestions.style.display = 'block';
+    }
+}
+
+// NEW (Feature 18): Add search term to history
+function saveSearchTerm(term) {
+    if (term.length < 3) return; // Ignore short or empty searches
+
+    let history = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || "[]");
+    
+    // Remove duplicates
+    history = history.filter(h => h.toLowerCase() !== term.toLowerCase());
+    
+    // Add new term to the front
+    history.unshift(term);
+    
+    // Limit size
+    history = history.slice(0, MAX_SEARCH_HISTORY);
+    
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+}
+
+function filterGames(event) {
+  let search = searchBar.value.toLowerCase().trim();
   let activeCategory = document.querySelector("#categoryFilters button.active")?.getAttribute("data-filter") || 'all';
   let visibleCount = 0;
 
+  // Save successful search on Enter key press
+  if (event && event.key === 'Enter') {
+      saveSearchTerm(search);
+      searchSuggestions.style.display = 'none';
+  } else if (!event) {
+      // Called on filter/init, hide suggestions
+      searchSuggestions.style.display = 'none';
+  }
+
+
   document.querySelectorAll("#allGamesGrid button").forEach(btn=>{
-    // Get text content
     const textContent = btn.innerText.toLowerCase(); 
     const category = btn.getAttribute("data-category");
     
-    // Check search term
     const matchesSearch = textContent.includes(search);
-
-    // Check category filter
     const matchesCategory = activeCategory === 'all' || category === activeCategory;
 
     if (matchesSearch && matchesCategory) {
@@ -958,7 +1514,6 @@ function filterGames() {
     }
   });
 
-  // Display 'No Results' message
   noResultsMessage.style.display = (visibleCount === 0 && (search.length > 0 || activeCategory !== 'all')) ? "block" : "none";
 }
 
@@ -975,17 +1530,33 @@ function filterByCategory(category, element) {
 }
 
 
-// RANDOM PICK
+// RANDOM PICK (Feature 5 dependency)
 function openRandomGame(){
   let visible = [...document.querySelectorAll("#allGamesGrid button")].filter(b=>b.style.display!="none");
   if (visible.length > 0) {
-    // Trigger the click event, which now calls showGameDetails
-    visible[Math.floor(Math.random()*visible.length)]?.click(); 
+    // Show the confirmation modal for the randomly selected game
+    showLaunchConfirm(visible[Math.floor(Math.random()*visible.length)]?.getAttribute('data-url')); 
   }
 }
 
+// Set the featured game (Feature 5)
+function setFeaturedGame() {
+    const allGames = [...document.querySelectorAll("#allGamesGrid button")];
+    if (allGames.length === 0) return;
 
-// --- RECENTLY PLAYED LOGIC (MODIFIED: REMOVED FAVORITES REFERENCES) ---
+    const randomIndex = Math.floor(Math.random() * allGames.length);
+    const featuredGame = allGames[randomIndex];
+    
+    const name = featuredGame.innerText.trim();
+    const url = featuredGame.getAttribute('data-url');
+    
+    document.getElementById("featuredGameName").innerText = name;
+    // Featured game button calls launch confirmation
+    document.getElementById("featuredGameLaunchBtn").setAttribute("onclick", `showLaunchConfirm('${url}')`);
+}
+
+
+// --- RECENTLY PLAYED LOGIC ---
 function addRecentGame(name, url, img) {
   let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
 
@@ -1013,13 +1584,13 @@ function displayRecentGames() {
   } else {
     header.classList.add("visible");
     container.innerHTML = recent.map(g => {
-        // Find the original game button for category
+        // Find the original game button for category and tag
         const button = [...document.querySelectorAll("#allGamesGrid button")].find(b => b.getAttribute('data-url') === g.url);
-        const category = button ? button.getAttribute('data-category') : 'casual'; 
+        const category = button ? button.querySelector('.game-card-tag')?.getAttribute('data-category-text') || 'Casual' : 'Casual'; 
         
-        // MODIFIED: Removed favorite button logic
         return `
-          <button onclick="showGameDetails('${g.url}')" data-category="${category}" data-url="${g.url}">
+          <button onclick="showLaunchConfirm('${g.url}')" data-category="${g.category}" data-url="${g.url}">
+            <span class="game-card-tag" data-category-text="${category}">${category}</span>
             <img src="${g.img}">
             ${g.name}
           </button>
@@ -1034,65 +1605,116 @@ function clearRecentGames() {
   alert("Recently Played list cleared!");
 }
 
-// --- FAVORITES LOGIC REMOVED ---
-// All favorites-related functions and constants have been deleted.
-
 // Main function to initialize all game grids
 function initializeGameGrids() {
     displayRecentGames();
-    filterGames(); // Also run a filter check in case search bar has content
+    filterGames(); 
+    setFeaturedGame(); 
 }
 
 
 // --- THEME & SETTINGS LOGIC ---
 
-// NEW FUNCTION: Save the custom panic URL
+// NEW (Feature 11): Quick Theme Cycle
+function quickCycleTheme() {
+    themeIndex = (themeIndex + 1) % THEME_COLORS.length;
+    const nextColor = THEME_COLORS[themeIndex];
+    setTheme(nextColor);
+    // Also update settings modal color picker in case they open it
+    document.getElementById("themeColorPicker").value = nextColor; 
+}
+
+
+// Save the custom site title (Feature 2)
+function saveSiteTitle() {
+    const input = document.getElementById("siteTitleInput");
+    const newTitle = input.value.trim() || DEFAULT_SITE_TITLE;
+    
+    localStorage.setItem(SITE_TITLE_KEY, newTitle);
+    originalDocumentTitle = newTitle; 
+    document.title = newTitle; 
+    input.value = newTitle; 
+    alert("Site Title saved to: " + newTitle);
+}
+
+// Save the custom background URL (Feature 3)
+function saveCustomBgUrl() {
+    const input = document.getElementById("customBgUrlInput");
+    let newUrl = input.value.trim();
+
+    localStorage.setItem(BG_URL_KEY, newUrl);
+    applyCustomBgUrl(newUrl);
+    alert("Background URL saved and applied.");
+}
+
+function applyCustomBgUrl(url) {
+    const body = document.body;
+    if (url) {
+        body.style.backgroundImage = `url('${url}')`;
+    } else {
+        body.style.backgroundImage = 'none';
+    }
+}
+
+// NEW (Feature 20): Save Custom Panic Key
+function savePanicKey() {
+    const input = document.getElementById("customPanicKeyInput");
+    let newKey = input.value.toUpperCase().charAt(0); // Only take the first char and uppercase it
+    
+    // Default back to P if invalid
+    if (!newKey || !/[A-Z]/.test(newKey)) {
+        newKey = "P";
+    }
+
+    localStorage.setItem(PANIC_KEY_CODE_KEY, newKey);
+    currentPanicKeyCode = newKey;
+    input.value = newKey; // Update input with sanitized value
+    updateHotkeyDisplay();
+    
+    alert(`Panic Hotkey saved to: Ctrl+Shift+${newKey}`);
+}
+
+// Save the custom panic URL
 function savePanicUrl() {
     const input = document.getElementById("panicUrlInput");
     let newUrl = input.value.trim();
 
-    // Simple validation: ensure it looks like a URL, add https:// if missing
     if (newUrl && !newUrl.startsWith("http")) {
         newUrl = "https://" + newUrl;
     }
     
-    // If the input is empty, reset to default
     if (!newUrl) {
       newUrl = DEFAULT_PANIC_URL;
     }
     
     localStorage.setItem(PANIC_URL_KEY, newUrl);
-    currentPanicURL = newUrl; // Update global variable immediately
-    input.value = newUrl; // Update input field with standardized URL
+    currentPanicURL = newUrl; 
+    input.value = newUrl; 
     
     alert("Panic URL saved successfully to: " + newUrl);
 }
 
-// Function to toggle the custom cursor
+// Toggle the custom cursor
 function toggleCustomCursor() {
     const isCurrentlyEnabled = localStorage.getItem("customCursorEnabled") !== "false";
     const newState = !isCurrentlyEnabled;
     
-    // Apply state
     if (newState) {
         document.body.classList.remove("system-cursor");
     } else {
         document.body.classList.add("system-cursor");
     }
     
-    // Save state
     localStorage.setItem("customCursorEnabled", newState ? "true" : "false");
 
-    // Update button text
     const toggleBtn = document.getElementById("cursorToggleBtn");
     if (toggleBtn) {
         toggleBtn.innerText = newState ? "Disable" : "Enable";
     }
 }
 
-// NEW: Function to initialize cursor state from local storage
+// Initialize cursor state from local storage
 function initializeCursorState() {
-    // Default is true. Only explicitly disable if saved as "false".
     const isEnabled = localStorage.getItem("customCursorEnabled") !== "false"; 
     
     if (isEnabled) {
@@ -1100,12 +1722,16 @@ function initializeCursorState() {
     } else {
         document.body.classList.add("system-cursor");
     }
+    
+    const toggleBtn = document.getElementById("cursorToggleBtn");
+    if (toggleBtn) {
+        toggleBtn.innerText = isEnabled ? "Disable" : "Enable";
+    }
 }
 
 
 // Helper function to convert hex to RGB
 function hexToRgb(hex) {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
     hex = hex.replace(shorthandRegex, function(m, r, g, b) {
         return r + r + g + g + b + b;
@@ -1119,60 +1745,174 @@ function hexToRgb(hex) {
     } : null;
 }
 
+// Set accent opacity (Feature 6)
+function setAccentOpacity(opacity) {
+    const savedColor = localStorage.getItem("themeColor") || "#00ff00";
+    let rgb = hexToRgb(savedColor);
+
+    if (!rgb) return;
+    
+    const glowRgba = `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})`; 
+    document.documentElement.style.setProperty("--bgGlow", glowRgba);
+    
+    localStorage.setItem("accentOpacity", opacity);
+}
+
 function setTheme(hexColor){
   let rgb = hexToRgb(hexColor);
   
-  // If conversion fails, default to green and stop
   if (!rgb) {
     hexColor = "#00ff00";
     rgb = {r: 0, g: 255, b: 0};
   } 
 
-  const glowRgba = `rgba(${rgb.r},${rgb.g},${rgb.b},0.4)`; // 40% opacity for glow
+  const opacity = localStorage.getItem("accentOpacity") || "0.4";
+  const glowRgba = `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})`; 
 
   document.documentElement.style.setProperty("--accent", hexColor);
   document.documentElement.style.setProperty("--bgGlow", glowRgba);
 
-  // Save selected theme (now a hex code)
   localStorage.setItem("themeColor", hexColor);
 }
+
+// NEW (Feature 15): Toggle Matrix Rain
+function toggleMatrixRain() {
+    if (isMatrixRunning) {
+        clearInterval(matrixInterval);
+        isMatrixRunning = false;
+        document.getElementById("matrixToggleBtn").innerText = "Start Rain";
+        // Clear screen instantly
+        ctx.fillStyle = "rgba(0,0,0,1)";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+    } else {
+        initializeMatrix(); // This will restart the interval
+        isMatrixRunning = true;
+        document.getElementById("matrixToggleBtn").innerText = "Stop Rain";
+    }
+}
+
 
 function setMatrixSpeed(delay) {
     clearInterval(matrixInterval);
     localStorage.setItem("matrixSpeed", delay);
 
     if (delay != 1000) { // 1000ms = "Off"
+        isMatrixRunning = true;
+        document.getElementById("matrixToggleBtn").innerText = "Stop Rain";
         matrixInterval = setInterval(drawMatrix, parseInt(delay));
+    } else {
+        isMatrixRunning = false;
+        document.getElementById("matrixToggleBtn").innerText = "Start Rain";
     }
 }
 
 // Set Matrix Text Type
 function setMatrixText(type) {
     localStorage.setItem("matrixTextType", type);
-    initializeMatrix(); // Re-initializes the matrix with new settings
+    initializeMatrix(); 
 }
+
+// Toggle Matrix Cycle Mode (Feature 7)
+function toggleMatrixCycle(enabled) {
+    isMatrixCycleEnabled = enabled;
+    localStorage.setItem("matrixCycleEnabled", enabled ? "true" : "false");
+    if (!enabled) {
+        setTheme(localStorage.getItem("themeColor") || "#00ff00");
+    }
+}
+
 
 function toggleSettingsModal() {
     const modal = document.getElementById("settingsModal");
-    // Reload state when opening
     if (modal.style.display !== "block") {
-      // Load saved hex color or default green
       document.getElementById("themeColorPicker").value = localStorage.getItem("themeColor") || "#00ff00"; 
       document.getElementById("matrixSpeed").value = localStorage.getItem("matrixSpeed") || "45";
-      // Load and set the matrix text type value
       document.getElementById("matrixText").value = localStorage.getItem("matrixTextType") || "binary";
       
-      // Load and set custom cursor state text on button
       const isCursorEnabled = localStorage.getItem("customCursorEnabled") !== "false";
       document.getElementById("cursorToggleBtn").innerText = isCursorEnabled ? "Disable" : "Enable";
       
-      // NEW: Load panic URL into input
       document.getElementById("panicUrlInput").value = currentPanicURL;
+      document.getElementById("customPanicKeyInput").value = currentPanicKeyCode;
+
+      document.getElementById("siteTitleInput").value = originalDocumentTitle;
+      document.getElementById("customBgUrlInput").value = localStorage.getItem(BG_URL_KEY) || "";
+      document.getElementById("accentOpacityRange").value = localStorage.getItem("accentOpacity") || "0.4";
+
+      const cycleEnabled = localStorage.getItem("matrixCycleEnabled") === "true";
+      document.getElementById("matrixCycleCheckbox").checked = cycleEnabled;
+      isMatrixCycleEnabled = cycleEnabled;
+      
+      // Update toggle button text based on matrix running state
+      document.getElementById("matrixToggleBtn").innerText = isMatrixRunning ? "Stop Rain" : "Start Rain";
 
     }
     modal.style.display = modal.style.display === "block" ? "none" : "block";
 }
 
+
+// NEW (Feature 16): Local Storage Backup/Restore
+function exportSettings() {
+    const allData = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        try {
+            // Attempt to parse as JSON if it looks like an array or object (e.g., recentGames)
+            allData[key] = JSON.parse(localStorage.getItem(key));
+        } catch (e) {
+            // Otherwise, store as raw string
+            allData[key] = localStorage.getItem(key);
+        }
+    }
+    
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "ubg_village_pro_settings_" + new Date().toISOString().slice(0, 10) + ".json");
+    document.body.appendChild(downloadAnchorNode); 
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+    alert("Settings and data exported successfully!");
+}
+
+function importSettings(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            // Clear existing data (optional, but safer for a full restore)
+            // localStorage.clear(); // NOTE: Clearing everything is risky, better to only overwrite known keys.
+            
+            let keysOverwritten = [];
+            for (const key in importedData) {
+                // Ensure the key is one we expect to save (for safety/integrity)
+                if ([PANIC_URL_KEY, SITE_TITLE_KEY, BG_URL_KEY, "themeColor", "accentOpacity", "customCursorEnabled", "matrixTextType", "matrixSpeed", "matrixCycleEnabled", "recentGames", PANIC_KEY_CODE_KEY, SEARCH_HISTORY_KEY].includes(key)) {
+                    const value = importedData[key];
+                    // Store strings or JSON-stringify complex objects (like recentGames)
+                    if (typeof value === 'object' && value !== null) {
+                         localStorage.setItem(key, JSON.stringify(value));
+                    } else {
+                         localStorage.setItem(key, value);
+                    }
+                    keysOverwritten.push(key);
+                }
+            }
+            
+            alert(`Settings imported successfully! Changes applied to: ${keysOverwritten.join(', ')}. Please refresh the page to see all changes.`);
+            // A full page reload is required to apply all new settings (theme, matrix, etc.)
+            window.location.reload(); 
+            
+        } catch (error) {
+            alert("Error importing file. Please ensure the file is a valid JSON export from this site.");
+            console.error("Import error:", error);
+        }
+    };
+    reader.readAsText(file);
+}
 
 // --- MATRIX RAIN SETUP ---
 const canvas = document.getElementById("matrix");
@@ -1192,14 +1932,18 @@ function drawMatrix() {
   ctx.fillStyle = "rgba(0,0,0,0.05)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
+  let currentAccentColor;
+  if (isMatrixCycleEnabled) {
+      colorCycleHue = (colorCycleHue + 1) % 360;
+      currentAccentColor = `hsl(${colorCycleHue}, 100%, 50%)`;
+  } else {
+      currentAccentColor = getComputedStyle(document.documentElement).getPropertyValue("--accent");
+  }
 
-  // Use computed style property for dynamic color change
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--accent");
+  ctx.fillStyle = currentAccentColor;
   ctx.font = fontSize + "px monospace";
 
-
   for(let i=0;i<drops.length;i++){
-    // Use the dynamically set currentLetters
     let text = currentLetters[Math.floor(Math.random()*currentLetters.length)];
     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
@@ -1222,29 +1966,79 @@ function initializeMatrix() {
     const type = localStorage.getItem("matrixTextType") || 'binary';
     currentLetters = (type === 'kanji') ? KANJI_CHARS : BINARY_CHARS;
     
-    // Re-starts the interval with the potentially new speed and new characters
+    isMatrixCycleEnabled = localStorage.getItem("matrixCycleEnabled") === "true";
+
     const savedSpeed = localStorage.getItem("matrixSpeed") || "45"; 
-    setMatrixSpeed(savedSpeed);
+    
+    // Only start the matrix if the speed is not "Off"
+    if (savedSpeed != 1000) {
+        isMatrixRunning = true;
+        setMatrixSpeed(savedSpeed);
+    } else {
+        isMatrixRunning = false;
+        clearInterval(matrixInterval);
+    }
+}
+
+// --- CLOCK FUNCTION (Feature 10) ---
+function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    document.getElementById('navbar-clock').innerText = timeString;
+}
+setInterval(updateClock, 1000); 
+
+
+// --- GO TO TOP BUTTON LOGIC (Feature 8) ---
+const goToTopBtn = document.getElementById("goToTopBtn");
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+    goToTopBtn.style.display = "block";
+  } else {
+    goToTopBtn.style.display = "none";
+  }
 }
 
 
 // Load on page start
 window.addEventListener("DOMContentLoaded", () => {
-  // Load the panic URL first
+  // --- Global State ---
+  originalDocumentTitle = localStorage.getItem(SITE_TITLE_KEY) || DEFAULT_SITE_TITLE;
+  document.title = originalDocumentTitle;
+
+  // --- Panic/Security ---
   currentPanicURL = localStorage.getItem(PANIC_URL_KEY) || DEFAULT_PANIC_URL;
+  currentPanicKeyCode = localStorage.getItem(PANIC_KEY_CODE_KEY) || "P";
+  currentPanicKeyCode = currentPanicKeyCode.toUpperCase().charAt(0); // Ensure it's a single uppercase letter
+  updateHotkeyDisplay();
+  document.getElementById("customPanicKeyInput").value = currentPanicKeyCode;
 
-  // Theme Loading Logic
-  let savedColor = localStorage.getItem("themeColor") || "#00ff00"; // default green hex
-  setTheme(savedColor); // Use the color hex directly
+  // --- Theme/Visuals ---
+  const savedBgUrl = localStorage.getItem(BG_URL_KEY) || "";
+  applyCustomBgUrl(savedBgUrl);
 
-  // Matrix Initialization (handles speed and character set)
+  let savedColor = localStorage.getItem("themeColor") || "#00ff00"; 
+  setTheme(savedColor); 
+  
+  const savedOpacity = localStorage.getItem("accentOpacity") || "0.4";
+  setAccentOpacity(savedOpacity);
+  
   initializeMatrix();
-  
-  // Game Grid Initialization (handles Recents only)
-  initializeGameGrids();
-  
-  // Custom Cursor Initialization
   initializeCursorState();
+
+  // --- Content/UX ---
+  initializeGameGrids();
+  updateClock();
+  
+  // Add listener for search bar focus to show suggestions
+  searchBar.addEventListener('focus', showSuggestions);
+  searchBar.addEventListener('blur', () => {
+    // Delay hiding to allow clicks on suggestions
+    setTimeout(() => { searchSuggestions.style.display = 'none'; }, 100);
+  });
+  
 });
 
 </script>
