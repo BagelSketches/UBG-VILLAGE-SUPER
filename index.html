@@ -1133,8 +1133,7 @@ let colorCycleHue = 0;
 let lastFrameTime = performance.now();
 const fpsDisplay = document.getElementById('fpsDisplay');
 
-// NEW (Feature 17): In-Game Overlay Auto-Hide Timer
-let mouseMoveTimer;
+
 
 // NEW (Feature 18): Search History
 const SEARCH_HISTORY_KEY = "searchHistory";
@@ -1360,20 +1359,8 @@ document.addEventListener('keydown', (e) => {
 // NEW (Feature 17): Auto-hide logic for top bar
 function setupOverlayAutoHide() {
     const topBar = document.getElementById("topBar");
-    const overlay = document.getElementById("gameOverlay");
+    const overlay = document.getElementsdById("gameOverlay");
     
-    // Function to hide the bar
-    function hideBar() {
-        topBar.classList.add('hidden');
-    }
-    
-    // Function to show the bar and reset timer
-    function resetTimer() {
-        topBar.classList.remove('hidden');
-        clearTimeout(mouseMoveTimer);
-        // Hide after 3 seconds of inactivity
-        mouseMoveTimer = setTimeout(hideBar, 3000); 
-    }
 
     // Clear existing listeners to prevent duplicates
     overlay.removeEventListener('mousemove', resetTimer);
