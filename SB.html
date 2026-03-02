@@ -9,6 +9,57 @@
 
 <head>
 	<script>
+    // 1. TRICK THE GAME ENGINE
+    // This tells the game it is NEVER on Discord, Mobile, or Steam
+    window.standaloneType = null;
+    window.standalone = false;
+
+    // 2. THE ARC "FULLSCREEN" TRICK
+    // This forces the game to think the window is 1200px wide, 
+    // stopping it from switching to the squished "E" and "S" buttons.
+    Object.defineProperty(window, 'innerWidth', { get: () => 1200 });
+    
+    // 3. CONTINUOUS LAYOUT CLEANER
+    // Every 50ms, this checks if the game tried to hide your buttons and forces them back.
+    setInterval(() => {
+        const gameDiv = document.getElementById("gameDiv");
+        const mods = document.getElementById("modsButton");
+        if (gameDiv) { gameDiv.classList.remove("mobile"); }
+        if (mods) { 
+            mods.style.setProperty("display", "inline-block", "important");
+            mods.innerText = "Mods"; // Fixes the "E" or "M" issue
+        }
+    }, 50);
+</script>
+
+<style>
+    /* 4. THE "IMG 1" PROPORTIONS (FORCE SQUARE) */
+    #gameCanvas {
+        width: 100% !important;
+        max-width: 600px !important; /* Adjust this to change game size */
+        height: auto !important;
+        aspect-ratio: 1 / 1 !important; 
+        min-height: 450px !important;   
+        display: block !important;
+        margin: 0 auto !important;
+    }
+
+    /* 5. STOP VERTICAL STRETCHING */
+    #gameDiv, #gameContainer {
+        height: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    /* 6. FORCE FULL BUTTON TEXT */
+    .controlButton {
+        min-width: 60px !important;
+        width: auto !important;
+        padding: 5px 10px !important;
+    }
+</style>
+	<script>
     // 1. KILL THE DISCORD/MOBILE DETECTION
     // This stops the game from ever thinking it's on a phone or Discord.
     window.standaloneType = null;
@@ -20302,6 +20353,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
