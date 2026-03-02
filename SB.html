@@ -9,29 +9,36 @@
 
 <head>
 	<style>
-    /* FORCE IMG 1 LOOK (NO STRETCHING) */
+    /* 1. FORCES THE SQUARE LOOK (IMG 1) */
     #gameCanvas {
         width: 100% !important;
         height: auto !important;
-        aspect-ratio: 1 / 1 !important; /* Forces Square */
-        min-height: 450px !important;   /* Fixes 'inf' error */
+        aspect-ratio: 1 / 1 !important; 
+        min-height: 450px !important;   /* Fixes the 'inf' error */
         display: block !important;
         margin: 0 auto !important;
     }
 
-    /* FORCE BUTTONS TO SHOW (IGNORES DELETE SCRIPTS) */
+    /* 2. FORCES BUTTONS TO STAY VISIBLE */
     #modsButton, #savesButton, #elementControls {
         display: inline-block !important;
         visibility: visible !important;
         opacity: 1 !important;
     }
 
-    /* STOP MOBILE MODE FROM SQUISHY LAYOUT */
+    /* 3. STOPS THE STRETCHY 'MOBILE' MODE */
     #gameDiv, .mobile#gameDiv {
         display: block !important;
         height: auto !important;
+        max-width: 800px !important;
+        margin: 0 auto !important;
     }
-</style> 
+
+    /* 4. PREVENTS THE UI FROM SQUISHING */
+    .controlButton {
+        min-width: 50px !important;
+    }
+</style>
 	
   <base href="https://cdn.jsdelivr.net/gh/R74nCom/sandboxels@main/">
 	<meta charset="utf-8">
@@ -20283,6 +20290,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
