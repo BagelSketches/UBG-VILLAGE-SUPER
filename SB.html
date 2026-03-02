@@ -8,6 +8,53 @@
 <html lang="en" class="homepage">
 
 <head>
+	<style>
+    /* 1. FORCE THE ITEM GRID TO SHOW (NO HIDDEN MENUS) */
+    #elementControls {
+        display: block !important;
+        visibility: visible !important;
+        height: auto !important;
+        opacity: 1 !important;
+    }
+
+    /* 2. PREVENT THE "THIN" MOBILE UI */
+    .mobile #elementControls {
+        display: block !important;
+    }
+
+    /* 3. FIX THE SCROLLING ISSUE (STOPS THE "EXTRA" SCROLL) */
+    html, body {
+        overflow: hidden !important;
+        height: 100vh !important;
+        position: fixed !important;
+        width: 100% !important;
+    }
+
+    /* 4. MAKE THE ITEM LIST SCROLLABLE IF IT'S TOO LONG */
+    #categories {
+        max-height: 200px !important; /* Adjust based on your iframe height */
+        overflow-y: auto !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+    }
+</style>
+
+<script>
+    // 5. THE "DESKTOP FORCER"
+    // This removes the 'mobile' tag that hides the items
+    setInterval(() => {
+        const gameDiv = document.getElementById("gameDiv");
+        if (gameDiv && gameDiv.classList.contains("mobile")) {
+            gameDiv.classList.remove("mobile");
+        }
+        
+        // Force the categories menu to stay open
+        const catMenu = document.getElementById("categories");
+        if (catMenu) {
+            catMenu.style.display = "flex";
+        }
+    }, 100);
+</script>
 	<script>
     // 1. TRICK THE GAME ENGINE
     // This tells the game it is NEVER on Discord, Mobile, or Steam
@@ -20353,6 +20400,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
