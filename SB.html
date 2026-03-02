@@ -62,8 +62,18 @@
 		standaloneType = null;
 	</script>
 	<style>
-		.setting-span {
-			display:block;padding-bottom:0.5em
+    .setting-span {
+        display:block;padding-bottom:0.5em
+    }
+    /* FIX: Force the game to show and have a size when embedded */
+    #gameContainer, #gameCanvas, canvas {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 450px; /* Prevents 0px height which causes the 'inf' error */
+        display: block !important;
+        visibility: visible !important;
+    }
+</style>
 		}
 	</style>
 	<!-- Schema -->
@@ -20293,4 +20303,5 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
