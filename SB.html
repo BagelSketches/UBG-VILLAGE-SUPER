@@ -8,222 +8,6 @@
 <html lang="en" class="homepage">
 
 <head>
-	<style>
-    /* 1. FORCE THE ELEMENT BOX TO SHOW */
-    #elementControls {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        background: rgba(0, 0, 0, 0.8) !important; /* Makes it easier to see */
-        width: 100% !important;
-        position: relative !important;
-        z-index: 999 !important;
-    }
-
-    /* 2. FIX THE "E" BUTTON ISSUE */
-    /* This stops the game from hiding the grid behind a single button */
-    #elemSelectButton {
-        display: none !important; 
-    }
-
-    /* 3. MAKE THE CATEGORIES & ELEMENTS SCROLLABLE */
-    /* This ensures that if there are too many items, you can scroll the box 
-       without scrolling the whole page */
-    #categories {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        max-height: 80px !important;
-        overflow-y: auto !important;
-        border-bottom: 1px solid #444;
-        padding-bottom: 5px;
-    }
-
-    #elements {
-        display: block !important;
-        max-height: 150px !important; /* Limits height so it doesn't leave the iframe */
-        overflow-y: auto !important;
-        padding-top: 5px;
-    }
-
-    /* 4. FORCE SQUARE CANVAS */
-    #gameCanvas {
-        aspect-ratio: 1 / 1 !important;
-        max-height: 50vh !important; /* Shrinks the board so items fit under it */
-        width: auto !important;
-        margin: 0 auto !important;
-        display: block !important;
-    }
-</style>
-<style>
-    /* 1. FORCE THE DRAWING BOARD (CANVAS) TO BE VISIBLE */
-    #gameCanvas {
-        display: block !important;
-        visibility: visible !important;
-        
-        /* Forces it to be a square that fits the top half of your screen */
-        width: 95vw !important; 
-        height: 95vw !important;
-        max-width: 500px !important;
-        max-height: 500px !important;
-        
-        margin: 10px auto !important;
-        background-color: #000 !important; /* Makes the void visible */
-        border: 2px solid #444 !important;
-        image-rendering: pixelated !important; /* Keeps it sharp */
-    }
-
-    /* 2. ENSURE THE CONTAINER DOESN'T HIDE IT */
-    #gameContainer, #gameDiv {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        min-height: 100vh !important;
-    }
-
-    /* 3. PUSH THE MENUS BELOW THE BOARD */
-    #elementControls {
-        margin-top: 10px !important;
-        width: 100% !important;
-        background: #111 !important;
-    }
-</style>
-
-<script>
-    // 4. THE "BOARD REFRESHER"
-    // This script forces the game engine to recognize the canvas size
-    setInterval(() => {
-        const canvas = document.getElementById("gameCanvas");
-        if (canvas && (canvas.offsetWidth === 0 || canvas.offsetHeight === 0)) {
-            canvas.style.width = "400px";
-            canvas.style.height = "400px";
-        }
-    }, 500);
-</script>
-<script>
-    // 5. THE RE-OPENER SCRIPT
-    // Sometimes the game engine shuts the menu when you click an element.
-    // This forces it to stay open.
-    setInterval(() => {
-        const el = document.getElementById("elementControls");
-        if (el && el.style.display === "none") {
-            el.style.setProperty("display", "block", "important");
-        }
-        // Remove the mobile flag again just in case
-        document.getElementById("gameDiv")?.classList.remove("mobile");
-    }, 200);
-</script>
-
-<script>
-    // 5. THE "DESKTOP FORCER"
-    // This removes the 'mobile' tag that hides the items
-    setInterval(() => {
-        const gameDiv = document.getElementById("gameDiv");
-        if (gameDiv && gameDiv.classList.contains("mobile")) {
-            gameDiv.classList.remove("mobile");
-        }
-        
-        // Force the categories menu to stay open
-        const catMenu = document.getElementById("categories");
-        if (catMenu) {
-            catMenu.style.display = "flex";
-        }
-    }, 100);
-</script>
-	<script>
-    // 1. TRICK THE GAME ENGINE
-    // This tells the game it is NEVER on Discord, Mobile, or Steam
-    window.standaloneType = null;
-    window.standalone = false;
-
-    // 2. THE ARC "FULLSCREEN" TRICK
-    // This forces the game to think the window is 1200px wide, 
-    // stopping it from switching to the squished "E" and "S" buttons.
-    Object.defineProperty(window, 'innerWidth', { get: () => 1200 });
-    
-    // 3. CONTINUOUS LAYOUT CLEANER
-    // Every 50ms, this checks if the game tried to hide your buttons and forces them back.
-    setInterval(() => {
-        const gameDiv = document.getElementById("gameDiv");
-        const mods = document.getElementById("modsButton");
-        if (gameDiv) { gameDiv.classList.remove("mobile"); }
-        if (mods) { 
-            mods.style.setProperty("display", "inline-block", "important");
-            mods.innerText = "Mods"; // Fixes the "E" or "M" issue
-        }
-    }, 50);
-</script>
-
-<style>
-    /* 4. THE "IMG 1" PROPORTIONS (FORCE SQUARE) */
-    #gameCanvas {
-        width: 100% !important;
-        max-width: 600px !important; /* Adjust this to change game size */
-        height: auto !important;
-        aspect-ratio: 1 / 1 !important; 
-        min-height: 450px !important;   
-        display: block !important;
-        margin: 0 auto !important;
-    }
-
-    /* 5. STOP VERTICAL STRETCHING */
-    #gameDiv, #gameContainer {
-        height: auto !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-    }
-
-    /* 6. FORCE FULL BUTTON TEXT */
-    .controlButton {
-        min-width: 60px !important;
-        width: auto !important;
-        padding: 5px 10px !important;
-    }
-</style>
-	<script>
-    // 1. KILL THE DISCORD/MOBILE DETECTION
-    // This stops the game from ever thinking it's on a phone or Discord.
-    window.standaloneType = null;
-    window.standalone = false;
-
-    // 2. FORCE THE UI TO STAY OPEN
-    // This runs every second to make sure no script hides your buttons.
-    setInterval(() => {
-        const mods = document.getElementById("modsButton");
-        const game = document.getElementById("gameDiv");
-        if (mods) { mods.style.display = "inline-block"; mods.style.visibility = "visible"; }
-        if (game) { game.classList.remove("mobile"); }
-    }, 100);
-</script>
-
-<style>
-    /* 3. FORCE THE IMG 1 PROPORTIONS */
-    #gameCanvas {
-        width: 100% !important;
-        height: auto !important;
-        aspect-ratio: 1 / 1 !important; /* Forces Square shape */
-        min-height: 400px !important;   /* Fixes 'inf' error */
-        max-height: 550px !important;   /* Prevents vertical stretching */
-        display: block !important;
-        margin: 0 auto !important;
-    }
-
-    /* 4. PREVENT THE LAYOUT FROM SQUISHING */
-    #gameDiv, #gameContainer {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        height: auto !important;
-    }
-
-    /* 5. FORCE BUTTONS TO STAY VISIBLE */
-    #modsButton, #savesButton {
-        display: inline-block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-</style>
-	
   <base href="https://cdn.jsdelivr.net/gh/R74nCom/sandboxels@main/">
 	<meta charset="utf-8">
 	<title id="titleTag">Sandboxels - Experiment with Pixels</title>
@@ -277,6 +61,12 @@
 		standalone = false;
 		standaloneType = null;
 	</script>
+	<style>
+		.setting-span {
+			display:block;padding-bottom:0.5em
+		}
+	</style>
+	<!-- Schema -->
 	<script type="application/ld+json">
 		{
 		  "@context": "https://schema.org",
@@ -342,7 +132,7 @@
 		console.log("Found this on another website? Let us know!");
 		console.log("©2021-" + new Date().getFullYear() + ". All Rights Reserved. https://sandboxels.R74n.com/license.txt");
 
-		isOnSite = true;
+		isOnSite = location.hostname === "sandboxels.r74n.com";
 
 		// If settings is in localStorage, load it. If not, create an empty object.
 		settings = localStorage.getItem("settings") ? JSON.parse(localStorage.getItem("settings")) : {};
@@ -19437,6 +19227,7 @@ window.onload = function() {
 		if (newWidth > 1002) { newWidth = 1002; }
 		// If we are on a desktop and the new height is greater than 500, set it to 500
 		if (window.innerWidth > 1000 && newHeight > 500) { newHeight = 500; }
+
 		newHeight -= newHeight % pixelSize;
 		newWidth -= newWidth % pixelSize;
 
@@ -20465,29 +20256,40 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 		document.getElementById("bottomInfoBox").style.display = "none";
 		document.getElementById("pagetitle").style.display = "none";
 		document.getElementById("noMods").insertAdjacentHTML("afterend","Requires Internet connection.<br><br>")
-		document.getElementById("gameDiv").classList.add("standalone")
+		document.getElementById("gameDiv").classList.add("standalone");
+		if (isMobile) {
+			document.getElementById("gameDiv").classList.add("mobile");
+		}
+		if (standaloneType === "discord") {
+			// document.getElementById("savesButton").style.display = "none";
+			// document.querySelector("#savesMenu .menuTabs").style.display = "none";
+			document.querySelector("#savesMenu div.menuTab[data-tab='local']").classList.remove("selected");
+			document.querySelector("#savesMenu div.menuTab[data-tab='discord']").classList.add("selected");
+			document.querySelector("#savesMenu button.menuTab[data-tab='local']").classList.remove("selected");
+			document.querySelector("#savesMenu button.menuTab[data-tab='discord']").classList.add("selected");
+			document.querySelectorAll("#savesMenu button.menuTab").forEach((e) => {
+				if (e.id !== "savesTabDiscord") e.style.display = "none";
+			})
+			document.getElementById("savesButton").addEventListener("click", showDiscordSaves);
+			document.getElementById("modsButton").style.display = "none";
+		}
+		if (standaloneType === "steam") {
+			// Hide scrollbars
+			document.head.insertAdjacentHTML("beforeend",`<style>::-webkit-scrollbar { display: none; }</style>`)
+			document.getElementById("setting-pixelsize-6w").value = "7w";
+		}
 	}
-			
+</script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-93720349-9"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'UA-93720349-9');
 </script>
 
 </body>
 
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
