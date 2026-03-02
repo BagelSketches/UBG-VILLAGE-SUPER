@@ -61,26 +61,30 @@
 		standalone = false;
 		standaloneType = null;
 	</script>
-	<style>
-    /* Prevents the 'stretched' look by forcing a 1:1 ratio */
+<style>
+    /* FIX: Force the game board to be a square and prevent 'inf' */
     #gameCanvas {
         width: 100% !important;
-        height: auto !important; /* Tells it not to stretch vertically */
-        aspect-ratio: 1 / 1 !important; /* Keeps the board square */
-        max-height: 550px !important; /* Adjust this to fit your screen */
+        height: auto !important; 
+        aspect-ratio: 1 / 1 !important; /* This stops the stretching */
+        min-height: 300px !important;   /* This stops the 'inf' error */
+        max-height: 550px !important; 
         display: block !important;
         margin: 0 auto !important;
+        background-color: #000;
     }
 
-    /* Resets the container so it doesn't force a stretch */
-    #gameDiv, #gameContainer, body, html {
+    /* Reset containers to stop them from hiding or stretching children */
+    #gameDiv, #gameContainer {
         height: auto !important;
         display: block !important;
+        visibility: visible !important;
     }
 
     /* Keep UI buttons visible */
     #modsButton, #savesButton {
         display: inline-block !important;
+        visibility: visible !important;
     }
 </style>
 	<script type="application/ld+json">
@@ -20272,10 +20276,8 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 		document.getElementById("bottomInfoBox").style.display = "none";
 		document.getElementById("pagetitle").style.display = "none";
 		document.getElementById("noMods").insertAdjacentHTML("afterend","Requires Internet connection.<br><br>")
-		document.getElementById("gameDiv").classList.add("standalone");
-		if (isMobile) {
-			document.getElementById("gameDiv").classList.add("mobile");
-		}
+		document.getElementById("gameDiv").classList.add("standalone")
+	}
 			// document.getElementById("savesButton").style.display = "none";
 			// document.querySelector("#savesMenu .menuTabs").style.display = "none";
 			document.querySelector("#savesMenu div.menuTab[data-tab='local']").classList.remove("selected");
@@ -20309,6 +20311,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
