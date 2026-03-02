@@ -62,18 +62,23 @@
 		standaloneType = null;
 	</script>
 	<style>
-    .setting-span {
-        display:block;padding-bottom:0.5em
-    }
-    /* FIX: Set a standard height and prevent stretching */
-    #gameContainer, #gameCanvas, canvas {
+    /* Prevents the 'stretched' look by forcing a 1:1 ratio */
+    #gameCanvas {
         width: 100% !important;
-        height: 600px !important; /* Change this number to adjust height */
-        max-height: 80vh !important; /* Prevents it from being taller than the screen */
+        height: auto !important; /* Tells it not to stretch vertically */
+        aspect-ratio: 1 / 1 !important; /* Keeps the board square */
+        max-height: 550px !important; /* Adjust this to fit your screen */
         display: block !important;
-        margin: 0 auto;
+        margin: 0 auto !important;
     }
-    /* Ensure UI elements remain visible */
+
+    /* Resets the container so it doesn't force a stretch */
+    #gameDiv, #gameContainer, body, html {
+        height: auto !important;
+        display: block !important;
+    }
+
+    /* Keep UI buttons visible */
     #modsButton, #savesButton {
         display: inline-block !important;
     }
@@ -20304,6 +20309,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
