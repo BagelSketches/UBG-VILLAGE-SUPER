@@ -132,7 +132,7 @@
 		console.log("Found this on another website? Let us know!");
 		console.log("©2021-" + new Date().getFullYear() + ". All Rights Reserved. https://sandboxels.R74n.com/license.txt");
 
-		isOnSite = location.hostname === "sandboxels.r74n.com";
+		isOnSite = true;
 
 		// If settings is in localStorage, load it. If not, create an empty object.
 		settings = localStorage.getItem("settings") ? JSON.parse(localStorage.getItem("settings")) : {};
@@ -20291,5 +20291,6 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 </script>
 
 </body>
+
 
 </html>
