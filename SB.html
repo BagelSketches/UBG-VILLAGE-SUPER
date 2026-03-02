@@ -65,18 +65,20 @@
     .setting-span {
         display:block;padding-bottom:0.5em
     }
-    /* FIX: Force the game to show and have a size when embedded */
+    /* FORCE VISIBILITY AND SIZE */
     #gameContainer, #gameCanvas, canvas {
         width: 100% !important;
         height: 100% !important;
-        min-height: 450px; /* Prevents 0px height which causes the 'inf' error */
+        min-height: 500px !important; /* This fixes the x:inf, y:inf error */
         display: block !important;
         visibility: visible !important;
     }
+    /* BRING BACK THE BUTTONS */
+    #modsButton, #savesButton {
+        display: inline-block !important;
+        visibility: visible !important;
+    }
 </style>
-		}
-	</style>
-	<!-- Schema -->
 	<script type="application/ld+json">
 		{
 		  "@context": "https://schema.org",
@@ -20303,5 +20305,6 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
