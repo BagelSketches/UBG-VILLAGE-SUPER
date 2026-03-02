@@ -65,18 +65,17 @@
     .setting-span {
         display:block;padding-bottom:0.5em
     }
-    /* FORCE VISIBILITY AND SIZE */
-   #gameContainer, #gameCanvas, canvas {
-    width: 100% !important;
-    height: 600px !important; /* Set this to your preferred height */
-    min-height: 400px !important;
-	max-height: 80vh !important; /* This keeps it within 80% of the screen height */
-    display: block !important;
-}
-    /* BRING BACK THE BUTTONS */
+    /* FIX: Set a standard height and prevent stretching */
+    #gameContainer, #gameCanvas, canvas {
+        width: 100% !important;
+        height: 600px !important; /* Change this number to adjust height */
+        max-height: 80vh !important; /* Prevents it from being taller than the screen */
+        display: block !important;
+        margin: 0 auto;
+    }
+    /* Ensure UI elements remain visible */
     #modsButton, #savesButton {
         display: inline-block !important;
-        visibility: visible !important;
     }
 </style>
 	<script type="application/ld+json">
@@ -20305,6 +20304,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
