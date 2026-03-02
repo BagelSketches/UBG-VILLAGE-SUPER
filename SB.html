@@ -8,35 +8,47 @@
 <html lang="en" class="homepage">
 
 <head>
-	<style>
-    /* 1. FORCES THE SQUARE LOOK (IMG 1) */
+	<script>
+    // 1. KILL THE DISCORD/MOBILE DETECTION
+    // This stops the game from ever thinking it's on a phone or Discord.
+    window.standaloneType = null;
+    window.standalone = false;
+
+    // 2. FORCE THE UI TO STAY OPEN
+    // This runs every second to make sure no script hides your buttons.
+    setInterval(() => {
+        const mods = document.getElementById("modsButton");
+        const game = document.getElementById("gameDiv");
+        if (mods) { mods.style.display = "inline-block"; mods.style.visibility = "visible"; }
+        if (game) { game.classList.remove("mobile"); }
+    }, 100);
+</script>
+
+<style>
+    /* 3. FORCE THE IMG 1 PROPORTIONS */
     #gameCanvas {
         width: 100% !important;
         height: auto !important;
-        aspect-ratio: 1 / 1 !important; 
-        min-height: 450px !important;   /* Fixes the 'inf' error */
+        aspect-ratio: 1 / 1 !important; /* Forces Square shape */
+        min-height: 400px !important;   /* Fixes 'inf' error */
+        max-height: 550px !important;   /* Prevents vertical stretching */
         display: block !important;
         margin: 0 auto !important;
     }
 
-    /* 2. FORCES BUTTONS (MODS/SAVES) TO STAY VISIBLE */
-    #modsButton, #savesButton, #elementControls {
+    /* 4. PREVENT THE LAYOUT FROM SQUISHING */
+    #gameDiv, #gameContainer {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        height: auto !important;
+    }
+
+    /* 5. FORCE BUTTONS TO STAY VISIBLE */
+    #modsButton, #savesButton {
         display: inline-block !important;
         visibility: visible !important;
         opacity: 1 !important;
-    }
-
-    /* 3. STOPS THE STRETCHY 'MOBILE' MODE TRIGGERED BY THE OVERLAY */
-    #gameDiv, .mobile#gameDiv {
-        display: block !important;
-        height: auto !important;
-        max-width: 800px !important;
-        margin: 0 auto !important;
-    }
-
-    /* 4. PREVENTS THE UI BUTTONS FROM SQUISHING */
-    .controlButton {
-        min-width: 50px !important;
     }
 </style>
 	
@@ -20290,6 +20302,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
