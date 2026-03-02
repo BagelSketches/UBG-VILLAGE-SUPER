@@ -9,35 +9,65 @@
 
 <head>
 	<style>
-    /* 1. FORCE THE ITEM GRID TO SHOW (NO HIDDEN MENUS) */
+    /* 1. FORCE THE ELEMENT BOX TO SHOW */
     #elementControls {
         display: block !important;
         visibility: visible !important;
-        height: auto !important;
         opacity: 1 !important;
-    }
-
-    /* 2. PREVENT THE "THIN" MOBILE UI */
-    .mobile #elementControls {
-        display: block !important;
-    }
-
-    /* 3. FIX THE SCROLLING ISSUE (STOPS THE "EXTRA" SCROLL) */
-    html, body {
-        overflow: hidden !important;
-        height: 100vh !important;
-        position: fixed !important;
+        background: rgba(0, 0, 0, 0.8) !important; /* Makes it easier to see */
         width: 100% !important;
+        position: relative !important;
+        z-index: 999 !important;
     }
 
-    /* 4. MAKE THE ITEM LIST SCROLLABLE IF IT'S TOO LONG */
+    /* 2. FIX THE "E" BUTTON ISSUE */
+    /* This stops the game from hiding the grid behind a single button */
+    #elemSelectButton {
+        display: none !important; 
+    }
+
+    /* 3. MAKE THE CATEGORIES & ELEMENTS SCROLLABLE */
+    /* This ensures that if there are too many items, you can scroll the box 
+       without scrolling the whole page */
     #categories {
-        max-height: 200px !important; /* Adjust based on your iframe height */
-        overflow-y: auto !important;
         display: flex !important;
         flex-wrap: wrap !important;
+        max-height: 80px !important;
+        overflow-y: auto !important;
+        border-bottom: 1px solid #444;
+        padding-bottom: 5px;
+    }
+
+    #elements {
+        display: block !important;
+        max-height: 150px !important; /* Limits height so it doesn't leave the iframe */
+        overflow-y: auto !important;
+        padding-top: 5px;
+    }
+
+    /* 4. FORCE SQUARE CANVAS */
+    #gameCanvas {
+        aspect-ratio: 1 / 1 !important;
+        max-height: 50vh !important; /* Shrinks the board so items fit under it */
+        width: auto !important;
+        margin: 0 auto !important;
+        display: block !important;
     }
 </style>
+
+<script>
+    // 5. THE RE-OPENER SCRIPT
+    // Sometimes the game engine shuts the menu when you click an element.
+    // This forces it to stay open.
+    setInterval(() => {
+        const el = document.getElementById("elementControls");
+        if (el && el.style.display === "none") {
+            el.style.setProperty("display", "block", "important");
+        }
+        // Remove the mobile flag again just in case
+        document.getElementById("gameDiv")?.classList.remove("mobile");
+    }, 200);
+</script>
 
 <script>
     // 5. THE "DESKTOP FORCER"
@@ -20400,6 +20430,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
