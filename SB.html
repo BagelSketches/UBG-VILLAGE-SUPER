@@ -62,27 +62,26 @@
 		standaloneType = null;
 	</script>
 <style>
-    /* FIX: Force the game board to be a square and prevent 'inf' */
+    /* 1. Stops the game board from stretching vertically */
     #gameCanvas {
         width: 100% !important;
-        height: auto !important; 
-        aspect-ratio: 1 / 1 !important; /* This stops the stretching */
-        min-height: 300px !important;   /* This stops the 'inf' error */
-        max-height: 550px !important; 
+        height: auto !important;
+        aspect-ratio: 1 / 1 !important; /* Forces a square shape */
+        min-height: 400px !important;   /* Prevents the 'inf' error */
+        max-height: 550px !important;   /* Limits the size on big screens */
         display: block !important;
         margin: 0 auto !important;
-        background-color: #000;
     }
 
-    /* Reset containers to stop them from hiding or stretching children */
-    #gameDiv, #gameContainer {
-        height: auto !important;
+    /* 2. Resets the layout that causes the Img 2 look */
+    #gameDiv, #gameContainer, .mobile#gameDiv {
         display: block !important;
-        visibility: visible !important;
+        height: auto !important;
+        flex-direction: column !important;
     }
 
-    /* Keep UI buttons visible */
-    #modsButton, #savesButton {
+    /* 3. Forces the Mods and Element buttons to stay visible */
+    #modsButton, #savesButton, #elementControls {
         display: inline-block !important;
         visibility: visible !important;
     }
@@ -20311,6 +20310,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
