@@ -54,7 +54,51 @@
         display: block !important;
     }
 </style>
+<style>
+    /* 1. FORCE THE DRAWING BOARD (CANVAS) TO BE VISIBLE */
+    #gameCanvas {
+        display: block !important;
+        visibility: visible !important;
+        
+        /* Forces it to be a square that fits the top half of your screen */
+        width: 95vw !important; 
+        height: 95vw !important;
+        max-width: 500px !important;
+        max-height: 500px !important;
+        
+        margin: 10px auto !important;
+        background-color: #000 !important; /* Makes the void visible */
+        border: 2px solid #444 !important;
+        image-rendering: pixelated !important; /* Keeps it sharp */
+    }
 
+    /* 2. ENSURE THE CONTAINER DOESN'T HIDE IT */
+    #gameContainer, #gameDiv {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        min-height: 100vh !important;
+    }
+
+    /* 3. PUSH THE MENUS BELOW THE BOARD */
+    #elementControls {
+        margin-top: 10px !important;
+        width: 100% !important;
+        background: #111 !important;
+    }
+</style>
+
+<script>
+    // 4. THE "BOARD REFRESHER"
+    // This script forces the game engine to recognize the canvas size
+    setInterval(() => {
+        const canvas = document.getElementById("gameCanvas");
+        if (canvas && (canvas.offsetWidth === 0 || canvas.offsetHeight === 0)) {
+            canvas.style.width = "400px";
+            canvas.style.height = "400px";
+        }
+    }, 500);
+</script>
 <script>
     // 5. THE RE-OPENER SCRIPT
     // Sometimes the game engine shuts the menu when you click an element.
@@ -20430,6 +20474,7 @@ if (document.referrer && document.referrer.indexOf("r74n.") === -1) {
 
 
 </html>
+
 
 
 
