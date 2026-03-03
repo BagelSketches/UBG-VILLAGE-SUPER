@@ -846,6 +846,111 @@
     }
   }
 
+
+  /* Collapse vertical gaps */
+  .search-container { margin: 5px auto !important; }
+  #randomGameBtn { margin: 5px auto !important; }
+  .site-logo { margin: 0 auto 5px !important; }
+  #categoryFilters { margin-bottom: 5px !important; }
+  #recentlyPlayedHeader { margin-top: 5px !important; margin-bottom: 5px !important; }
+  #featuredGameBanner { margin-bottom: 10px !important; }
+  #recentlyPlayed { margin-bottom: 5px !important; }
+
+
+  #randomGameBtn {
+    padding: 20px 45px !important;
+    font-size: 1.5em !important;
+    font-weight: bold !important;
+    border-width: 3px !important;
+    border-radius: 15px !important;
+    margin: 5px auto !important;
+    display: block !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+  }
+
+</style>
+<style>
+  /* --- VILLAGE PRO CLEANER --- */
+  #navbar, header, .top-bar, .navbar-container { display: none !important; }
+
+  .game-buttons {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 30px !important;
+    padding: 50px 20px !important;
+    max-width: 1550px !important;
+    margin: 0 auto !important;
+    justify-items: center !important;
+  }
+
+  .game-buttons button, .game-card {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 220px !important;  /* Wider and bigger */
+    height: 220px !important; 
+    aspect-ratio: 1 / 1 !important;
+    display: flex !important;
+    position: relative !important;
+    overflow: visible !important;
+    color: transparent !important;
+    font-size: 0 !important;
+  }
+
+  .game-buttons img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 20px !important;
+    border: 3px solid transparent !important;
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  }
+
+  .game-buttons button:hover img {
+    border-color: var(--accent) !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 25px var(--bgGlow) !important;
+  }
+
+  /* Kills the 'white thing' tags */
+  .game-buttons .tag, .game-buttons .game-tag, .game-buttons span:not(.hover-tooltip) {
+    display: none !important;
+    opacity: 0 !important;
+  }
+
+  /* Tooltip Name */
+  .game-buttons button::after {
+    content: attr(data-title);
+    position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.95); color: var(--accent); padding: 8px 16px;
+    border: 1px solid var(--accent); border-radius: 6px; font-size: 14px !important;
+    opacity: 0; transition: 0.2s; pointer-events: none; white-space: nowrap; z-index: 1000;
+  }
+  .game-buttons button:hover::after { opacity: 1; bottom: 8px; }
+
+  /* SIDEBAR ISLAND */
+  #sidebar-island {
+    position: fixed; right: 25px; top: 50%; transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.95); border: 2px solid var(--accent);
+    border-radius: 50px; padding: 30px 15px; display: flex;
+    flex-direction: column; gap: 30px; z-index: 10001;
+    backdrop-filter: blur(20px); transition: 0.4s ease;
+  }
+  .sidebar-hidden { opacity: 0 !important; visibility: hidden !important; transform: translateY(-50%) translateX(100px) !important; }
+  .nav-item { position: relative; cursor: pointer; color: var(--accent); display: flex; justify-content: center; }
+  .nav-item svg { width: 34px; height: 34px; }
+  .nav-item .tooltip {
+    position: absolute; right: 65px; background: var(--accent); color: #000;
+    padding: 8px 15px; border-radius: 8px; font-weight: bold; opacity: 0;
+    white-space: nowrap; transition: 0.3s; top: 50%; transform: translateY(-50%);
+  }
+  .nav-item:hover .tooltip { opacity: 1; right: 75px; }
 </style>
 </head>
 
@@ -2049,6 +2154,52 @@ window.addEventListener("DOMContentLoaded", () => {
   
 });
 
+</script>
+
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    // Inject Sidebar
+    const sidebar = `
+      <div id="sidebar-island">
+        <div class="nav-item" onclick="location.reload()"><i data-lucide="home"></i><span class="tooltip">Home</span></div>
+        <div class="nav-item" onclick="showGames()"><i data-lucide="gamepad-2"></i><span class="tooltip">Games</span></div>
+        <div class="nav-item" onclick="toggleSettingsModal()"><i data-lucide="settings"></i><span class="tooltip">Settings</span></div>
+        <div class="nav-item" onclick="window.open('https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit', '_blank')"><i data-lucide="tv"></i><span class="tooltip">Movies</span></div>
+        <div class="nav-item" onclick="window.open('chatroom.html', '_blank')"><i data-lucide="message-square"></i><span class="tooltip">Chat</span></div>
+        <div class="nav-item" onclick="window.open('https://discord.gg/qDrefFBQUs', '_blank')"><i data-lucide="hash"></i><span class="tooltip">Discord</span></div>
+      </div>`;
+    document.body.insertAdjacentHTML('afterbegin', sidebar);
+    lucide.createIcons();
+
+    // Map Titles & Clean up button text
+    document.querySelectorAll('.game-buttons button').forEach(btn => {
+      const name = btn.innerText.trim();
+      if(name && !btn.getAttribute('data-title')) btn.setAttribute('data-title', name);
+    });
+  });
+
+  function showHome() {
+    document.getElementById('splashScreen').style.display = 'flex';
+    document.getElementById('mainContent').style.display = 'none';
+  }
+  function showGames() {
+    document.getElementById('splashScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+  }
+
+  setInterval(() => {
+    const overlay = document.getElementById('gameOverlay');
+    const sidebar = document.getElementById('sidebar-island');
+    if (sidebar) {
+      if (overlay && (overlay.style.display === 'block' || overlay.style.display === 'flex')) {
+        sidebar.classList.add('sidebar-hidden');
+      } else {
+        sidebar.classList.remove('sidebar-hidden');
+      }
+    }
+  }, 200);
 </script>
 
 </body>
