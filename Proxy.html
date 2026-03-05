@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="/scram/scramjet.all.js"></script>
+  <script src="https://scramjet-app-rqhg.onrender.com/baremux/bare.cjs"></script>
+</head>
+<body>
+<script>
+  const url = new URLSearchParams(location.search).get('url');
+
+  async function go() {
+    const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+    await navigator.serviceWorker.ready;
+
+    const connection = new BareMux.BareMuxConnection('/baremux/worker.js');
+    await connection.setTransport('https://scramjet-app-rqhg.onrender.com/epoxy/index.mjs', [{
+      wisp: 'wss://scramjet-app-rqhg.onrender.com/wisp/'
+    }]);
+
+    location.href = '/scram/' + url;
+  }
+
+  go();
+</script>
+</body>
+</html>
