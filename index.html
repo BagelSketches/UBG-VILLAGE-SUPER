@@ -5,6 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>UBG-Village-Pro</title>
 <link rel="icon" type="image/png" href="icon128.png">
+  <!-- Scramjet proxy scripts -->
+<script src="https://scramjet-app-rqhg.onrender.com/scram/scramjet.all.js"></script>
+<script src="https://scramjet-app-rqhg.onrender.com/baremux/bare.cjs"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+      await navigator.serviceWorker.register("https://scramjet-app-rqhg.onrender.com/sw.js", {
+        scope: "/"
+      });
+      const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+      await connection.setTransport("/epoxy/index.mjs", [{
+        wisp: "wss://scramjet-app-rqhg.onrender.com/wisp/"
+      }]);
+    });
+  }
+</script>
 
 <style>
   /* --- CUSTOM PROPERTIES & ACCENTS --- */
@@ -1294,14 +1310,10 @@
   const PROXY_BASE = 'https://uv-on-vercel-dusky.vercel.app/';
 
   function buildProxyUrl(url) {
-    // YouTube embeds don't need a proxy — they load natively in iframes
-    if (url.includes('youtube.com/embed/')) return url;
-
-    if (PROXY_BASE) {
-      return PROXY_BASE + encodeURIComponent(url);
-    }
-    return url;
-  }
+  if (url.includes('youtube.com/embed/')) return url;
+  // Use Scramjet's service worker encoding
+  return 'https://scramjet-app-rqhg.onrender.com/scramjet/' + btoa(url);
+}
 
   // Adds https:// if the user forgot it
   // Also converts YouTube watch URLs to embed URLs automatically
