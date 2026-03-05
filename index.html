@@ -1309,10 +1309,9 @@
   // Example: const PROXY_BASE = 'https://your-uv-app.onrender.com/service/';
   const PROXY_BASE = 'https://scramjet-app-rqhg.onrender.com/';
 
-  function buildProxyUrl(url) {
+ function buildProxyUrl(url) {
   if (url.includes('youtube.com/embed/')) return url;
-  // Open through Scramjet's own frontend directly
-  return 'https://scramjet-app-rqhg.onrender.com/?url=' + encodeURIComponent(url);
+  return '/proxy.html?url=' + encodeURIComponent(url);
 }
 
   // Adds https:// if the user forgot it
