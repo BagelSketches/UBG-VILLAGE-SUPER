@@ -38,29 +38,42 @@
   }
 
   // This is the function your search bar should call
+  <script>
+  // This function handles the actual searching/browsing
   function launchProxy(url) {
-    if (!window.scramjet) return alert("Proxy not ready yet!");
+    // Check if the engine loaded
+    if (!window.scramjet) {
+        console.error("Scramjet Controller not found.");
+        return alert("Proxy is still initializing... please wait 5 seconds.");
+    }
+    
+    let targetUrl = url.trim();
     
     // If it's not a URL, search Google
-    if (!url.includes('.') || url.includes(' ')) {
-        url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+    if (!targetUrl.includes('.') || targetUrl.includes(' ')) {
+        targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(targetUrl);
     } else {
-        if (!url.startsWith('http')) url = 'https://' + url;
+        if (!targetUrl.startsWith('http')) targetUrl = 'https://' + targetUrl;
     }
 
-    // This converts the URL into a Scramjet link
-    const proxiedUrl = window.scramjet.encodeUrl(url);
-    
-    // Open it in your game iframe (or a new tab)
-    const frame = document.getElementById('gameIframe');
-    if (frame) {
-        frame.src = proxiedUrl;
-        document.getElementById('gameOverlay').style.display = 'block';
-    } else {
-        window.location.href = proxiedUrl;
+    try {
+        // This converts the URL into a Scramjet link
+        const proxiedUrl = window.scramjet.encodeUrl(targetUrl);
+        
+        const frame = document.getElementById('gameIframe');
+        if (frame) {
+            frame.src = proxiedUrl;
+            document.getElementById('gameOverlay').style.display = 'block';
+        } else {
+            window.location.href = proxiedUrl;
+        }
+    } catch (e) {
+        console.error("Encoding error:", e);
+        alert("Error encoding the URL. Make sure scramjet.all.js is loaded.");
     }
   }
 </script>
+
 <style>
   /* --- CUSTOM PROPERTIES & ACCENTS --- */
   :root {
