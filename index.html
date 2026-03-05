@@ -1188,12 +1188,8 @@
     <div id="proxyLabel">🌐 PROXY — Open (Almost) Any Site</div>
     <div id="proxyBarWrapper">
       <!-- The text input where the user types the URL -->
-      <input
-        type="text"
-        id="proxyInput"
-        placeholder="Type a URL... e.g. google.com"
-        onkeydown="if(event.key==='Enter') openProxy()"
-      />
+      <input type="text" placeholder="Search or enter URL..." 
+       onkeydown="if(event.key==='Enter') launchProxy(this.value)">
       <!-- The Go button calls openProxy() defined in the <script> below -->
       <button id="proxyGoBtn" onclick="openProxy()">GO ▶</button>
     </div>
