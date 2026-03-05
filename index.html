@@ -6,71 +6,19 @@
 <title>UBG-Village-Pro</title>
 <link rel="icon" type="image/png" href="icon128.png">
   <!-- Scramjet proxy scripts -->
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>UBG-Village-Pro</title>
-  <link rel="icon" type="image/png" href="icon128.png">
-  <script src="./scramjet.all.js"></script>
+<script src="https://scramjet-app-rqhg.onrender.com/scram/scramjet.all.js"></script>
+<script src="https://scramjet-app-rqhg.onrender.com/baremux/bare.cjs"></script>
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", async () => {
-      try {
-        // Register the local worker
-        await navigator.serviceWorker.register("./sw.js", { scope: "/" });
-
-        // Initialize the controller
-        const { ScramjetController } = $scramjetLoadController();
-        window.scramjet = new ScramjetController({
-          files: {
-            wasm: "/scramjet.wasm.wasm",
-            all: "/scramjet.all.js"
-          },
-          wisp: "wss://scramjet-app-rqhg.onrender.com/wisp/" 
-        });
-
-        await window.scramjet.init();
-        console.log("Scramjet is ready!");
-      } catch (err) {
-        console.error("Proxy failed to start:", err);
-      }
+      await navigator.serviceWorker.register("https://scramjet-app-rqhg.onrender.com/sw.js", {
+        scope: "/"
+      });
+      const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+      await connection.setTransport("/epoxy/index.mjs", [{
+        wisp: "wss://scramjet-app-rqhg.onrender.com/wisp/"
+      }]);
     });
-  }
-
-  // This is the function your search bar should call
-  <script>
-  // This function handles the actual searching/browsing
-  function launchProxy(url) {
-    // Check if the engine loaded
-    if (!window.scramjet) {
-        console.error("Scramjet Controller not found.");
-        return alert("Proxy is still initializing... please wait 5 seconds.");
-    }
-    
-    let targetUrl = url.trim();
-    
-    // If it's not a URL, search Google
-    if (!targetUrl.includes('.') || targetUrl.includes(' ')) {
-        targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(targetUrl);
-    } else {
-        if (!targetUrl.startsWith('http')) targetUrl = 'https://' + targetUrl;
-    }
-
-    try {
-        // This converts the URL into a Scramjet link
-        const proxiedUrl = window.scramjet.encodeUrl(targetUrl);
-        
-        const frame = document.getElementById('gameIframe');
-        if (frame) {
-            frame.src = proxiedUrl;
-            document.getElementById('gameOverlay').style.display = 'block';
-        } else {
-            window.location.href = proxiedUrl;
-        }
-    } catch (e) {
-        console.error("Encoding error:", e);
-        alert("Error encoding the URL. Make sure scramjet.all.js is loaded.");
-    }
   }
 </script>
 
@@ -1201,8 +1149,12 @@
     <div id="proxyLabel">🌐 PROXY — Open (Almost) Any Site</div>
     <div id="proxyBarWrapper">
       <!-- The text input where the user types the URL -->
-      <input type="text" placeholder="Search or enter URL..." 
-       onkeydown="if(event.key==='Enter') launchProxy(this.value)">
+      <input
+        type="text"
+        id="proxyInput"
+        placeholder="Type a URL... e.g. google.com"
+        onkeydown="if(event.key==='Enter') openProxy()"
+      />
       <!-- The Go button calls openProxy() defined in the <script> below -->
       <button id="proxyGoBtn" onclick="openProxy()">GO ▶</button>
     </div>
@@ -1355,7 +1307,7 @@
 
   // CHANGE THIS to your deployed proxy URL when you have one.
   // Example: const PROXY_BASE = 'https://your-uv-app.onrender.com/service/';
-  const PROXY_BASE = 'https://scramjet-app-rqhg.onrender.com/';
+  const PROXY_BASE = 'https://uv-on-vercel-dusky.vercel.app/';
 
   function buildProxyUrl(url) {
   if (url.includes('youtube.com/embed/')) return url;
