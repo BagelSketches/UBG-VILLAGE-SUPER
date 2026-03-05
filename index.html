@@ -6,22 +6,40 @@
 <title>UBG-Village-Pro</title>
 <link rel="icon" type="image/png" href="icon128.png">
   <!-- Scramjet proxy scripts -->
-<script src="https://scramjet-app-rqhg.onrender.com/scram/scramjet.all.js"></script>
-<script src="https://scramjet-app-rqhg.onrender.com/baremux/bare.cjs"></script>
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async () => {
-      await navigator.serviceWorker.register("https://scramjet-app-rqhg.onrender.com/sw.js", {
-        scope: "/"
-      });
-      const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-      await connection.setTransport("/epoxy/index.mjs", [{
-        wisp: "wss://scramjet-app-rqhg.onrender.com/wisp/"
-      }]);
-    });
-  }
-</script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UBG-Village-Pro</title>
+  <link rel="icon" type="image/png" href="icon128.png">
 
+  <script src="./scramjet.all.js"></script>
+  <script src="https://scramjet-app-rqhg.onrender.com/baremux/bare.cjs"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", async () => {
+        try {
+          // This tells the browser to use YOUR local file
+          await navigator.serviceWorker.register("./sw.js", {
+            scope: "/"
+          });
+
+          const { ScramjetController } = $scramjetLoadController();
+          const scramjet = new ScramjetController({
+            wisp: "wss://scramjet-app-rqhg.onrender.com/wisp/",
+            files: {
+                wasm: "/scramjet.wasm.wasm",
+                all: "/scramjet.all.js"
+            }
+          });
+          
+          await scramjet.init();
+          console.log("Scramjet is now running locally!");
+        } catch (err) {
+          console.error("Proxy error:", err);
+        }
+      });
+    }
+  </script>
 <style>
   /* --- CUSTOM PROPERTIES & ACCENTS --- */
   :root {
