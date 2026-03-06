@@ -5,51 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>UBG-Village-Pro</title>
 <link rel="icon" type="image/png" href="icon128.png">
-  <!-- Scramjet proxy scripts -->
-<script src="https://scramjet-app-rqhg.onrender.com/scram/scramjet.all.js"></script>
-<script src="https://scramjet-app-rqhg.onrender.com/baremux/bare.cjs"></script>
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async () => {
-      await navigator.serviceWorker.register("https://scramjet-app-rqhg.onrender.com/sw.js", {
-        scope: "/"
-      });
-      const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-      await connection.setTransport("/epoxy/index.mjs", [{
-        wisp: "wss://scramjet-app-rqhg.onrender.com/wisp/"
-      }]);
-    });
-  }
-</script>
 
 <style>
-  /* --- CUSTOM PROPERTIES & ACCENTS --- */
   :root {
     --accent: #00ff00;
     --bgGlow: rgba(0,255,0,0.3);
     --dark-bg: #0a0a0a;
-    --card-bg: rgba(0,255,0,0.05); /* Lighter background for game cards */
-    --scanline-opacity: 0.05; /* NEW: Global property for scanline effect */
+    --card-bg: rgba(0,255,0,0.05);
+    --scanline-opacity: 0.05;
   }
 
-  /* --- BASE & UTILITY --- */
   body {
     margin: 0;
     background: var(--dark-bg);
     color: white;
-    font-family: 'Consolas', 'Monospace', sans-serif; /* Hacker-style font */
+    font-family: 'Consolas', 'Monospace', sans-serif;
     overflow-x: hidden;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    /* NEW: Custom Background Image Style */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     transition: background-image 0.5s ease;
   }
   
-  /* DARK OVERLAY (IMPROVE READABILITY) */
   body::after {
     content: "";
     position: fixed;
@@ -58,25 +38,21 @@
     z-index: -1;
   }
   
-  /* MATRIX CANVAS */
   #matrix {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -2; /* Put behind the overlay */
+    z-index: -2;
   }
 
-  /* NEW (Feature 19): Scanline/Noise Effect */
   #mainContent {
       position: relative;
-      /* Include existing styles */
       max-width: 1200px;
       margin: 20px auto;
       padding: 30px;
       display: none; 
-      /* Enable 3D transform for better rendering of noise */
       transform: translateZ(0);
   }
 
@@ -87,10 +63,9 @@
       left: 0;
       width: 100%;
       height: 100%;
-      pointer-events: none; /* Allows clicks to pass through */
-      z-index: 1; /* Above content, below custom cursor */
+      pointer-events: none;
+      z-index: 1;
       opacity: var(--scanline-opacity);
-      /* Scanline pattern (subtle horizontal lines) */
       background: repeating-linear-gradient(
           0deg,
           rgba(0, 0, 0, 0.6) 0,
@@ -98,7 +73,6 @@
           transparent 2px,
           transparent 4px
       );
-      /* Subtle TV static animation (optional but cool) */
       animation: noise 5s infinite step-end;
   }
 
@@ -115,54 +89,37 @@
       90% { clip-path: inset(0 0 72% 0); }
   }
   
-  /* --- CUSTOM CURSOR STYLES --- */
-  /* Hide default cursor */
-  * {
-    cursor: none !important;
-  }
+  * { cursor: none !important; }
 
-  /* NEW CSS for cursor toggle: Re-enables system cursor and hides custom cursor */
-  body.system-cursor * {
-    cursor: default !important; 
-  }
+  body.system-cursor * { cursor: default !important; }
+  body.system-cursor #customCursor { display: none !important; }
 
-  body.system-cursor #customCursor {
-    display: none !important; 
-  }
-
-  /* The actual custom cursor element */
   #customCursor {
     position: fixed;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    /* Border is solid color defined by --accent */
     border: 2px solid var(--accent); 
-    /* Ensure the inside is transparent by default */
     background-color: transparent; 
-    pointer-events: none; /* Allows clicks to pass through to elements below */
-    transform: translate(-50%, -50%); /* Centers the cursor on the mouse point */
-    transition: all 0.1s ease-out; /* Smooth follow/hover effect */
-    z-index: 10002; /* Always on top */
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: all 0.1s ease-out;
+    z-index: 10002;
   }
 
-  /* Hover effect for buttons/links/interactive elements */
   button:hover ~ #customCursor, 
   a:hover ~ #customCursor, 
   select:hover ~ #customCursor, 
   input:hover ~ #customCursor,
   #themeCycleBtn:hover ~ #customCursor {
-    /* Larger, filled, and glowing on hover */
     width: 30px;
     height: 30px;
-    /* Use an rgba background to keep the fill translucent (0.9 opacity) */
     background-color: var(--bgGlow); 
     border-width: 1px;
-    opacity: 1; /* Ensure border remains solid */
+    opacity: 1;
     box-shadow: 0 0 10px var(--accent);
   }
   
-  /* --- NAVIGATION BAR --- */
   #navbar {
     position: sticky;
     top: 0;
@@ -184,7 +141,6 @@
     text-shadow: 0 0 5px var(--bgGlow);
   }
   
-  /* Clock Style */
   #navbar-clock {
     color: var(--accent);
     font-size: 18px;
@@ -193,7 +149,6 @@
     text-shadow: 0 0 3px var(--bgGlow);
   }
 
-  /* NEW (Feature 11): Quick Theme Cycle Button */
   #themeCycleBtn {
     background: none;
     border: none;
@@ -201,7 +156,7 @@
     padding: 8px 10px;
     margin-left: 10px;
     cursor: pointer;
-    font-size: 20px; /* Bigger icon */
+    font-size: 20px;
     font-weight: 600;
     text-decoration: none;
     transition: color 0.2s, text-shadow 0.2s;
@@ -231,7 +186,6 @@
     text-shadow: 0 0 8px var(--accent);
   }
   
-  /* --- SPLASH SCREEN --- */
   #splashScreen {
     flex-grow: 1;
     display: flex;
@@ -242,7 +196,6 @@
     padding: 20px;
     max-width: 800px;
     margin: 0 auto;
-    /* Ensure splash screen is visible initially */
     display: flex; 
   }
   
@@ -260,7 +213,6 @@
     margin-top: 0;
   }
 
-  /* --- MAIN CONTENT & GAME GRID --- */
   .site-logo {
     display: block;
     margin: 0 auto 15px;
@@ -270,7 +222,6 @@
     filter: drop-shadow(0 0 10px var(--accent));
   }
   
-  /* Headers for Recents */
   #recentlyPlayedHeader {
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -279,11 +230,8 @@
     margin-bottom: 10px; 
   }
   
-  #recentlyPlayedHeader.visible {
-    opacity: 1;
-  }
+  #recentlyPlayedHeader.visible { opacity: 1; }
   
-  /* Featured Game Banner */
   #featuredGameBanner {
     margin-bottom: 30px;
     padding: 20px;
@@ -295,16 +243,8 @@
     align-items: center;
     justify-content: space-between;
   }
-  #featuredGameBanner h2 {
-    color: white;
-    margin: 0;
-    font-size: 1.8em;
-  }
-  #featuredGameBanner span {
-    color: var(--accent);
-    font-weight: bold;
-    text-shadow: 0 0 5px var(--bgGlow);
-  }
+  #featuredGameBanner h2 { color: white; margin: 0; font-size: 1.8em; }
+  #featuredGameBanner span { color: var(--accent); font-weight: bold; text-shadow: 0 0 5px var(--bgGlow); }
   #featuredGameBanner button {
     background: var(--accent);
     color: var(--dark-bg);
@@ -315,10 +255,7 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-  #featuredGameBanner button:hover {
-    background: white;
-    box-shadow: 0 0 15px var(--bgGlow);
-  }
+  #featuredGameBanner button:hover { background: white; box-shadow: 0 0 15px var(--bgGlow); }
 
   #randomGameBtn {
     background: var(--dark-bg);
@@ -330,13 +267,8 @@
     box-shadow: 0 0 10px var(--bgGlow);
     transition: 0.2s;
   }
+  #randomGameBtn:hover { background: var(--card-bg); box-shadow: 0 0 15px var(--bgGlow); }
 
-  #randomGameBtn:hover {
-    background: var(--card-bg);
-    box-shadow: 0 0 15px var(--bgGlow);
-  }
-
-  /* Search Bar Wrapper for Clear Button */
   .search-container {
     position: relative;
     width: 100%;
@@ -347,7 +279,7 @@
   #searchBar {
     width: 100%;
     padding: 12px;
-    padding-right: 40px; /* Space for the clear button */
+    padding-right: 40px;
     border-radius: 10px;
     font-size: 16px;
     border: 2px solid var(--accent);
@@ -360,7 +292,6 @@
     box-sizing: border-box;
   }
   
-  /* Clear Search Button Style */
   #clearSearchBtn {
     position: absolute;
     right: 5px;
@@ -373,14 +304,10 @@
     cursor: pointer;
     padding: 0 5px;
     line-height: 1;
-    display: none; /* Initially hidden */
+    display: none;
   }
-  #clearSearchBtn:hover {
-      color: white;
-      text-shadow: 0 0 5px var(--accent);
-  }
+  #clearSearchBtn:hover { color: white; text-shadow: 0 0 5px var(--accent); }
 
-  /* NEW (Feature 18): Search Suggestions */
   #searchSuggestions {
       position: absolute;
       top: 100%;
@@ -402,16 +329,9 @@
       font-size: 0.9em;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
-  .suggestion-item:last-child {
-      border-bottom: none;
-  }
-  .suggestion-item:hover {
-      background: var(--card-bg);
-      color: var(--accent);
-  }
+  .suggestion-item:last-child { border-bottom: none; }
+  .suggestion-item:hover { background: var(--card-bg); color: var(--accent); }
 
-  
-  /* Category Filter Buttons */
   #categoryFilters button {
     background: var(--dark-bg);
     color: var(--accent);
@@ -427,39 +347,29 @@
     color: var(--dark-bg);
     box-shadow: 0 0 5px var(--bgGlow);
   }
-  #noResultsMessage {
-    color: #ff5555;
-    text-align: center;
-    padding: 20px;
-    display: none;
-  }
+  #noResultsMessage { color: #ff5555; text-align: center; padding: 20px; display: none; }
 
   .game-buttons {
     display: grid;
-    /* MODIFIED: Set to exactly 5 columns with equal width on large screens */
     grid-template-columns: repeat(5, 1fr); 
     gap: 20px;
     margin-top: 25px;
   }
   
-  /* NEW CSS for spacing fix */
-  #recentlyPlayed {
-      margin-bottom: 40px; 
-  }
-
+  #recentlyPlayed { margin-bottom: 40px; }
 
   .game-buttons button {
     background: var(--card-bg);
-    color: white; /* Changed to white for better contrast with the tag */
+    color: white;
     border: 1px solid var(--accent);
     padding: 20px 15px;
-    padding-top: 35px; /* Added space for the new tag */
+    padding-top: 35px;
     border-radius: 12px;
     cursor: pointer;
     text-align: center;
     font-weight: 600;
     box-shadow: 0 0 8px var(--bgGlow);
-    transition: all 0.3s ease-out; /* NEW: Added transition for hover effect */
+    transition: all 0.3s ease-out;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -469,12 +379,11 @@
     position: relative; 
   }
   
-  /* NEW (Feature 13): Hover Zoom and Glow Effect */
   .game-buttons button:hover {
     background: rgba(0, 255, 0, 0.15);
-    box-shadow: 0 0 20px var(--bgGlow); /* Increased glow */
-    transform: translateY(-5px) scale(1.03); /* Lifts and scales */
-    color: var(--accent); /* Change text color on hover */
+    box-shadow: 0 0 20px var(--bgGlow);
+    transform: translateY(-5px) scale(1.03);
+    color: var(--accent);
   }
 
   .game-buttons img {
@@ -486,7 +395,6 @@
     object-fit: cover;
   }
   
-  /* NEW (Feature 12): Game Card Tag Style */
   .game-card-tag {
     position: absolute;
     top: 0;
@@ -500,7 +408,6 @@
     text-transform: uppercase;
   }
 
-  /* GAME OVERLAY */
   #gameOverlay {
     position: fixed;
     top: 0;
@@ -513,7 +420,7 @@
     z-index: 9999;
   }
 
-  #topBar { /* Game Overlay Top Bar */
+  #topBar {
     width: 98%;
     height: 50px;
     background: #111;
@@ -522,13 +429,9 @@
     align-items: center;
     padding: 15px 15px;
     border-bottom: 2px solid var(--accent);
-    transition: opacity 0.3s ease; /* NEW: Transition for auto-hide */
+    transition: opacity 0.3s ease;
   }
-  /* Class to apply when bar is hidden */
-  #topBar.hidden {
-      opacity: 0;
-      pointer-events: none; /* Make buttons unclickable when hidden */
-  }
+  #topBar.hidden { opacity: 0; pointer-events: none; }
 
   #topBar button {
     background: black;
@@ -539,15 +442,10 @@
     cursor: pointer;
     font-size: 16px;
     transition: 0.2s;
-    margin-left: 5px; /* Added spacing between buttons */
+    margin-left: 5px;
   }
-
-  #topBar button:hover {
-    background: var(--accent);
-    color: black;
-  }
+  #topBar button:hover { background: var(--accent); color: black; }
   
-  /* FPS Counter Style */
   #fpsDisplay {
     color: var(--accent);
     font-weight: bold;
@@ -558,7 +456,6 @@
     border-radius: 5px;
   }
   
-  /* Specific style for the panic button for quick visual distinction */
   #panicButton {
     background: #ff0000 !important;
     border-color: #ff0000 !important;
@@ -566,13 +463,8 @@
     font-weight: bold;
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
   }
-  
-  #panicButton:hover {
-    background: #cc0000 !important;
-    color: white !important;
-  }
+  #panicButton:hover { background: #cc0000 !important; color: white !important; }
 
-  /* Loading Indicator */
   #loadingIndicator {
     position: absolute;
     top: 50%;
@@ -587,11 +479,10 @@
   
   #gameFrame {
     width: 100%;
-    height: calc(100vh - 82px); /* Adjusted height for the topBar */
+    height: calc(100vh - 82px);
     border: none;
   }
 
-  /* --- Settings Modal/Panel --- */
   #settingsModal {
       position: fixed;
       top: 50%;
@@ -605,15 +496,12 @@
       z-index: 10001;
       display: none;
       width: 300px;
-      max-height: 80vh; /* Added max height */
-      overflow-y: auto; /* Added scrolling */
+      max-height: 80vh;
+      overflow-y: auto;
       color: white;
   }
   
-  /* Style for Range Input */
-  .range-container {
-    margin-top: 10px;
-  }
+  .range-container { margin-top: 10px; }
   .range-container input[type="range"] {
     -webkit-appearance: none;
     width: 100%;
@@ -635,22 +523,9 @@
     box-shadow: 0 0 5px var(--accent);
   }
 
-  /* Checkbox style for Matrix Cycle */
-  .checkbox-group {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  .checkbox-group input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin: 0;
-    cursor: pointer;
-    accent-color: var(--accent);
-  }
+  .checkbox-group { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--accent); }
   
-  /* --- Game Details Modal (Confirmation Modal uses this base) --- */
   #gameDetailsModal, #launchConfirmModal {
       position: fixed;
       z-index: 10001;
@@ -659,8 +534,8 @@
       width: 100%;
       height: 100%;
       overflow: auto;
-      background-color: rgba(0,0,0,0.85); /* Dark background */
-      display: none; /* Hidden by default */
+      background-color: rgba(0,0,0,0.85);
+      display: none;
       align-items: center;
       justify-content: center;
       backdrop-filter: blur(5px);
@@ -678,65 +553,19 @@
       color: white;
   }
   
-  /* NEW (Feature 14) Confirmation Modal Specific Styles */
-  #launchConfirmModal .modal-content {
-      max-width: 400px;
-      text-align: center;
-  }
-  #confirmLaunchBtn, #cancelLaunchBtn {
-      width: 48%;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: bold;
-      margin-top: 15px;
-  }
-  #confirmLaunchBtn {
-      background: var(--accent);
-      color: var(--dark-bg);
-      border: 2px solid var(--accent);
-      margin-right: 4%;
-  }
-  #cancelLaunchBtn {
-      background: var(--dark-bg);
-      color: #ff5555;
-      border: 2px solid #ff5555;
-  }
-  #confirmLaunchBtn:hover {
-      background: white;
-      color: black;
-  }
-  #cancelLaunchBtn:hover {
-      background: #ff5555;
-      color: white;
-  }
+  #launchConfirmModal .modal-content { max-width: 400px; text-align: center; }
+  #confirmLaunchBtn, #cancelLaunchBtn { width: 48%; padding: 10px; border-radius: 8px; font-weight: bold; margin-top: 15px; }
+  #confirmLaunchBtn { background: var(--accent); color: var(--dark-bg); border: 2px solid var(--accent); margin-right: 4%; }
+  #cancelLaunchBtn { background: var(--dark-bg); color: #ff5555; border: 2px solid #ff5555; }
+  #confirmLaunchBtn:hover { background: white; color: black; }
+  #cancelLaunchBtn:hover { background: #ff5555; color: white; }
 
-
-  .modal-body {
-      max-height: 400px;
-      overflow-y: auto;
-      padding-right: 15px; 
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 15px;
-  }
+  .modal-body { max-height: 400px; overflow-y: auto; padding-right: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px; }
   
-  .close-btn {
-      color: var(--accent);
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-      line-height: 1;
-  }
-  
-  .close-btn:hover,
-  .close-btn:focus {
-      color: white;
-      text-shadow: 0 0 5px var(--accent);
-      text-decoration: none;
-  }
+  .close-btn { color: var(--accent); float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
+  .close-btn:hover, .close-btn:focus { color: white; text-shadow: 0 0 5px var(--accent); text-decoration: none; }
   
   #modalLaunchBtn {
-      /* Style to match settings button but more prominent */
       background: var(--accent);
       color: var(--dark-bg);
       border: 2px solid var(--accent);
@@ -746,30 +575,12 @@
       font-weight: bold;
       transition: all 0.2s;
   }
-  
-  #modalLaunchBtn:hover {
-      background: var(--dark-bg);
-      color: var(--accent);
-      box-shadow: 0 0 10px var(--bgGlow);
-  }
+  #modalLaunchBtn:hover { background: var(--dark-bg); color: var(--accent); box-shadow: 0 0 10px var(--bgGlow); }
 
-
-  #settingsModal h2 {
-      color: var(--accent);
-      margin-top: 0;
-      border-bottom: 1px solid var(--accent);
-      padding-bottom: 10px;
-  }
-  .setting-group {
-      margin-bottom: 20px;
-  }
-  .setting-group label, .setting-group select {
-      display: block;
-      margin-top: 5px;
-      font-size: 0.9em;
-  }
+  #settingsModal h2 { color: var(--accent); margin-top: 0; border-bottom: 1px solid var(--accent); padding-bottom: 10px; }
+  .setting-group { margin-bottom: 20px; }
+  .setting-group label, .setting-group select { display: block; margin-top: 5px; font-size: 0.9em; }
   
-  /* Correctly scoped CSS for buttons, select, AND color picker/text input in settings modal */
   #settingsModal select, 
   #settingsModal button, 
   #settingsModal input[type="color"],
@@ -786,32 +597,11 @@
       transition: background 0.2s, color 0.2s;
   }
   
-  /* Ensure the text input is still input-style when not hovered */
-  #settingsModal input[type="text"] {
-    cursor: text;
-  }
-  /* NEW (Feature 20) Style for Custom Hotkey Input */
-  #customPanicKeyInput {
-      width: 50px; /* Small size for single letter */
-      text-align: center;
-      font-weight: bold;
-      text-transform: uppercase;
-      display: inline-block;
-      margin-left: 10px;
-  }
-
-  /* Specific styling for the color input to make the swatch visible and styled */
-  #settingsModal input[type="color"] {
-    height: 40px; 
-    padding: 2px;
-  }
-
-  #settingsModal button:hover {
-    background: var(--accent);
-    color: var(--dark-bg);
-  }
+  #settingsModal input[type="text"] { cursor: text; }
+  #customPanicKeyInput { width: 50px; text-align: center; font-weight: bold; text-transform: uppercase; display: inline-block; margin-left: 10px; }
+  #settingsModal input[type="color"] { height: 40px; padding: 2px; }
+  #settingsModal button:hover { background: var(--accent); color: var(--dark-bg); }
   
-  /* Go To Top Button */
   #goToTopBtn {
       display: none;
       position: fixed;
@@ -828,42 +618,18 @@
       box-shadow: 0 0 10px var(--bgGlow);
       transition: all 0.3s;
   }
-  #goToTopBtn:hover {
-      background-color: var(--accent);
-      color: var(--dark-bg);
-      box-shadow: 0 0 15px var(--bgGlow);
-  }
+  #goToTopBtn:hover { background-color: var(--accent); color: var(--dark-bg); box-shadow: 0 0 15px var(--bgGlow); }
 
-  /* MEDIA QUERIES for smaller screens */
   @media (max-width: 768px) {
-    #navbar {
-      padding: 10px 15px;
-      flex-direction: column;
-    }
-    #navbar-links {
-      margin-top: 10px;
-    }
-    #navbar-title {
-      font-size: 20px;
-    }
-    #splashScreen h1 {
-      font-size: 4em;
-    }
-    #splashScreen p {
-      font-size: 1.2em;
-    }
-    .game-buttons {
-      /* Scales down grid for mobile */
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
-    }
-    /* Hide clock on small screens for space */
-    #navbar-clock {
-      display: none;
-    }
+    #navbar { padding: 10px 15px; flex-direction: column; }
+    #navbar-links { margin-top: 10px; }
+    #navbar-title { font-size: 20px; }
+    #splashScreen h1 { font-size: 4em; }
+    #splashScreen p { font-size: 1.2em; }
+    .game-buttons { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+    #navbar-clock { display: none; }
   }
 
-
-  /* Collapse vertical gaps */
   .search-container { margin: 5px auto !important; }
   #randomGameBtn { margin: 5px auto !important; }
   .site-logo { margin: 0 auto 5px !important; }
@@ -871,7 +637,6 @@
   #recentlyPlayedHeader { margin-top: 5px !important; margin-bottom: 5px !important; }
   #featuredGameBanner { margin-bottom: 10px !important; }
   #recentlyPlayed { margin-bottom: 5px !important; }
-
 
   #randomGameBtn {
     padding: 20px 45px !important;
@@ -884,8 +649,8 @@
     text-transform: uppercase !important;
     letter-spacing: 2px !important;
   }
-
 </style>
+
 <style>
   /* --- VILLAGE PRO CLEANER --- */
   #navbar, header, .top-bar, .navbar-container { display: none !important; }
@@ -909,7 +674,7 @@
     box-shadow: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    width: 220px !important;  /* Wider and bigger */
+    width: 220px !important;
     height: 220px !important; 
     aspect-ratio: 1 / 1 !important;
     display: flex !important;
@@ -934,13 +699,11 @@
     box-shadow: 0 0 25px var(--bgGlow) !important;
   }
 
-  /* Kills the 'white thing' tags */
   .game-buttons .tag, .game-buttons .game-tag, .game-buttons span:not(.hover-tooltip) {
     display: none !important;
     opacity: 0 !important;
   }
 
-  /* Tooltip Name */
   .game-buttons button::after {
     content: attr(data-title);
     position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%);
@@ -972,7 +735,6 @@
 
 <body>
 <div id="customCursor"></div> 
-
 <canvas id="matrix"></canvas>
 
 <div id="navbar">
@@ -981,73 +743,61 @@
       <span id="navbar-clock"></span>
       <button id="themeCycleBtn" onclick="quickCycleTheme()" title="Quick Theme Cycle">🎨</button>
       <div id="navbar-links">
-  <button onclick="showMainContent()">GAMES</button> 
-  <button onclick="toggleChatbot()">🤖 AI CHAT</button>
-  <button onclick="toggleSettingsModal()">⚙ SETTINGS</button>
-  <a href="chatroom.html" target="_blank">CHAT</a> 
-  <a href="https://devilapig247.github.io/Movie-night/" target="_blank">Movie night</a>
-  <a href="https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit?usp=sharing" target="_blank">MOVIES/TV</a>
-  <a href="https://discord.gg/qDrefFBQUs" target="_blank">DISCORD</a>
-</div>
+        <button onclick="showMainContent()">GAMES</button> 
+        <button onclick="toggleSettingsModal()">⚙ SETTINGS</button>
+        <a href="chatroom.html" target="_blank">CHAT</a> 
+        <a href="https://devilapig247.github.io/Movie-night/" target="_blank">Movie night</a>
+        <a href="https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit?usp=sharing" target="_blank">MOVIES/TV</a>
+        <a href="https://discord.gg/qDrefFBQUs" target="_blank">DISCORD</a>
       </div>
   </div>
 </div>
 
 <div id="settingsModal">
     <h2>⚙ Site Settings</h2>
-    
     <div class="setting-group">
         <label for="siteTitleInput">Site Title (Browser Tab):</label>
         <input type="text" id="siteTitleInput" placeholder="UBG-Village-Pro">
         <button onclick="saveSiteTitle()">Save Site Title</button>
     </div>
-    
     <div class="setting-group">
         <label for="customBgUrlInput">Custom Background URL (Image/Video):</label>
         <input type="text" id="customBgUrlInput" placeholder="https://example.com/bg.jpg">
         <button onclick="saveCustomBgUrl()">Apply Background</button>
     </div>
-    
     <div class="setting-group">
         <label for="themeColorPicker">Theme Color:</label>
         <input type="color" id="themeColorPicker" value="#00ff00" oninput="setTheme(this.value)">
     </div>
-    
     <div class="setting-group">
         <label for="accentOpacityRange">Accent Glow Opacity:</label>
         <div class="range-container">
             <input type="range" id="accentOpacityRange" min="0.1" max="1.0" step="0.05" oninput="setAccentOpacity(this.value)">
         </div>
     </div>
-    
     <div class="setting-group">
         <label for="cursorToggleBtn">Custom Cursor:</label>
         <button id="cursorToggleBtn" onclick="toggleCustomCursor()">Disable</button>
     </div>
-
     <div class="setting-group">
         <label>Panic Hotkey: Ctrl+Shift+</label>
         <input type="text" id="customPanicKeyInput" maxlength="1" oninput="this.value = this.value.toUpperCase()">
         <button onclick="savePanicKey()">Set Custom Panic Key</button>
     </div>
-
     <div class="setting-group">
         <label for="panicUrlInput">Panic Button URL:</label>
         <input type="text" id="panicUrlInput" placeholder="https://llv.instructure.com">
         <button onclick="savePanicUrl()">Save Panic URL</button>
     </div>
-    
     <h3>Matrix Rain Settings</h3>
     <div class="setting-group">
         <button id="matrixToggleBtn" onclick="toggleMatrixRain()">Stop Rain</button>
-        
         <label for="matrixText">Matrix Text Type:</label>
         <select id="matrixText" onchange="setMatrixText(this.value)">
           <option value="binary">Binary (01)</option>
           <option value="kanji">Kanji (Japanese)</option>
         </select>
     </div>
-    
     <div class="setting-group">
         <label for="matrixSpeed">Matrix Speed/Density:</label>
         <select id="matrixSpeed" onchange="setMatrixSpeed(this.value)">
@@ -1057,7 +807,6 @@
           <option value="1000">Off</option>
         </select>
     </div>
-    
     <div class="setting-group">
         <label for="matrixCycleCheckbox">Matrix Color Cycle Mode:</label>
         <div class="checkbox-group">
@@ -1065,12 +814,10 @@
             <input type="checkbox" id="matrixCycleCheckbox" onchange="toggleMatrixCycle(this.checked)">
         </div>
     </div>
-
     <h3>Data Utilities</h3>
     <button onclick="exportSettings()">💾 Export Settings</button>
     <button onclick="document.getElementById('importFile').click()">📤 Import Settings</button>
     <input type="file" id="importFile" accept="application/json" style="display: none;" onchange="importSettings(event)">
-
     <button onclick="clearRecentGames()" style="margin-top: 20px;">Clear Recently Played</button> 
     <button onclick="toggleSettingsModal()" style="margin-top: 20px; border-color: #555; color: #aaa;">Close Settings</button>
 </div>
@@ -1102,7 +849,6 @@
 
 <div id="gameOverlay">
   <div id="loadingIndicator">Loading Game...</div> 
-
   <div id="topBar">
     <span id="gameTitle" style="color: var(--accent); font-weight:bold;">No game</span>
     <div style="display: flex; align-items: center;">
@@ -1116,300 +862,11 @@
   <iframe id="gameFrame" src="" frameborder="0" allowfullscreen></iframe>
 </div>
 
+<!-- SPLASH SCREEN — proxy bar removed, use sidebar Proxy button instead -->
 <div id="splashScreen">
   <h1>UBG-Village-Pro</h1>
-  <p>A curated collection of unblocked games and community tools. Access thousands of hours of fun, chat with friends, or dive into a movie or TV show—all in one place.</p>
-
-  <!--
-    =====================================================================
-    PROXY URL BAR — HOW IT WORKS (read this so you can edit it yourself!)
-    =====================================================================
-
-    A "proxy" on a static GitHub Pages site can't actually route traffic
-    server-side like a real proxy. Instead, we use a technique called
-    "iframe embedding" — we just open the URL directly inside your existing
-    game overlay iframe. This works for sites that don't block iframes
-    (many do with "X-Frame-Options", which will show a blank/error).
-
-    For a real unblocker proxy, you'd need a separate service running on
-    a server (like Ultraviolet, Rammerhead, etc.) and point to it here.
-    The URL bar below is wired up to work with BOTH approaches:
-      - Direct iframe embed (works for many sites, not all)
-      - External proxy service (swap the buildProxyUrl() function below)
-
-    THE FLOW:
-      1. User types a URL → clicks Go (or presses Enter)
-      2. openProxy() runs → cleans up the URL → builds proxy URL
-      3. launchGame() is called → opens your existing game iframe overlay
-         (same overlay your games use — no extra code needed!)
-    =====================================================================
-  -->
-
-  <div id="proxySection">
-    <div id="proxyLabel">🌐 PROXY — Open (Almost) Any Site</div>
-    <div id="proxyBarWrapper">
-      <!-- The text input where the user types the URL -->
-      <input
-        type="text"
-        id="proxyInput"
-        placeholder="Type a URL... e.g. google.com"
-        onkeydown="if(event.key==='Enter') openProxy()"
-      />
-      <!-- The Go button calls openProxy() defined in the <script> below -->
-      <button id="proxyGoBtn" onclick="openProxy()">GO ▶</button>
-    </div>
-    <div id="proxyHint">Enter any URL to open it through the proxy</div>
-  </div>
+  <p>A curated collection of unblocked games and community tools.<br>Use the sidebar to browse games, open the proxy, chat, and more.</p>
 </div>
-
-<style>
-  /* =====================================================================
-     PROXY SECTION STYLES
-     These are scoped to #proxySection so they don't break anything else.
-     ===================================================================== */
-
-  #proxySection {
-    /* Sits below the splash screen text */
-    margin-top: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    max-width: 620px;
-    /* Center it horizontally inside the splash screen */
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  #proxyLabel {
-    color: var(--accent);           /* Uses your green accent color */
-    font-size: 13px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    opacity: 0.75;
-  }
-
-  #proxyBarWrapper {
-    display: flex;
-    width: 100%;
-    /* The glowing border around the whole bar */
-    border: 1.5px solid var(--accent);
-    border-radius: 6px;
-    box-shadow: 0 0 18px var(--bgGlow), 0 0 6px var(--bgGlow) inset;
-    overflow: hidden;               /* Clips children to the rounded border */
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    transition: box-shadow 0.2s ease;
-  }
-
-  /* Brighten glow when user is typing */
-  #proxyBarWrapper:focus-within {
-    box-shadow: 0 0 30px var(--bgGlow), 0 0 12px var(--bgGlow) inset;
-  }
-
-  #proxyInput {
-    flex: 1;                        /* Takes all available width except the button */
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--accent);
-    font-family: 'Consolas', 'Monospace', sans-serif;
-    font-size: 15px;
-    padding: 13px 16px;
-    caret-color: var(--accent);     /* Blinking cursor is green */
-  }
-
-  #proxyInput::placeholder {
-    color: rgba(0, 255, 0, 0.3);    /* Dim green placeholder */
-  }
-
-  #proxyGoBtn {
-    background: var(--accent);
-    color: #000;
-    border: none;
-    padding: 0 22px;
-    font-family: 'Consolas', 'Monospace', sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: background 0.15s ease, opacity 0.15s ease;
-  }
-
-  #proxyGoBtn:hover {
-    opacity: 0.85;
-  }
-
-  #proxyGoBtn:active {
-    opacity: 0.65;
-  }
-
-  #proxyHint {
-    font-size: 11px;
-    color: rgba(0, 255, 0, 0.35);
-    letter-spacing: 1px;
-  }
-</style>
-
-<script>
-
-  /*
-    =====================================================================
-    PROXY LOGIC — 3 functions, that's it.
-    =====================================================================
-
-    FUNCTION 1: buildProxyUrl(url)
-    --------------------------------
-    This is the ONLY function you need to change if you switch proxy services.
-    Right now it's set to direct iframe embed (no external proxy).
-
-    Want to use Ultraviolet or another service? Just change this one function.
-    Examples:
-      Ultraviolet:  return '/uv/service/' + __uv$config.encodeUrl(url);
-      Corrosion:    return '/corrosion?url=' + encodeURIComponent(url);
-      Bare server:  return 'https://your-proxy.com/bare/' + encodeURIComponent(url);
-
-    FUNCTION 2: cleanUrl(raw)
-    --------------------------------
-    Makes sure the URL is valid even if the user forgets "https://".
-    "google.com" → "https://google.com"
-    "http://..." → left as-is
-
-    FUNCTION 3: openProxy()
-    --------------------------------
-    Reads the input, calls cleanUrl + buildProxyUrl, then calls your
-    existing launchGame() which opens the game overlay iframe.
-    No extra HTML needed — it reuses what's already there.
-    =====================================================================
-  */
-
-  /*
-    =====================================================================
-    PROXY LOGIC — how to maintain this yourself
-    =====================================================================
-
-    THE CORE PROBLEM: sites like Poki, Google, YouTube use a header called
-    "X-Frame-Options: DENY" which tells browsers to refuse loading them in
-    an <iframe>. You can't bypass this with JavaScript — it's enforced by
-    the browser itself. The only solution is a PROXY SERVER that fetches
-    the page on your behalf and strips that header before sending it to you.
-
-    HOW TO SET UP ULTRAVIOLET (free, works on GitHub Pages):
-      1. Go to https://github.com/titaniumnetwork-dev/ultraviolet-app
-      2. Click "Deploy to Heroku" or deploy to Render.com (both free tiers)
-      3. Once deployed, you get a URL like: https://your-app.onrender.com
-      4. Change PROXY_BASE below to that URL + "/service/"
-
-    Until you have a proxy server, direct embed works for sites that allow it.
-    =====================================================================
-  */
-
-  // CHANGE THIS to your deployed proxy URL when you have one.
-  // Example: const PROXY_BASE = 'https://your-uv-app.onrender.com/service/';
-  const PROXY_BASE = 'https://scramjet-app-rqhg.onrender.com/';
-
- function buildProxyUrl(url) {
-  if (url.includes('youtube.com/embed/')) return url;
-  return '/proxy.html?url=' + encodeURIComponent(url);
-}
-  // Adds https:// if the user forgot it
-  // Also converts YouTube watch URLs to embed URLs automatically
-  function cleanUrl(raw) {
-    raw = raw.trim();
-    if (!raw.startsWith('http://') && !raw.startsWith('https://')) {
-      raw = 'https://' + raw;
-    }
-
-    // YouTube detection — converts watch URLs to embeds which don't need a proxy
-    // youtube.com/watch?v=ABC  →  youtube.com/embed/ABC
-    // youtu.be/ABC             →  youtube.com/embed/ABC
-    var ytMatch = raw.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    if (ytMatch) {
-      return 'https://www.youtube.com/embed/' + ytMatch[1] + '?autoplay=1';
-    }
-
-    return raw;
-  }
-
-  // Called when user clicks GO or presses Enter
-  function openProxy() {
-    var input = document.getElementById('proxyInput');
-    var raw = input.value.trim();
-    if (!raw) { input.focus(); return; }
-
-    var cleanedUrl = cleanUrl(raw);
-    var finalUrl = buildProxyUrl(cleanedUrl);
-
-    // Update the title bar at the top of the game overlay
-    document.getElementById('gameTitle').innerText = '🌐 ' + cleanedUrl;
-    document.title = cleanedUrl;
-
-    var overlay = document.getElementById('gameOverlay');
-    var frame = document.getElementById('gameFrame');
-    var loadingIndicator = document.getElementById('loadingIndicator');
-
-    overlay.style.display = 'flex';
-    loadingIndicator.style.display = 'block';
-    frame.src = finalUrl;
-
-    // Hide the custom cursor while inside the proxy overlay
-    // (same thing launchGame() does for games)
-    wasCursorEnabledBeforeGame = localStorage.getItem("customCursorEnabled") !== "false";
-    document.body.classList.add("system-cursor");
-
-    frame.onload = function() {
-      loadingIndicator.style.display = 'none';
-
-      // Detect if the iframe was blocked (X-Frame-Options / CSP).
-      // When a site refuses to load in an iframe, the frame's location
-      // becomes inaccessible — we can't read frame.contentDocument.
-      // We can't catch the block directly, but we can show a help message
-      // by checking if the frame appears empty after load.
-      try {
-        // If this throws, the site blocked cross-origin access → likely blocked
-        var doc = frame.contentDocument || frame.contentWindow.document;
-        if (!doc || doc.body === null || doc.body.innerHTML === '') {
-          showProxyBlockedMessage(cleanedUrl);
-        }
-      } catch(e) {
-        // Security error = cross-origin = site loaded (or blocked, can't tell)
-        // Either way, don't show an error — the site is probably just cross-origin
-      }
-    };
-
-    if (typeof setupOverlayAutoHide === 'function') setupOverlayAutoHide();
-  }
-
-  // Shows a helpful message inside the overlay when a site blocks iframes
-  function showProxyBlockedMessage(url) {
-    var existing = document.getElementById('proxyBlockMsg');
-    if (existing) existing.remove();
-
-    var msg = document.createElement('div');
-    msg.id = 'proxyBlockMsg';
-    msg.innerHTML = `
-      <div style="
-        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-        background:#0a0a0a; border:1.5px solid var(--accent);
-        padding:30px 40px; border-radius:8px; text-align:center;
-        font-family:Consolas,monospace; color:var(--accent);
-        box-shadow: 0 0 30px var(--bgGlow); z-index:9999;
-        max-width: 420px;
-      ">
-        <div style="font-size:2em; margin-bottom:12px">🚫</div>
-        <strong>${url}</strong><br><br>
-        This site blocks iframes.<br>
-        <span style="color:#aaa; font-size:13px">
-          To unblock it, you need a real proxy server (Ultraviolet).<br>
-          See the comment in the JS for setup instructions.
-        </span>
-      </div>`;
-    msg.style.cssText = 'position:absolute;inset:0;z-index:9998;';
-    document.getElementById('gameOverlay').appendChild(msg);
-  }
-</script>
-
 
 <div id="mainContent" class="container panel">
   <img src="UBP.png" alt="UBG Village Pro Logo" class="site-logo">
@@ -1526,12 +983,10 @@
     <button onclick="showLaunchConfirm('SE.html')" data-category="Puzzle" data-url="SE.html"> <span class="game-card-tag" data-category-text="Puzzle">Puzzle</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/318.png">Side effects</button>
     <button onclick="showLaunchConfirm('RB4.html')" data-category="Puzzle" data-url="RB4.html"> <span class="game-card-tag" data-category-text="Puzzle">Puzzle</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/242.png">Red ball 4</button>
     <button onclick="showLaunchConfirm('F11.html')" data-category="Action" data-url="F11.html"> <span class="game-card-tag" data-category-text="Action">Action</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/685.png">FIFA 11</button>
-
   </div>
 </div>
 
 <button onclick="document.documentElement.scrollTop = 0;" id="goToTopBtn" title="Go to top">▲</button>
-
 
 <script>
 // --- GLOBAL CONFIG ---
@@ -1544,98 +999,91 @@ const DEFAULT_SITE_TITLE = "UBG-Village-Pro";
 let originalDocumentTitle = DEFAULT_SITE_TITLE;
 
 const BG_URL_KEY = "customBgUrl";
-
-const THEME_COLORS = ["#00ff00", "#00bfff", "#ff0000", "#ffff00", "#00ffff"]; // Green, Blue, Red, Yellow, Cyan
+const THEME_COLORS = ["#00ff00", "#00bfff", "#ff0000", "#ffff00", "#00ffff"];
 let themeIndex = 0;
 
-// NEW (Feature 20): Custom Panic Hotkey
 const PANIC_KEY_CODE_KEY = "customPanicKeyCode";
-let currentPanicKeyCode = "P"; // Default to P
+let currentPanicKeyCode = "P";
 
 let matrixInterval;
-let isMatrixRunning = true; // NEW (Feature 15)
-
-// Global variable for cursor state before game launch
+let isMatrixRunning = true;
 let wasCursorEnabledBeforeGame = true;
-
-// Matrix Cycle
 let isMatrixCycleEnabled = false;
 let colorCycleHue = 0;
 
-// FPS Counter Globals
 let lastFrameTime = performance.now();
 const fpsDisplay = document.getElementById('fpsDisplay');
 
-
-
-// NEW (Feature 18): Search History
 const SEARCH_HISTORY_KEY = "searchHistory";
 const MAX_SEARCH_HISTORY = 5;
 
-
-// --- GAME DETAILS DATA ---
-// ... (Game details data is omitted for brevity but should be included here) ...
 const gameDetails = {
     "GAMES/bloons5.html": {
         description: "A classic tower defense game where you place monkey towers to pop waves of incoming bloons (balloons). Upgrade your towers and use special agents to defend your base.",
         controls: "Mouse (for placing and upgrading towers). Use hotkeys 1-5 for quick tower selection."
     },
     "CookieClicker/cookieclicker.html": {
-        description: "An incremental idle game where you start by clicking a giant cookie and then buy assets like grandmas and farms to automatically generate cookies. The goal is to accumulate astronomical numbers of cookies.",
-        controls: "Mouse (for clicking the cookie and purchasing upgrades). Click the main cookie as fast as you can!"
+        description: "An incremental idle game where you start by clicking a giant cookie and then buy assets like grandmas and farms to automatically generate cookies.",
+        controls: "Mouse (for clicking the cookie and purchasing upgrades)."
     },
     "Retrobowl/retro.html": {
-        description: "A retro-style American football game that blends simple arcade gameplay with management elements. You manage the team and play the offensive side of the game.",
-        controls: "Swipe up/down (Throw/Pass), Drag (Aim), Tap (Snap the ball), Mouse/Touch (Dive/Tackle)."
+        description: "A retro-style American football game that blends simple arcade gameplay with management elements.",
+        controls: "Swipe up/down (Throw/Pass), Drag (Aim), Tap (Snap the ball)."
     },
     "Minecraft.html": {
-        description: "A sandbox survival game where players explore a blocky, procedurally-generated 3D world, mine materials, craft tools, and build structures. Play in survival or creative mode.",
+        description: "A sandbox survival game where players explore a blocky, procedurally-generated 3D world.",
         controls: "W/A/S/D (Move), Space (Jump), Left Click (Break/Attack), Right Click (Place/Use), E (Inventory)."
     },
     "Slope plus.html": {
-        description: "Control a ball rolling down a slippery, randomized slope. Avoid obstacles and holes while trying to maintain balance and speed.",
+        description: "Control a ball rolling down a slippery, randomized slope. Avoid obstacles and holes.",
         controls: "Left Arrow/A (Move Left), Right Arrow/D (Move Right)."
     },
     "GAMES/Slither.io.html": {
-        description: "A multiplayer snake game where you eat pellets to grow longer. Try to cut off other players to eliminate them and absorb their mass, but don't let them touch your head!",
+        description: "A multiplayer snake game where you eat pellets to grow longer.",
         controls: "Mouse (Steering), Left Click (Boost/Speed up)."
     },
     "GAMES/Vex 5.html": {
-        description: "A fast-paced stickman platformer filled with challenging acts, spinning blades, and deadly traps. Run, jump, and slide your way to the exit.",
+        description: "A fast-paced stickman platformer filled with challenging acts, spinning blades, and deadly traps.",
         controls: "W/A/S/D or Arrow Keys (Move), Jump (W or Up Arrow), Slide (S or Down Arrow)."
     },
-    // Add default detail for games not explicitly listed
 };
-// --- END GAME DETAILS DATA ---
 
-
-// --- GLOBAL MATRIX CHARS ---
 const BINARY_CHARS = "01";
 const KANJI_CHARS = "日ﾓﾀﾝｸｱｲｽｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ"; 
 let currentLetters = BINARY_CHARS; 
 
-
-// --- CUSTOM CURSOR LOGIC ---
+// --- CUSTOM CURSOR ---
 const customCursor = document.getElementById('customCursor');
 document.addEventListener('mousemove', (e) => {
     customCursor.style.left = `${e.clientX}px`;
     customCursor.style.top = `${e.clientY}px`;
 });
 
-
-// --- PAGE NAVIGATION LOGIC ---
+// --- PAGE NAVIGATION ---
 function showMainContent() {
   document.getElementById("splashScreen").style.display = "none";
   document.getElementById("mainContent").style.display = "block";
   setFeaturedGame();
-  // Attach search listeners now that elements exist (showGames does the same)
   if (typeof showGames === 'function') showGames();
 }
 
-// Fullscreen Modes
+// --- SCRAMJET PROXY ---
+function openScramjet() {
+  var overlay = document.getElementById('gameOverlay');
+  var frame = document.getElementById('gameFrame');
+  overlay.style.display = 'flex';
+  frame.src = 'https://scramjet-app-rqhg.onrender.com';
+  document.getElementById('gameTitle').innerText = '🌐 Proxy';
+  document.title = 'Proxy';
+  wasCursorEnabledBeforeGame = localStorage.getItem("customCursorEnabled") !== "false";
+  document.body.classList.add("system-cursor");
+  document.getElementById('loadingIndicator').style.display = 'block';
+  frame.onload = () => { document.getElementById('loadingIndicator').style.display = 'none'; };
+  setupOverlayAutoHide();
+}
+
 function toggleFullscreen(mode) {
     let frame = document.getElementById("gameFrame");
-    
     if (mode === 'frame') {
         if (!document.fullscreenElement) {
             frame.requestFullscreen().catch(err => console.log("Fullscreen failed:", err));
@@ -1643,212 +1091,123 @@ function toggleFullscreen(mode) {
             document.exitFullscreen();
         }
     } else if (mode === 'window') {
-        if (frame.src) {
-            window.open(frame.src, '_blank');
-        }
+        if (frame.src) window.open(frame.src, '_blank');
     }
 }
 
-// NEW (Feature 14): Shows the launch confirmation modal
 function showLaunchConfirm(url) {
-    // Exclusion: Open external links immediately
-    if (
-        url.includes("discord.gg") ||
-        url.includes("discord.com") ||
-        url.includes("docs.google.com") ||
-        url.includes("chatroom.html")
-    ) {
+    if (url.includes("discord.gg") || url.includes("discord.com") || url.includes("docs.google.com") || url.includes("chatroom.html")) {
         window.open(url, "_blank");
         return;
     }
-    
-    // Find button and game name
-    let btn = [...document.querySelectorAll("#allGamesGrid button, #recentlyPlayed button")]
-                .find(b => b.getAttribute("data-url") === url);
+    let btn = [...document.querySelectorAll("#allGamesGrid button, #recentlyPlayed button")].find(b => b.getAttribute("data-url") === url);
     let gameName = btn ? btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim() : 'The Game';
-    
-    // Set up modal
     document.getElementById("gameNameConfirm").innerText = gameName;
-    
-    // Configure launch button to call launchGame with the URL
     const confirmBtn = document.getElementById("confirmLaunchBtn");
     confirmBtn.setAttribute("onclick", `launchGame('${url}')`);
-    
-    // Show modal
     document.getElementById("launchConfirmModal").style.display = "flex";
 }
 
-// NEW FUNCTION: Launches the game in the iframe (original logic now wrapped)
 function launchGame(url) {
-    // 1. Close Modals
     closeGameDetailsModal(); 
     document.getElementById("launchConfirmModal").style.display = "none";
-    
-    // Get game info
-    let btn = [...document.querySelectorAll(".game-buttons button")]
-                .find(b => b.getAttribute("data-url") === url);
+    let btn = [...document.querySelectorAll(".game-buttons button")].find(b => b.getAttribute("data-url") === url);
     let gameName = btn ? btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim() : 'Game In Progress';
-    
     document.title = gameName; 
     document.getElementById("gameTitle").innerText = gameName; 
-
-    // Custom Cursor Disable Logic
     wasCursorEnabledBeforeGame = localStorage.getItem("customCursorEnabled") !== "false";
     document.body.classList.add("system-cursor");
-
     let overlay = document.getElementById("gameOverlay");
     let frame = document.getElementById("gameFrame");
     let loadingIndicator = document.getElementById("loadingIndicator");
-
-    // OPEN OVERLAY
     overlay.style.display = "flex";
     loadingIndicator.style.display = "block";
     frame.src = url;
-
-    // HIDE LOADING INDICATOR ON LOAD
-    frame.onload = () => {
-        loadingIndicator.style.display = "none";
-    };
-    
-    // Start auto-hide timer
+    frame.onload = () => { loadingIndicator.style.display = "none"; };
     setupOverlayAutoHide();
-
-    // Find button data and update recent games/title (keep this logic)
     if (btn) {
         let img = btn.querySelector("img")?.src;
         addRecentGame(gameName, url, img);
     }
 }
 
-// Opens the Game Details Modal. The Launch button in this modal calls showLaunchConfirm.
 function showGameDetails(url) {
-    if (
-        url.includes("discord.gg") ||
-        url.includes("discord.com") ||
-        url.includes("docs.google.com") ||
-        url.includes("chatroom.html")
-    ) {
+    if (url.includes("discord.gg") || url.includes("discord.com") || url.includes("docs.google.com") || url.includes("chatroom.html")) {
         window.open(url, "_blank");
         return;
     }
-
-    let btn = [...document.querySelectorAll("#allGamesGrid button")]
-                .find(b => b.getAttribute("data-url") === url);
-
-    const details = gameDetails[url] || { 
-        description: "Description not available. This game is provided as-is.", 
-        controls: "Controls may vary. Try using Arrow Keys, WASD, and Mouse/Click." 
-    };
-    
+    let btn = [...document.querySelectorAll("#allGamesGrid button")].find(b => b.getAttribute("data-url") === url);
+    const details = gameDetails[url] || { description: "Description not available.", controls: "Try Arrow Keys, WASD, and Mouse/Click." };
     let gameName = btn ? btn.innerText.trim().replace(/^Launch_/, '').replace(/_/g, ' ').trim() : 'Game Title';
-
     document.getElementById("modalGameTitle").innerText = gameName;
     document.getElementById("modalGameDescription").innerText = details.description;
     document.getElementById("modalGameControls").innerText = details.controls;
-    
-    // The details modal launch button now calls the confirmation modal
     document.getElementById("modalLaunchBtn").setAttribute("onclick", `document.getElementById('gameDetailsModal').style.display='none'; showLaunchConfirm('${url}')`);
-
     document.getElementById("gameDetailsModal").style.display = "flex";
 }
 
+function closeGameDetailsModal() { document.getElementById("gameDetailsModal").style.display = "none"; }
 
-function closeGameDetailsModal() {
-    document.getElementById("gameDetailsModal").style.display = "none";
-}
-
-// Close modal when clicking outside of the content area
 window.onclick = function(event) {
     const detailModal = document.getElementById('gameDetailsModal');
     const confirmModal = document.getElementById('launchConfirmModal');
-    if (event.target == detailModal) {
-        closeGameDetailsModal();
-    }
-    if (event.target == confirmModal) {
-        document.getElementById('launchConfirmModal').style.display = 'none';
-    }
+    if (event.target == detailModal) closeGameDetailsModal();
+    if (event.target == confirmModal) document.getElementById('launchConfirmModal').style.display = 'none';
 }
 
-// ⭐ PANIC BUTTON LOGIC & AUTOPANIC KEYBINDING ⭐
-
-// NEW (Feature 20): Updates the visible hotkey display
 function updateHotkeyDisplay() {
     document.getElementById("hotkeyDisplay").innerText = `Ctrl+Shift+${currentPanicKeyCode}`;
 }
 
-document.getElementById("panicButton").onclick = () => {
-  window.location.replace(currentPanicURL);
-};
+document.getElementById("panicButton").onclick = () => { window.location.replace(currentPanicURL); };
 
 document.addEventListener('keydown', (e) => {
-    // Check for Ctrl+Shift+<Custom Key>
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toUpperCase() === currentPanicKeyCode) {
         e.preventDefault(); 
         window.location.replace(currentPanicURL);
     }
 });
 
-
-// --- GAME/OVERLAY LOGIC ---
-
-// NEW (Feature 17): Auto-hide logic for top bar
-function setupOverlayAutoHide() {
+let mouseMoveTimer;
+function resetTimer() {
     const topBar = document.getElementById("topBar");
-    const overlay = document.getElementsdById("gameOverlay");
-    
+    topBar.classList.remove('hidden');
+    clearTimeout(mouseMoveTimer);
+    mouseMoveTimer = setTimeout(() => topBar.classList.add('hidden'), 3000);
+}
+function hideBar() { document.getElementById("topBar").classList.add('hidden'); }
 
-    // Clear existing listeners to prevent duplicates
+function setupOverlayAutoHide() {
+    const overlay = document.getElementById("gameOverlay");
     overlay.removeEventListener('mousemove', resetTimer);
     overlay.removeEventListener('mouseenter', resetTimer);
     overlay.removeEventListener('mouseleave', hideBar);
-
-    // Add new listeners
     overlay.addEventListener('mousemove', resetTimer);
     overlay.addEventListener('mouseenter', resetTimer);
     overlay.addEventListener('mouseleave', hideBar);
-
-    // Initial call to hide it if no movement occurs immediately
     resetTimer();
 }
 
-// CLOSE GAME
 document.getElementById("closeGame").onclick = () => {
   document.getElementById("gameOverlay").style.display = "none";
-  document.getElementById("gameFrame").src = ""; // Clear iframe source
+  document.getElementById("gameFrame").src = "";
   document.getElementById("gameTitle").innerText = "No game";
-  
-  // Restore site title
   document.title = originalDocumentTitle;
-
-  // Restore Custom Cursor Logic
-  if (wasCursorEnabledBeforeGame) {
-      document.body.classList.remove("system-cursor"); // Re-enable custom cursor
-  } 
-  
-  // Clear auto-hide timer on close
+  if (wasCursorEnabledBeforeGame) document.body.classList.remove("system-cursor");
   clearTimeout(mouseMoveTimer);
 };
 
-// FPS Counter (Feature 4)
 function updateFPS() {
     const now = performance.now();
     const delta = now - lastFrameTime;
     const fps = Math.round(1000 / delta);
     lastFrameTime = now;
-    
     if (document.getElementById("gameOverlay").style.display === "flex") {
         fpsDisplay.innerText = `FPS: ${fps}`;
     }
     window.requestAnimationFrame(updateFPS);
 }
-// Start the FPS loop immediately
 window.requestAnimationFrame(updateFPS);
-
-
-// --- SEARCH & FILTER LOGIC ---
-// NOTE: We do NOT grab these elements at page load because mainContent is
-// hidden initially — getElementById returns null for hidden elements' children.
-// Instead each function grabs what it needs at the moment it runs.
 
 function getSearchBar() { return document.getElementById("searchBar"); }
 function getNoResults() { return document.getElementById("noResultsMessage"); }
@@ -1868,18 +1227,14 @@ function clearSearch() {
     if (ss) ss.style.display = "none";
 }
 
-// NEW (Feature 18): Show search suggestions
 function showSuggestions() {
     var searchBar = getSearchBar();
     var searchSuggestions = getSearchSuggestions();
     if (!searchBar || !searchSuggestions) return;
-
     const search = searchBar.value.toLowerCase().trim();
     const history = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || "[]");
-    
     searchSuggestions.innerHTML = '';
     searchSuggestions.style.display = 'none';
-
     if (search === '' && document.activeElement === searchBar && history.length > 0) {
         history.forEach(item => {
             const div = document.createElement('div');
@@ -1897,21 +1252,12 @@ function showSuggestions() {
     }
 }
 
-// NEW (Feature 18): Add search term to history
 function saveSearchTerm(term) {
-    if (term.length < 3) return; // Ignore short or empty searches
-
+    if (term.length < 3) return;
     let history = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || "[]");
-    
-    // Remove duplicates
     history = history.filter(h => h.toLowerCase() !== term.toLowerCase());
-    
-    // Add new term to the front
     history.unshift(term);
-    
-    // Limit size
     history = history.slice(0, MAX_SEARCH_HISTORY);
-    
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
 }
 
@@ -1919,152 +1265,106 @@ function filterGames(event) {
   var searchBar = getSearchBar();
   var noResultsMessage = getNoResults();
   var searchSuggestions = getSearchSuggestions();
-  if (!searchBar) return; // games page not visible yet
-
+  if (!searchBar) return;
   let search = searchBar.value.toLowerCase().trim();
   let activeCategory = document.querySelector("#categoryFilters button.active")?.getAttribute("data-filter") || 'all';
   let visibleCount = 0;
-
   if (event && event.key === 'Enter') {
       saveSearchTerm(search);
       if (searchSuggestions) searchSuggestions.style.display = 'none';
   } else if (!event) {
       if (searchSuggestions) searchSuggestions.style.display = 'none';
   }
-
-  document.querySelectorAll("#allGamesGrid button").forEach(btn=>{
+  document.querySelectorAll("#allGamesGrid button").forEach(btn => {
     const textContent = btn.innerText.toLowerCase(); 
     const category = btn.getAttribute("data-category");
     const matchesSearch = textContent.includes(search);
     const matchesCategory = activeCategory === 'all' || category === activeCategory;
-    if (matchesSearch && matchesCategory) {
-      btn.style.display = "";
-      visibleCount++;
-    } else {
-      btn.style.display = "none";
-    }
+    if (matchesSearch && matchesCategory) { btn.style.display = ""; visibleCount++; }
+    else btn.style.display = "none";
   });
-
   if (noResultsMessage) {
     noResultsMessage.style.display = (visibleCount === 0 && (search.length > 0 || activeCategory !== 'all')) ? "block" : "none";
   }
 }
 
 function filterByCategory(category, element) {
-    // Update active filter button
     document.querySelectorAll('#categoryFilters button').forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
-    
-    // Set data-filter on the button that was clicked.
     element.setAttribute('data-filter', category);
-
-    // Re-filter the games
     filterGames();
 }
 
-
-// RANDOM PICK (Feature 5 dependency)
-function openRandomGame(){
-  let visible = [...document.querySelectorAll("#allGamesGrid button")].filter(b=>b.style.display!="none");
-  if (visible.length > 0) {
-    // Show the confirmation modal for the randomly selected game
-    showLaunchConfirm(visible[Math.floor(Math.random()*visible.length)]?.getAttribute('data-url')); 
-  }
+function openRandomGame() {
+  let visible = [...document.querySelectorAll("#allGamesGrid button")].filter(b => b.style.display != "none");
+  if (visible.length > 0) showLaunchConfirm(visible[Math.floor(Math.random() * visible.length)]?.getAttribute('data-url')); 
 }
 
-// Set the featured game (Feature 5)
 function setFeaturedGame() {
     const allGames = [...document.querySelectorAll("#allGamesGrid button")];
     if (allGames.length === 0) return;
-
     var today = new Date();
     var seed = today.getFullYear() * 10000 + today.getMonth() * 100 + today.getDate();
     var randomIndex = seed % allGames.length;
     const featuredGame = allGames[randomIndex];
-    
     const name = featuredGame.innerText.trim();
     const url = featuredGame.getAttribute('data-url');
-    
     document.getElementById("featuredGameName").innerText = name;
-    // Featured game button calls launch confirmation
     document.getElementById("featuredGameLaunchBtn").setAttribute("onclick", `showLaunchConfirm('${url}')`);
 }
 
-
-// --- RECENTLY PLAYED LOGIC ---
 function addRecentGame(name, url, img) {
   let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
-
-  // Remove duplicates
   recent = recent.filter(g => g.url !== url);
-
-  // Add to top
   recent.unshift({ name, url, img });
-
-  // Limit to 10 games
   recent = recent.slice(0, 10);
-
   localStorage.setItem("recentGames", JSON.stringify(recent));
-  initializeGameGrids(); // Refresh grids
+  initializeGameGrids();
 }
 
 function displayRecentGames() {
   let recent = JSON.parse(localStorage.getItem("recentGames") || "[]");
   let container = document.getElementById("recentlyPlayed");
   let header = document.getElementById("recentlyPlayedHeader");
-  
   if (recent.length === 0) {
     container.innerHTML = "";
     header.classList.remove("visible");
   } else {
     header.classList.add("visible");
     container.innerHTML = recent.map(g => {
-        // Find the original game button for category and tag
         const button = [...document.querySelectorAll("#allGamesGrid button")].find(b => b.getAttribute('data-url') === g.url);
         const category = button ? button.querySelector('.game-card-tag')?.getAttribute('data-category-text') || 'Casual' : 'Casual'; 
-        
-        return `
-          <button onclick="showLaunchConfirm('${g.url}')" data-category="${g.category}" data-url="${g.url}">
+        return `<button onclick="showLaunchConfirm('${g.url}')" data-category="${g.category}" data-url="${g.url}">
             <span class="game-card-tag" data-category-text="${category}">${category}</span>
             <img src="${g.img}">
             ${g.name}
-          </button>
-        `;
+          </button>`;
     }).join("");
   }
 }
 
 function clearRecentGames() {
   localStorage.removeItem("recentGames");
-  initializeGameGrids(); // Refresh grids
+  initializeGameGrids();
   alert("Recently Played list cleared!");
 }
 
-// Main function to initialize all game grids
 function initializeGameGrids() {
     displayRecentGames();
     filterGames(); 
     setFeaturedGame(); 
 }
 
-
-// --- THEME & SETTINGS LOGIC ---
-
-// NEW (Feature 11): Quick Theme Cycle
 function quickCycleTheme() {
     themeIndex = (themeIndex + 1) % THEME_COLORS.length;
     const nextColor = THEME_COLORS[themeIndex];
     setTheme(nextColor);
-    // Also update settings modal color picker in case they open it
     document.getElementById("themeColorPicker").value = nextColor; 
 }
 
-
-// Save the custom site title (Feature 2)
 function saveSiteTitle() {
     const input = document.getElementById("siteTitleInput");
     const newTitle = input.value.trim() || DEFAULT_SITE_TITLE;
-    
     localStorage.setItem(SITE_TITLE_KEY, newTitle);
     originalDocumentTitle = newTitle; 
     document.title = newTitle; 
@@ -2072,166 +1372,100 @@ function saveSiteTitle() {
     alert("Site Title saved to: " + newTitle);
 }
 
-// Save the custom background URL (Feature 3)
 function saveCustomBgUrl() {
     const input = document.getElementById("customBgUrlInput");
     let newUrl = input.value.trim();
-
     localStorage.setItem(BG_URL_KEY, newUrl);
     applyCustomBgUrl(newUrl);
     alert("Background URL saved and applied.");
 }
 
 function applyCustomBgUrl(url) {
-    const body = document.body;
-    if (url) {
-        body.style.backgroundImage = `url('${url}')`;
-    } else {
-        body.style.backgroundImage = 'none';
-    }
+    document.body.style.backgroundImage = url ? `url('${url}')` : 'none';
 }
 
-// NEW (Feature 20): Save Custom Panic Key
 function savePanicKey() {
     const input = document.getElementById("customPanicKeyInput");
-    let newKey = input.value.toUpperCase().charAt(0); // Only take the first char and uppercase it
-    
-    // Default back to P if invalid
-    if (!newKey || !/[A-Z]/.test(newKey)) {
-        newKey = "P";
-    }
-
+    let newKey = input.value.toUpperCase().charAt(0);
+    if (!newKey || !/[A-Z]/.test(newKey)) newKey = "P";
     localStorage.setItem(PANIC_KEY_CODE_KEY, newKey);
     currentPanicKeyCode = newKey;
-    input.value = newKey; // Update input with sanitized value
+    input.value = newKey;
     updateHotkeyDisplay();
-    
     alert(`Panic Hotkey saved to: Ctrl+Shift+${newKey}`);
 }
 
-// Save the custom panic URL
 function savePanicUrl() {
     const input = document.getElementById("panicUrlInput");
     let newUrl = input.value.trim();
-
-    if (newUrl && !newUrl.startsWith("http")) {
-        newUrl = "https://" + newUrl;
-    }
-    
-    if (!newUrl) {
-      newUrl = DEFAULT_PANIC_URL;
-    }
-    
+    if (newUrl && !newUrl.startsWith("http")) newUrl = "https://" + newUrl;
+    if (!newUrl) newUrl = DEFAULT_PANIC_URL;
     localStorage.setItem(PANIC_URL_KEY, newUrl);
     currentPanicURL = newUrl; 
     input.value = newUrl; 
-    
     alert("Panic URL saved successfully to: " + newUrl);
 }
 
-// Toggle the custom cursor
 function toggleCustomCursor() {
     const isCurrentlyEnabled = localStorage.getItem("customCursorEnabled") !== "false";
     const newState = !isCurrentlyEnabled;
-    
-    if (newState) {
-        document.body.classList.remove("system-cursor");
-    } else {
-        document.body.classList.add("system-cursor");
-    }
-    
+    if (newState) document.body.classList.remove("system-cursor");
+    else document.body.classList.add("system-cursor");
     localStorage.setItem("customCursorEnabled", newState ? "true" : "false");
-
     const toggleBtn = document.getElementById("cursorToggleBtn");
-    if (toggleBtn) {
-        toggleBtn.innerText = newState ? "Disable" : "Enable";
-    }
+    if (toggleBtn) toggleBtn.innerText = newState ? "Disable" : "Enable";
 }
 
-// Initialize cursor state from local storage
 function initializeCursorState() {
     const isEnabled = localStorage.getItem("customCursorEnabled") !== "false"; 
-    
-    if (isEnabled) {
-        document.body.classList.remove("system-cursor");
-    } else {
-        document.body.classList.add("system-cursor");
-    }
-    
+    if (isEnabled) document.body.classList.remove("system-cursor");
+    else document.body.classList.add("system-cursor");
     const toggleBtn = document.getElementById("cursorToggleBtn");
-    if (toggleBtn) {
-        toggleBtn.innerText = isEnabled ? "Disable" : "Enable";
-    }
+    if (toggleBtn) toggleBtn.innerText = isEnabled ? "Disable" : "Enable";
 }
 
-
-// Helper function to convert hex to RGB
 function hexToRgb(hex) {
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-        return r + r + g + g + b + b;
-    });
-
+    hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
+    return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
 }
 
-// Set accent opacity (Feature 6)
 function setAccentOpacity(opacity) {
     const savedColor = localStorage.getItem("themeColor") || "#00ff00";
     let rgb = hexToRgb(savedColor);
-
     if (!rgb) return;
-    
-    const glowRgba = `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})`; 
-    document.documentElement.style.setProperty("--bgGlow", glowRgba);
-    
+    document.documentElement.style.setProperty("--bgGlow", `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})`);
     localStorage.setItem("accentOpacity", opacity);
 }
 
-function setTheme(hexColor){
+function setTheme(hexColor) {
   let rgb = hexToRgb(hexColor);
-  
-  if (!rgb) {
-    hexColor = "#00ff00";
-    rgb = {r: 0, g: 255, b: 0};
-  } 
-
+  if (!rgb) { hexColor = "#00ff00"; rgb = {r: 0, g: 255, b: 0}; } 
   const opacity = localStorage.getItem("accentOpacity") || "0.4";
-  const glowRgba = `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})`; 
-
   document.documentElement.style.setProperty("--accent", hexColor);
-  document.documentElement.style.setProperty("--bgGlow", glowRgba);
-
+  document.documentElement.style.setProperty("--bgGlow", `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})`);
   localStorage.setItem("themeColor", hexColor);
 }
 
-// NEW (Feature 15): Toggle Matrix Rain
 function toggleMatrixRain() {
     if (isMatrixRunning) {
         clearInterval(matrixInterval);
         isMatrixRunning = false;
         document.getElementById("matrixToggleBtn").innerText = "Start Rain";
-        // Clear screen instantly
         ctx.fillStyle = "rgba(0,0,0,1)";
         ctx.fillRect(0,0,canvas.width,canvas.height);
     } else {
-        initializeMatrix(); // This will restart the interval
+        initializeMatrix();
         isMatrixRunning = true;
         document.getElementById("matrixToggleBtn").innerText = "Stop Rain";
     }
 }
 
-
 function setMatrixSpeed(delay) {
     clearInterval(matrixInterval);
     localStorage.setItem("matrixSpeed", delay);
-
-    if (delay != 1000) { // 1000ms = "Off"
+    if (delay != 1000) {
         isMatrixRunning = true;
         document.getElementById("matrixToggleBtn").innerText = "Stop Rain";
         matrixInterval = setInterval(drawMatrix, parseInt(delay));
@@ -2241,21 +1475,13 @@ function setMatrixSpeed(delay) {
     }
 }
 
-// Set Matrix Text Type
-function setMatrixText(type) {
-    localStorage.setItem("matrixTextType", type);
-    initializeMatrix(); 
-}
+function setMatrixText(type) { localStorage.setItem("matrixTextType", type); initializeMatrix(); }
 
-// Toggle Matrix Cycle Mode (Feature 7)
 function toggleMatrixCycle(enabled) {
     isMatrixCycleEnabled = enabled;
     localStorage.setItem("matrixCycleEnabled", enabled ? "true" : "false");
-    if (!enabled) {
-        setTheme(localStorage.getItem("themeColor") || "#00ff00");
-    }
+    if (!enabled) setTheme(localStorage.getItem("themeColor") || "#00ff00");
 }
-
 
 function toggleSettingsModal() {
     const modal = document.getElementById("settingsModal");
@@ -2263,110 +1489,74 @@ function toggleSettingsModal() {
       document.getElementById("themeColorPicker").value = localStorage.getItem("themeColor") || "#00ff00"; 
       document.getElementById("matrixSpeed").value = localStorage.getItem("matrixSpeed") || "45";
       document.getElementById("matrixText").value = localStorage.getItem("matrixTextType") || "binary";
-      
       const isCursorEnabled = localStorage.getItem("customCursorEnabled") !== "false";
       document.getElementById("cursorToggleBtn").innerText = isCursorEnabled ? "Disable" : "Enable";
-      
       document.getElementById("panicUrlInput").value = currentPanicURL;
       document.getElementById("customPanicKeyInput").value = currentPanicKeyCode;
-
       document.getElementById("siteTitleInput").value = originalDocumentTitle;
       document.getElementById("customBgUrlInput").value = localStorage.getItem(BG_URL_KEY) || "";
       document.getElementById("accentOpacityRange").value = localStorage.getItem("accentOpacity") || "0.4";
-
       const cycleEnabled = localStorage.getItem("matrixCycleEnabled") === "true";
       document.getElementById("matrixCycleCheckbox").checked = cycleEnabled;
       isMatrixCycleEnabled = cycleEnabled;
-      
-      // Update toggle button text based on matrix running state
       document.getElementById("matrixToggleBtn").innerText = isMatrixRunning ? "Stop Rain" : "Start Rain";
-
     }
     modal.style.display = modal.style.display === "block" ? "none" : "block";
 }
 
-
-// NEW (Feature 16): Local Storage Backup/Restore
 function exportSettings() {
     const allData = {};
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        try {
-            // Attempt to parse as JSON if it looks like an array or object (e.g., recentGames)
-            allData[key] = JSON.parse(localStorage.getItem(key));
-        } catch (e) {
-            // Otherwise, store as raw string
-            allData[key] = localStorage.getItem(key);
-        }
+        try { allData[key] = JSON.parse(localStorage.getItem(key)); }
+        catch (e) { allData[key] = localStorage.getItem(key); }
     }
-    
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "ubg_village_pro_settings_" + new Date().toISOString().slice(0, 10) + ".json");
-    document.body.appendChild(downloadAnchorNode); 
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-    alert("Settings and data exported successfully!");
+    const a = document.createElement('a');
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", "ubg_village_pro_settings_" + new Date().toISOString().slice(0, 10) + ".json");
+    document.body.appendChild(a); 
+    a.click();
+    a.remove();
+    alert("Settings exported successfully!");
 }
 
 function importSettings(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const importedData = JSON.parse(e.target.result);
-            
-            // Clear existing data (optional, but safer for a full restore)
-            // localStorage.clear(); // NOTE: Clearing everything is risky, better to only overwrite known keys.
-            
             let keysOverwritten = [];
             for (const key in importedData) {
-                // Ensure the key is one we expect to save (for safety/integrity)
                 if ([PANIC_URL_KEY, SITE_TITLE_KEY, BG_URL_KEY, "themeColor", "accentOpacity", "customCursorEnabled", "matrixTextType", "matrixSpeed", "matrixCycleEnabled", "recentGames", PANIC_KEY_CODE_KEY, SEARCH_HISTORY_KEY].includes(key)) {
                     const value = importedData[key];
-                    // Store strings or JSON-stringify complex objects (like recentGames)
-                    if (typeof value === 'object' && value !== null) {
-                         localStorage.setItem(key, JSON.stringify(value));
-                    } else {
-                         localStorage.setItem(key, value);
-                    }
+                    localStorage.setItem(key, typeof value === 'object' && value !== null ? JSON.stringify(value) : value);
                     keysOverwritten.push(key);
                 }
             }
-            
-            alert(`Settings imported successfully! Changes applied to: ${keysOverwritten.join(', ')}. Please refresh the page to see all changes.`);
-            // A full page reload is required to apply all new settings (theme, matrix, etc.)
+            alert(`Settings imported! Reload to apply all changes.`);
             window.location.reload(); 
-            
         } catch (error) {
-            alert("Error importing file. Please ensure the file is a valid JSON export from this site.");
-            console.error("Import error:", error);
+            alert("Error importing file.");
         }
     };
     reader.readAsText(file);
 }
 
-// --- MATRIX RAIN SETUP ---
+// --- MATRIX RAIN ---
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
-
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
-
 const fontSize = 14;
 const columns = canvas.width / fontSize;
 const drops = Array(Math.floor(columns)).fill(0);
 
-
 function drawMatrix() {
   ctx.fillStyle = "rgba(0,0,0,0.05)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-
   let currentAccentColor;
   if (isMatrixCycleEnabled) {
       colorCycleHue = (colorCycleHue + 1) % 360;
@@ -2374,38 +1564,23 @@ function drawMatrix() {
   } else {
       currentAccentColor = getComputedStyle(document.documentElement).getPropertyValue("--accent");
   }
-
   ctx.fillStyle = currentAccentColor;
   ctx.font = fontSize + "px monospace";
-
-  for(let i=0;i<drops.length;i++){
-    let text = currentLetters[Math.floor(Math.random()*currentLetters.length)];
+  for (let i = 0; i < drops.length; i++) {
+    let text = currentLetters[Math.floor(Math.random() * currentLetters.length)];
     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-
-    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975){
-      drops[i] = 0;
-    }
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
     drops[i]++;
   }
 }
 
+window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
 
-window.onresize = ()=>{
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-};
-
-// Function to load settings and start the matrix
 function initializeMatrix() {
     const type = localStorage.getItem("matrixTextType") || 'binary';
     currentLetters = (type === 'kanji') ? KANJI_CHARS : BINARY_CHARS;
-    
     isMatrixCycleEnabled = localStorage.getItem("matrixCycleEnabled") === "true";
-
     const savedSpeed = localStorage.getItem("matrixSpeed") || "45"; 
-    
-    // Only start the matrix if the speed is not "Off"
     if (savedSpeed != 1000) {
         isMatrixRunning = true;
         setMatrixSpeed(savedSpeed);
@@ -2415,90 +1590,53 @@ function initializeMatrix() {
     }
 }
 
-// --- CLOCK FUNCTION (Feature 10) ---
 function updateClock() {
     const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-    document.getElementById('navbar-clock').innerText = timeString;
+    document.getElementById('navbar-clock').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 }
 setInterval(updateClock, 1000); 
 
-
-// --- GO TO TOP BUTTON LOGIC (Feature 8) ---
 const goToTopBtn = document.getElementById("goToTopBtn");
-window.onscroll = function() {scrollFunction()};
+window.onscroll = function() {
+  goToTopBtn.style.display = (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) ? "block" : "none";
+};
 
-function scrollFunction() {
-  if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-    goToTopBtn.style.display = "block";
-  } else {
-    goToTopBtn.style.display = "none";
-  }
-}
-
-
-// Load on page start
 window.addEventListener("DOMContentLoaded", () => {
-  // --- Global State ---
   originalDocumentTitle = localStorage.getItem(SITE_TITLE_KEY) || DEFAULT_SITE_TITLE;
   document.title = originalDocumentTitle;
-
-  // --- Panic/Security ---
   currentPanicURL = localStorage.getItem(PANIC_URL_KEY) || DEFAULT_PANIC_URL;
-  currentPanicKeyCode = localStorage.getItem(PANIC_KEY_CODE_KEY) || "P";
-  currentPanicKeyCode = currentPanicKeyCode.toUpperCase().charAt(0); // Ensure it's a single uppercase letter
+  currentPanicKeyCode = (localStorage.getItem(PANIC_KEY_CODE_KEY) || "P").toUpperCase().charAt(0);
   updateHotkeyDisplay();
   document.getElementById("customPanicKeyInput").value = currentPanicKeyCode;
-
-  // --- Theme/Visuals ---
-  const savedBgUrl = localStorage.getItem(BG_URL_KEY) || "";
-  applyCustomBgUrl(savedBgUrl);
-
-  let savedColor = localStorage.getItem("themeColor") || "#00ff00"; 
-  setTheme(savedColor); 
-  
-  const savedOpacity = localStorage.getItem("accentOpacity") || "0.4";
-  setAccentOpacity(savedOpacity);
-  
+  applyCustomBgUrl(localStorage.getItem(BG_URL_KEY) || "");
+  setTheme(localStorage.getItem("themeColor") || "#00ff00"); 
+  setAccentOpacity(localStorage.getItem("accentOpacity") || "0.4");
   initializeMatrix();
   initializeCursorState();
-
-  // --- Content/UX ---
   initializeGameGrids();
   updateClock();
-  
-  // Search bar listeners are attached in showGames() / showMainContent()
-  // because the element doesn't exist until mainContent is visible
 });
-
 </script>
-
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
   window.addEventListener('DOMContentLoaded', () => {
-    // Inject Sidebar HTML into the page
     const sidebar = `
       <div id="sidebar-island">
         <div class="nav-item" onclick="location.reload()"><i data-lucide="home"></i><span class="tooltip">Home</span></div>
         <div class="nav-item" onclick="showGames()"><i data-lucide="gamepad-2"></i><span class="tooltip">Games</span></div>
+        <div class="nav-item" onclick="openScramjet()"><i data-lucide="globe"></i><span class="tooltip">Proxy</span></div>
         <div class="nav-item" onclick="window.open('https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit', '_blank')"><i data-lucide="tv"></i><span class="tooltip">Movies</span></div>
         <div class="nav-item" onclick="window.open('chatroom.html', '_blank')"><i data-lucide="message-square"></i><span class="tooltip">Chat</span></div>
         <div class="nav-item" onclick="window.open('https://discord.gg/qDrefFBQUs', '_blank')"><i data-lucide="hash"></i><span class="tooltip">Discord</span></div>
         <div class="nav-item" onclick="window.open('https://forms.gle/46p18CeutMtCjqyPA', '_blank')"><i data-lucide="clipboard-list"></i><span class="tooltip">Suggest</span></div>
-
+        <div class="nav-item" onclick="toggleSettingsModal()"><i data-lucide="settings"></i><span class="tooltip">Settings</span></div>
       </div>`;
     document.body.insertAdjacentHTML('afterbegin', sidebar);
-
-    // LESSON: createIcons() MUST run AFTER insertAdjacentHTML above.
-    // It scans the DOM for <i data-lucide="..."> tags and replaces them with SVGs.
-    // If you call it before those <i> tags exist, it finds nothing and icons stay blank.
     lucide.createIcons();
-
-    // Map Titles & Clean up button text
     document.querySelectorAll('.game-buttons button').forEach(btn => {
       const name = btn.innerText.trim();
-      if(name && !btn.getAttribute('data-title')) btn.setAttribute('data-title', name);
+      if (name && !btn.getAttribute('data-title')) btn.setAttribute('data-title', name);
     });
   });
 
@@ -2506,17 +1644,16 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById('splashScreen').style.display = 'flex';
     document.getElementById('mainContent').style.display = 'none';
   }
+
   function showGames() {
     document.getElementById('splashScreen').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
-    // Attach search listeners now that the elements exist
+    setFeaturedGame();
     var sb = getSearchBar();
     var ss = getSearchSuggestions();
     if (sb && !sb._listenersAdded) {
       sb.addEventListener('focus', showSuggestions);
-      sb.addEventListener('blur', () => {
-        setTimeout(() => { if(ss) ss.style.display = 'none'; }, 150);
-      });
+      sb.addEventListener('blur', () => { setTimeout(() => { if(ss) ss.style.display = 'none'; }, 150); });
       sb._listenersAdded = true;
     }
   }
