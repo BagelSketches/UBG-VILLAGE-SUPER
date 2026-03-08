@@ -1172,10 +1172,8 @@ let mouseMoveTimer;
 function resetTimer() {
     const topBar = document.getElementById("topBar");
     topBar.classList.remove('hidden');
-    clearTimeout(mouseMoveTimer);
-    mouseMoveTimer = setTimeout(() => topBar.classList.add('hidden'), 3000);
 }
-function hideBar() { document.getElementById("topBar").classList.add('hidden'); }
+function hideBar() { /* disabled - top bar always visible */ }
 
 function setupOverlayAutoHide() {
     const overlay = document.getElementById("gameOverlay");
