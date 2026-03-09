@@ -93,6 +93,11 @@
 
   body.system-cursor * { cursor: default !important; }
   body.system-cursor #customCursor { display: none !important; }
+  
+  /* Ensure custom cursor works inside modals */
+  #leaderboardModal *, #profileModal *, #friendsModal *, #tournamentsModal * { cursor: none !important; }
+  body.system-cursor #leaderboardModal *, body.system-cursor #profileModal *, 
+  body.system-cursor #friendsModal *, body.system-cursor #tournamentsModal * { cursor: default !important; }
 
   #customCursor {
     position: fixed;
@@ -104,7 +109,7 @@
     pointer-events: none;
     transform: translate(-50%, -50%);
     transition: all 0.1s ease-out;
-    z-index: 10002;
+    z-index: 99999;
   }
 
   button:hover ~ #customCursor, 
@@ -734,6 +739,7 @@
 </head>
 
 <body>
+
 <div id="customCursor"></div> 
 <canvas id="matrix"></canvas>
 
@@ -854,6 +860,7 @@
     <div style="display: flex; align-items: center;">
       <span id="fpsDisplay">FPS: --</span>
       <button id="panicButton">🚨 Panic! (<span id="hotkeyDisplay">Ctrl+Shift+P</span>)</button>
+      <button onclick="openLeaderboard()" style="margin-left:5px;">🏆 Leaderboard</button>
       <button id="closeGame">✖ Close</button>
       <button onclick="toggleFullscreen('frame')" style="margin-left: 10px;">⛶ Frame FS</button>
       <button onclick="toggleFullscreen('window')">⛶ Window FS</button>
@@ -896,6 +903,7 @@
       <button onclick="filterByCategory('casual', this)" data-filter="casual">Casual/Clicker</button>
       <button onclick="filterByCategory('sports', this)" data-filter="sports">Sports</button>
       <button onclick="filterByCategory('horror', this)" data-filter="horror">Horror</button>
+      <button onclick="filterByCategory('puzzle', this)" data-filter="puzzle">Puzzle</button>
       <button onclick="filterByCategory('utility', this)" data-filter="utility">Utilities</button>
   </div>
   
@@ -1275,9 +1283,9 @@ function filterGames(event) {
   }
   document.querySelectorAll("#allGamesGrid button").forEach(btn => {
     const textContent = btn.innerText.toLowerCase(); 
-    const category = btn.getAttribute("data-category");
+    const category = (btn.getAttribute("data-category") || '').toLowerCase();
     const matchesSearch = textContent.includes(search);
-    const matchesCategory = activeCategory === 'all' || category === activeCategory;
+    const matchesCategory = activeCategory === 'all' || category === activeCategory.toLowerCase();
     if (matchesSearch && matchesCategory) { btn.style.display = ""; visibleCount++; }
     else btn.style.display = "none";
   });
@@ -1331,9 +1339,10 @@ function displayRecentGames() {
     header.classList.add("visible");
     container.innerHTML = recent.map(g => {
         const button = [...document.querySelectorAll("#allGamesGrid button")].find(b => b.getAttribute('data-url') === g.url);
-        const category = button ? button.querySelector('.game-card-tag')?.getAttribute('data-category-text') || 'Casual' : 'Casual'; 
-        return `<button onclick="showLaunchConfirm('${g.url}')" data-category="${g.category}" data-url="${g.url}">
-            <span class="game-card-tag" data-category-text="${category}">${category}</span>
+        const category = button ? (button.getAttribute('data-category') || 'casual').toLowerCase() : 'casual';
+        const categoryLabel = button ? button.querySelector('.game-card-tag')?.innerText || 'Casual' : 'Casual';
+        return `<button onclick="showLaunchConfirm('${g.url}')" data-category="${category}" data-url="${g.url}">
+            <span class="game-card-tag" data-category-text="${categoryLabel}">${categoryLabel}</span>
             <img src="${g.img}">
             ${g.name}
           </button>`;
@@ -1628,6 +1637,9 @@ window.addEventListener("DOMContentLoaded", () => {
         <div class="nav-item" onclick="window.open('chatroom.html', '_blank')"><i data-lucide="message-square"></i><span class="tooltip">Chat</span></div>
         <div class="nav-item" onclick="window.open('https://discord.gg/qDrefFBQUs', '_blank')"><i data-lucide="hash"></i><span class="tooltip">Discord</span></div>
         <div class="nav-item" onclick="window.open('https://forms.gle/46p18CeutMtCjqyPA', '_blank')"><i data-lucide="clipboard-list"></i><span class="tooltip">Suggest</span></div>
+        <div class="nav-item" onclick="openProfile()"><i data-lucide="user"></i><span class="tooltip">Profile</span></div>
+        <div class="nav-item" onclick="openFriends()"><i data-lucide="users"></i><span class="tooltip">Friends</span></div>
+        <div class="nav-item" onclick="openTournaments()"><i data-lucide="trophy"></i><span class="tooltip">Tournaments</span></div>
         <div class="nav-item" onclick="toggleSettingsModal()"><i data-lucide="settings"></i><span class="tooltip">Settings</span></div>
       </div>`;
     document.body.insertAdjacentHTML('afterbegin', sidebar);
@@ -1669,5 +1681,545 @@ window.addEventListener("DOMContentLoaded", () => {
   }, 200);
 </script>
 
+
+<!-- LEADERBOARD MODAL -->
+<div id="leaderboardModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:10005; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+  <div style="background:#0a0a0a; border:2px solid var(--accent); border-radius:15px; padding:30px; width:500px; max-width:95vw; max-height:85vh; overflow-y:auto; box-shadow:0 0 30px var(--bgGlow); position:relative;">
+    <span onclick="closeLeaderboard()" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
+    <h2 style="color:var(--accent);margin:0 0 5px 0;text-align:center;letter-spacing:3px;">🏆 LEADERBOARD</h2>
+    <p id="lbGameName" style="color:#aaa;text-align:center;margin:0 0 20px 0;font-size:0.85em;letter-spacing:2px;text-transform:uppercase;"></p>
+
+    <!-- Submit score -->
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="lbPlayerName" placeholder="Your name" maxlength="20"
+        style="flex:1;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
+      <input type="number" id="lbScoreInput" placeholder="Score" min="0"
+        style="width:110px;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
+      <button onclick="submitScore()" 
+        style="background:var(--accent);color:#000;border:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;cursor:pointer;transition:0.2s;">
+        SUBMIT
+      </button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;align-items:center;">
+      <input type="text" id="lbScreenshotInput" placeholder="📸 Screenshot URL (optional proof)" 
+        style="flex:1;background:#000;border:1px solid #333;color:#aaa;padding:8px 12px;border-radius:8px;font-family:Consolas,monospace;font-size:13px;outline:none;">
+      <button id="lbAdminBtn" onclick="toggleAdminMode()"
+        style="background:transparent;color:#444;border:1px solid #333;padding:8px 12px;border-radius:8px;font-family:Consolas,monospace;font-size:12px;cursor:pointer;white-space:nowrap;">
+        🔐 Admin
+      </button>
+    </div>
+
+    <!-- Scores table -->
+    <div id="lbScoresList" style="width:100%;">
+      <div style="color:#555;text-align:center;padding:20px;">Loading scores...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Score auto-detect toast -->
+<div id="scoreToast" style="display:none;position:fixed;bottom:80px;right:30px;background:#0a0a0a;border:2px solid var(--accent);color:var(--accent);padding:15px 20px;border-radius:10px;z-index:10006;font-family:Consolas,monospace;box-shadow:0 0 15px var(--bgGlow);max-width:300px;">
+  <div style="font-weight:bold;margin-bottom:8px;">📊 Score Detected!</div>
+  <div id="toastScoreVal" style="font-size:1.4em;font-weight:bold;margin-bottom:10px;"></div>
+  <div style="display:flex;gap:8px;">
+    <button onclick="submitDetectedScore()" style="flex:1;background:var(--accent);color:#000;border:none;padding:8px;border-radius:6px;font-weight:bold;cursor:pointer;font-family:Consolas,monospace;">Submit</button>
+    <button onclick="dismissToast()" style="flex:1;background:transparent;color:var(--accent);border:1px solid var(--accent);padding:8px;border-radius:6px;cursor:pointer;font-family:Consolas,monospace;">Dismiss</button>
+  </div>
+</div>
+
+
+
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- LEADERBOARD MODAL -->
+<div id="leaderboardModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
+  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:520px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 0 30px var(--bgGlow);position:relative;">
+    <span onclick="closeLeaderboard()" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
+    <h2 style="color:var(--accent);margin:0 0 5px 0;text-align:center;letter-spacing:3px;">🏆 LEADERBOARD</h2>
+    <p id="lbGameName" style="color:#aaa;text-align:center;margin:0 0 20px 0;font-size:0.85em;letter-spacing:2px;text-transform:uppercase;"></p>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="lbPlayerName" placeholder="Your name" maxlength="20"
+        style="flex:1;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
+      <input type="number" id="lbScoreInput" placeholder="Score" min="0"
+        style="width:110px;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
+      <button onclick="submitScore()" style="background:var(--accent);color:#000;border:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;cursor:pointer;">SUBMIT</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;align-items:center;">
+      <input type="file" id="lbScreenshotFile" accept="image/*" onchange="previewScreenshot(this)" style="display:none;">
+      <button onclick="document.getElementById('lbScreenshotFile').click()"
+        style="background:#000;color:#aaa;border:1px solid #333;padding:8px 14px;border-radius:8px;font-family:Consolas,monospace;font-size:13px;cursor:pointer;">
+        📸 Upload Screenshot
+      </button>
+      <span id="lbScreenshotStatus" style="color:#555;font-size:0.8em;font-family:Consolas,monospace;flex:1;">No file chosen</span>
+      <button id="lbAdminBtn" onclick="toggleAdminMode()"
+        style="background:transparent;color:#444;border:1px solid #333;padding:8px 12px;border-radius:8px;font-family:Consolas,monospace;font-size:12px;cursor:pointer;">
+        🔐 Admin
+      </button>
+    </div>
+    <input type="hidden" id="lbScreenshotInput" value="">
+    <div id="lbScoresList"><div style="color:#555;text-align:center;padding:20px;">Loading scores...</div></div>
+  </div>
+</div>
+
+<!-- SCORE TOAST -->
+<div id="scoreToast" style="display:none;position:fixed;bottom:80px;right:30px;background:#0a0a0a;border:2px solid var(--accent);color:var(--accent);padding:15px 20px;border-radius:10px;z-index:10006;font-family:Consolas,monospace;box-shadow:0 0 15px var(--bgGlow);max-width:300px;">
+  <div style="font-weight:bold;margin-bottom:8px;">📊 Score Detected!</div>
+  <div id="toastScoreVal" style="font-size:1.4em;font-weight:bold;margin-bottom:10px;"></div>
+  <div style="display:flex;gap:8px;">
+    <button onclick="submitDetectedScore()" style="flex:1;background:var(--accent);color:#000;border:none;padding:8px;border-radius:6px;font-weight:bold;cursor:pointer;font-family:Consolas,monospace;">Submit</button>
+    <button onclick="dismissToast()" style="flex:1;background:transparent;color:var(--accent);border:1px solid var(--accent);padding:8px;border-radius:6px;cursor:pointer;font-family:Consolas,monospace;">Dismiss</button>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profileModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
+  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:420px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 0 30px var(--bgGlow);position:relative;">
+    <span onclick="closeModal('profileModal')" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
+    <h2 style="color:var(--accent);margin:0 0 25px 0;text-align:center;letter-spacing:3px;">👤 PROFILE</h2>
+    <div style="text-align:center;margin-bottom:25px;">
+      <div id="profileAvatar" style="width:80px;height:80px;border-radius:50%;margin:0 auto 15px;border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:2em;background:#111;"></div>
+      <div id="profileUsername" style="color:var(--accent);font-size:1.4em;font-weight:bold;letter-spacing:2px;"></div>
+      <div id="profileCode" style="color:#333;font-size:0.75em;margin-top:5px;font-family:Consolas,monospace;"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px;">
+      <div style="background:#111;border:1px solid #222;border-radius:8px;padding:15px;text-align:center;">
+        <div id="statGamesPlayed" style="color:var(--accent);font-size:1.8em;font-weight:bold;">0</div>
+        <div style="color:#555;font-size:0.75em;letter-spacing:1px;margin-top:4px;">GAMES PLAYED</div>
+      </div>
+      <div style="background:#111;border:1px solid #222;border-radius:8px;padding:15px;text-align:center;">
+        <div id="statFavoriteGame" style="color:var(--accent);font-size:0.9em;font-weight:bold;">—</div>
+        <div style="color:#555;font-size:0.75em;letter-spacing:1px;margin-top:4px;">FAVORITE GAME</div>
+      </div>
+    </div>
+    <div style="margin-bottom:15px;">
+      <label style="color:#aaa;font-size:0.85em;letter-spacing:1px;display:block;margin-bottom:6px;">USERNAME</label>
+      <input type="text" id="profileUsernameInput" maxlength="20" placeholder="Enter username..."
+        style="width:100%;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;box-sizing:border-box;">
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <label style="color:#aaa;font-size:0.85em;letter-spacing:1px;display:block;margin-bottom:6px;">AVATAR EMOJI</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <span onclick="selectAvatar('🎮')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🎮</span>
+        <span onclick="selectAvatar('👾')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">👾</span>
+        <span onclick="selectAvatar('🕹️')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🕹️</span>
+        <span onclick="selectAvatar('🏆')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🏆</span>
+        <span onclick="selectAvatar('⚡')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">⚡</span>
+        <span onclick="selectAvatar('🔥')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🔥</span>
+        <span onclick="selectAvatar('💀')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">💀</span>
+        <span onclick="selectAvatar('🌐')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🌐</span>
+        <span onclick="selectAvatar('🎯')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🎯</span>
+        <span onclick="selectAvatar('🦊')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🦊</span>
+        <span onclick="selectAvatar('🐉')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🐉</span>
+        <span onclick="selectAvatar('🤖')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🤖</span>
+      </div>
+    </div>
+    <button onclick="saveProfile()" style="width:100%;background:var(--accent);color:#000;border:none;padding:12px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;font-size:15px;cursor:pointer;letter-spacing:2px;">SAVE PROFILE</button>
+  </div>
+</div>
+
+<!-- FRIENDS MODAL -->
+<div id="friendsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
+  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:480px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 0 30px var(--bgGlow);position:relative;">
+    <span onclick="closeModal('friendsModal')" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
+    <h2 style="color:var(--accent);margin:0 0 5px 0;text-align:center;letter-spacing:3px;">👥 FRIENDS</h2>
+    <p style="color:#555;text-align:center;font-size:0.8em;letter-spacing:1px;margin:0 0 20px 0;">Share your friend code to connect</p>
+    <div style="background:#111;border:1px solid var(--accent);border-radius:10px;padding:15px;text-align:center;margin-bottom:20px;">
+      <div style="color:#555;font-size:0.75em;letter-spacing:2px;margin-bottom:8px;">YOUR FRIEND CODE</div>
+      <div id="myFriendCode" style="color:var(--accent);font-size:2em;font-weight:bold;letter-spacing:6px;font-family:Consolas,monospace;"></div>
+      <button onclick="copyFriendCode()" style="margin-top:10px;background:transparent;color:var(--accent);border:1px solid var(--accent);padding:6px 16px;border-radius:6px;font-family:Consolas,monospace;font-size:12px;cursor:pointer;">📋 Copy Code</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <input type="text" id="addFriendInput" placeholder="Enter friend code..." maxlength="6"
+        style="flex:1;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:16px;outline:none;text-transform:uppercase;letter-spacing:4px;text-align:center;">
+      <button onclick="addFriend()" style="background:var(--accent);color:#000;border:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;cursor:pointer;">ADD</button>
+    </div>
+    <div id="friendsList" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="color:#333;text-align:center;padding:20px;font-size:0.85em;">No friends added yet</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOURNAMENTS MODAL -->
+<div id="tournamentsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
+  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:540px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 0 30px var(--bgGlow);position:relative;">
+    <span onclick="closeModal('tournamentsModal')" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
+    <h2 style="color:var(--accent);margin:0 0 5px 0;text-align:center;letter-spacing:3px;">🏟️ TOURNAMENTS</h2>
+    <p style="color:#555;text-align:center;font-size:0.8em;letter-spacing:1px;margin:0 0 20px 0;">Weekly competitions — new tournament every Monday</p>
+    <div id="tournamentContent"><div style="color:#555;text-align:center;padding:20px;">Loading...</div></div>
+  </div>
+</div>
+
 </body>
 </html>
+<script>
+const SUPABASE_URL = 'https://uicvpfwiuwwqzrmrhdio.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_SU0dFx-A0GzwbW0v9_pJJw_m4MSHrkn';
+const ADMIN_PASSWORD = 'ubgadmin2025';
+const SCORE_CAPS = {"slope": 9999, "cookie": 999999999999, "retrobowl": 9999, "subway": 9999999, "minecraft": 9999999, "paperio": 100, "polytrack": 999999, "pvz": 999999, "bloons": 999999, "bitlife": 999, "coreball": 9999, "drive mad": 9999, "basketball": 9999, "time shooter": 9999, "vex": 9999, "run 3": 9999999, "slither": 9999999};
+
+let currentLbGame = '';
+let detectedScore = null;
+let isAdminMode = false;
+let scoreDetectionInterval = null;
+
+// ===== SUPABASE HELPER =====
+async function sbFetch(path, options = {}) {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || 'return=representation',
+      ...(options.headers || {})
+    }
+  });
+  if (!res.ok) { const err = await res.text(); throw new Error(err); }
+  return res.status === 204 ? null : res.json();
+}
+
+// ===== LEADERBOARD =====
+function getScoreCap(gameName) {
+  const lower = gameName.toLowerCase();
+  for (const [key, cap] of Object.entries(SCORE_CAPS)) { if (lower.includes(key)) return cap; }
+  return 999999999;
+}
+
+function openLeaderboard() {
+  currentLbGame = document.getElementById('gameTitle').innerText || 'Unknown Game';
+  document.getElementById('lbGameName').innerText = currentLbGame;
+  const savedName = localStorage.getItem('lbPlayerName') || getProfile().username || '';
+  document.getElementById('lbPlayerName').value = savedName;
+  document.getElementById('lbScoreInput').value = '';
+  document.getElementById('lbScreenshotInput').value = '';
+  document.getElementById('lbScreenshotStatus').innerText = 'No file chosen';
+  document.getElementById('leaderboardModal').style.display = 'flex';
+  loadScores();
+}
+
+function closeLeaderboard() { document.getElementById('leaderboardModal').style.display = 'none'; }
+
+async function loadScores() {
+  const list = document.getElementById('lbScoresList');
+  list.innerHTML = '<div style="color:#555;text-align:center;padding:20px;">Loading...</div>';
+  try {
+    const data = await sbFetch('leaderboard?game=eq.' + encodeURIComponent(currentLbGame) + '&order=score.desc&limit=20', { method: 'GET', prefer: '' });
+    renderScores(data || []);
+  } catch(e) {
+    list.innerHTML = '<div style="color:#ff5555;text-align:center;padding:20px;">Failed to load.<br><small>' + e.message + '</small></div>';
+  }
+}
+
+function renderScores(scores) {
+  const list = document.getElementById('lbScoresList');
+  if (!scores.length) { list.innerHTML = '<div style="color:#555;text-align:center;padding:30px;">No scores yet — be the first!</div>'; return; }
+  const medals = ['🥇','🥈','🥉'];
+  list.innerHTML = `<table style="width:100%;border-collapse:collapse;">
+    <thead><tr style="color:#555;font-size:0.8em;text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid #222;">
+      <td style="padding:8px 5px;">#</td><td style="padding:8px 5px;">Player</td>
+      <td style="padding:8px 5px;text-align:right;">Score</td>
+      <td style="padding:8px 5px;text-align:center;">Proof</td>
+      ${isAdminMode ? '<td style="padding:8px 5px;">Del</td>' : ''}
+    </tr></thead><tbody>
+    ${scores.map((s,i) => `<tr style="border-bottom:1px solid #111;${i<3?'color:var(--accent);':'color:#ccc;'}">
+      <td style="padding:10px 5px;font-weight:bold;">${medals[i]||(i+1)}</td>
+      <td style="padding:10px 5px;">${escHtml(s.player_name)}</td>
+      <td style="padding:10px 5px;text-align:right;font-weight:bold;">${Number(s.score).toLocaleString()}</td>
+      <td style="padding:10px 5px;text-align:center;">${s.screenshot_url?`<a href="${escHtml(s.screenshot_url)}" target="_blank" style="color:var(--accent);font-size:0.8em;">📸</a>`:'<span style="color:#333;">—</span>'}</td>
+      ${isAdminMode?`<td style="padding:10px 5px;"><button onclick="deleteScore('${s.id}')" style="background:#f00;color:#fff;border:none;padding:3px 7px;border-radius:4px;cursor:pointer;font-size:0.75em;">DEL</button></td>`:''}
+    </tr>`).join('')}
+    </tbody></table>`;
+}
+
+function previewScreenshot(input) {
+  const status = document.getElementById('lbScreenshotStatus');
+  if (input.files && input.files[0]) { status.style.color='var(--accent)'; status.innerText='✅ '+input.files[0].name; }
+  else { status.style.color='#555'; status.innerText='No file chosen'; }
+}
+
+async function uploadScreenshot(file) {
+  const ext = file.name.split('.').pop();
+  const fileName = Date.now()+'_'+Math.random().toString(36).substring(2,8)+'.'+ext;
+  const res = await fetch(SUPABASE_URL+'/storage/v1/object/screenshots/'+fileName, {
+    method:'POST', headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':file.type,'x-upsert':'true'}, body:file
+  });
+  if (!res.ok) throw new Error('Upload failed: '+(await res.text()));
+  return SUPABASE_URL+'/storage/v1/object/public/screenshots/'+fileName;
+}
+
+async function submitScore() {
+  const name = document.getElementById('lbPlayerName').value.trim();
+  const score = parseInt(document.getElementById('lbScoreInput').value);
+  const file = document.getElementById('lbScreenshotFile').files[0] || null;
+  if (!name) { alert('Please enter your name!'); return; }
+  if (isNaN(score) || score < 0) { alert('Please enter a valid score!'); return; }
+  const cap = getScoreCap(currentLbGame);
+  if (score > cap) { alert('Score too high! Max: '+cap.toLocaleString()+'. Suspicious scores are rejected.'); return; }
+  localStorage.setItem('lbPlayerName', name);
+  const btn = document.querySelector('#leaderboardModal button[onclick="submitScore()"]');
+  if (btn) { btn.innerText='Submitting...'; btn.disabled=true; }
+  try {
+    let screenshotUrl = null;
+    if (file) { document.getElementById('lbScreenshotStatus').innerText='⬆️ Uploading...'; screenshotUrl = await uploadScreenshot(file); document.getElementById('lbScreenshotStatus').innerText='✅ Uploaded!'; }
+    await sbFetch('leaderboard', { method:'POST', body:JSON.stringify({ game:currentLbGame, player_name:name, score, screenshot_url:screenshotUrl }) });
+    document.getElementById('lbScoreInput').value='';
+    document.getElementById('lbScreenshotFile').value='';
+    document.getElementById('lbScreenshotStatus').innerText='No file chosen';
+    document.getElementById('lbScreenshotStatus').style.color='#555';
+    loadScores();
+  } catch(e) { alert('Failed: '+e.message); }
+  finally { if(btn){btn.innerText='SUBMIT';btn.disabled=false;} }
+}
+
+async function deleteScore(id) {
+  if (!isAdminMode) return;
+  try { await sbFetch('leaderboard?id=eq.'+id, { method:'DELETE', prefer:'' }); loadScores(); }
+  catch(e) { alert('Delete failed: '+e.message); }
+}
+
+function toggleAdminMode() {
+  if (isAdminMode) { isAdminMode=false; document.getElementById('lbAdminBtn').innerText='🔐 Admin'; loadScores(); return; }
+  const pw = prompt('Admin password:');
+  if (pw === ADMIN_PASSWORD) { isAdminMode=true; document.getElementById('lbAdminBtn').innerText='🔓 ON'; loadScores(); }
+  else if (pw !== null) alert('Wrong password.');
+}
+
+// Auto score detection
+function startScoreDetection() {
+  stopScoreDetection();
+  const selectors = ['#score','#scoreDisplay','#scoreValue','#score-value','#currentScore','#points','.score','.scoreDisplay','.current-score','[id*="score"]:not(body)','[id*="point"]:not(body)'];
+  scoreDetectionInterval = setInterval(() => {
+    try {
+      const frame = document.getElementById('gameFrame');
+      if (!frame||!frame.contentDocument) return;
+      const doc = frame.contentDocument;
+      for (const sel of selectors) {
+        try {
+          const el = doc.querySelector(sel);
+          if (el) {
+            const text = el.innerText||el.textContent||'';
+            const match = text.match(/[0-9][0-9,.]*/);
+            if (match) { const val=parseInt(match[0].replace(/[,.]/g,'')); if(!isNaN(val)&&val>0){showScoreToast(val);return;} }
+          }
+        } catch(e2){}
+      }
+    } catch(e){}
+  }, 5000);
+}
+
+function stopScoreDetection() { if(scoreDetectionInterval){clearInterval(scoreDetectionInterval);scoreDetectionInterval=null;} dismissToast(); }
+function showScoreToast(score) { if(detectedScore===score)return; detectedScore=score; document.getElementById('toastScoreVal').innerText=Number(score).toLocaleString()+' pts'; document.getElementById('scoreToast').style.display='block'; }
+async function submitDetectedScore() {
+  if(detectedScore===null)return; dismissToast();
+  currentLbGame=document.getElementById('gameTitle').innerText||'Unknown Game';
+  const name=localStorage.getItem('lbPlayerName')||getProfile().username||'';
+  if(!name){openLeaderboard();document.getElementById('lbScoreInput').value=detectedScore;return;}
+  if(detectedScore>getScoreCap(currentLbGame))return;
+  try {
+    await sbFetch('leaderboard',{method:'POST',body:JSON.stringify({game:currentLbGame,player_name:name,score:detectedScore,screenshot_url:null})});
+    document.getElementById('toastScoreVal').innerText='✅ Submitted!'; document.getElementById('scoreToast').style.display='block';
+    setTimeout(()=>document.getElementById('scoreToast').style.display='none',2000);
+  } catch(e){console.error(e);}
+}
+function dismissToast(){document.getElementById('scoreToast').style.display='none';}
+document.getElementById('closeGame').addEventListener('click', stopScoreDetection);
+
+// ===== PROFILE =====
+function getProfile() {
+  return JSON.parse(localStorage.getItem('ubgProfile')||'{"username":"","title":"Newbie","avatar":"🎮","gamesPlayed":0,"gameHistory":{}}');
+}
+
+function saveProfile() {
+  const p = getProfile();
+  p.username = document.getElementById('profileUsernameInput').value.trim() || p.username;
+  localStorage.setItem('ubgProfile', JSON.stringify(p));
+  localStorage.setItem('lbPlayerName', p.username);
+  renderProfile();
+  alert('Profile saved!');
+}
+
+function selectAvatar(emoji) {
+  const p = getProfile();
+  p.avatar = emoji;
+  localStorage.setItem('ubgProfile', JSON.stringify(p));
+  document.getElementById('profileAvatar').innerText = emoji;
+}
+
+function renderProfile() {
+  const p = getProfile();
+  document.getElementById('profileAvatar').innerText = p.avatar || '🎮';
+  document.getElementById('profileUsername').innerText = p.username || 'Anonymous';
+  document.getElementById('profileCode').innerText = 'Code: ' + getFriendCode();
+  document.getElementById('profileUsernameInput').value = p.username || '';
+  document.getElementById('statGamesPlayed').innerText = p.gamesPlayed || 0;
+  const history = p.gameHistory || {};
+  const fav = Object.entries(history).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('statFavoriteGame').innerText = fav ? fav[0].substring(0,15) : '—';
+}
+
+function openProfile() { renderProfile(); document.getElementById('profileModal').style.display='flex'; }
+
+// Track games played in profile
+const _origLaunchForProfile = window.launchGame;
+window.launchGame = function(url) {
+  if (_origLaunchForProfile) _origLaunchForProfile(url);
+  const p = getProfile();
+  p.gamesPlayed = (p.gamesPlayed||0)+1;
+  const gameName = url.split('/').pop().replace('.html','').substring(0,20);
+  p.gameHistory = p.gameHistory||{};
+  p.gameHistory[gameName] = (p.gameHistory[gameName]||0)+1;
+  localStorage.setItem('ubgProfile', JSON.stringify(p));
+  setTimeout(()=>startScoreDetection(),3000);
+};
+
+// ===== FRIEND CODES =====
+function getFriendCode() {
+  let code = localStorage.getItem('friendCode');
+  if (!code) { code = Math.random().toString(36).substring(2,8).toUpperCase(); localStorage.setItem('friendCode', code); }
+  return code;
+}
+
+function openFriends() {
+  document.getElementById('myFriendCode').innerText = getFriendCode();
+  renderFriendsList();
+  document.getElementById('friendsModal').style.display='flex';
+}
+
+function copyFriendCode() {
+  navigator.clipboard.writeText(getFriendCode()).then(()=>alert('Friend code copied!')).catch(()=>alert('Code: '+getFriendCode()));
+}
+
+async function addFriend() {
+  const code = document.getElementById('addFriendInput').value.trim().toUpperCase();
+  if (code.length !== 6) { alert('Friend codes are 6 characters!'); return; }
+  if (code === getFriendCode()) { alert("That's your own code!"); return; }
+  try {
+    const data = await sbFetch('profiles?friend_code=eq.'+code+'&select=username,friend_code,title,avatar', { method:'GET', prefer:'' });
+    if (!data || !data.length) { alert('No player found with that code.'); return; }
+    const friend = data[0];
+    let friends = JSON.parse(localStorage.getItem('friendsList')||'[]');
+    if (friends.find(f=>f.friend_code===code)) { alert('Already friends!'); return; }
+    friends.push(friend);
+    localStorage.setItem('friendsList', JSON.stringify(friends));
+    renderFriendsList();
+    document.getElementById('addFriendInput').value='';
+    alert('Added '+friend.username+'!');
+  } catch(e) { alert('Error: '+e.message); }
+}
+
+function renderFriendsList() {
+  const friends = JSON.parse(localStorage.getItem('friendsList')||'[]');
+  const list = document.getElementById('friendsList');
+  if (!friends.length) { list.innerHTML='<div style="color:#333;text-align:center;padding:20px;font-size:0.85em;">No friends added yet</div>'; return; }
+  list.innerHTML = friends.map((f,i) => `
+    <div style="display:flex;align-items:center;gap:12px;background:#111;border:1px solid #222;border-radius:10px;padding:12px 15px;">
+      <span style="font-size:1.8em;">${f.avatar||'🎮'}</span>
+      <div style="flex:1;">
+        <div style="color:var(--accent);font-weight:bold;">${escHtml(f.username)}</div>
+        <div style="color:#555;font-size:0.8em;">${f.friend_code}</div>
+      </div>
+      <button onclick="removeFriend(${i})" style="background:transparent;color:#555;border:1px solid #333;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:0.8em;">Remove</button>
+    </div>`).join('');
+}
+
+function removeFriend(i) {
+  let friends = JSON.parse(localStorage.getItem('friendsList')||'[]');
+  friends.splice(i,1);
+  localStorage.setItem('friendsList', JSON.stringify(friends));
+  renderFriendsList();
+}
+
+// Save profile to Supabase so friends can find you
+async function syncProfileToSupabase() {
+  const p = getProfile();
+  if (!p.username) return;
+  try {
+    await sbFetch('profiles', {
+      method:'POST', prefer:'resolution=merge-duplicates',
+      body:JSON.stringify({ friend_code:getFriendCode(), username:p.username, title:p.title, avatar:p.avatar })
+    });
+  } catch(e) { console.log('Profile sync:', e.message); }
+}
+
+// ===== TOURNAMENTS =====
+async function openTournaments() {
+  document.getElementById('tournamentsModal').style.display='flex';
+  loadTournaments();
+}
+
+async function loadTournaments() {
+  const el = document.getElementById('tournamentContent');
+  el.innerHTML='<div style="color:#555;text-align:center;padding:20px;">Loading...</div>';
+  try {
+    // Get current week number
+    const now = new Date();
+    const weekNum = Math.floor((now - new Date(now.getFullYear(),0,1)) / 604800000);
+    const weekId = now.getFullYear()+'_W'+weekNum;
+
+    // Get or create tournament
+    let data = await sbFetch('tournaments?week_id=eq.'+weekId+'&select=*', { method:'GET', prefer:'' });
+    let tournament;
+    if (!data || !data.length) {
+      // Create new tournament for this week
+      const games = [...document.querySelectorAll('#allGamesGrid button')];
+      const picked = [];
+      const used = new Set();
+      while (picked.length < 3 && picked.length < games.length) {
+        const g = games[Math.floor(Math.random()*games.length)];
+        const url = g.getAttribute('data-url');
+        if (!used.has(url)) { used.add(url); picked.push({ name:g.innerText.trim(), url }); }
+      }
+      const created = await sbFetch('tournaments', { method:'POST', body:JSON.stringify({ week_id:weekId, games:JSON.stringify(picked), ends_at: new Date(now.getTime()+7*86400000).toISOString() }) });
+      tournament = created[0];
+    } else { tournament = data[0]; }
+
+    const tGames = JSON.parse(tournament.games||'[]');
+    const endsAt = new Date(tournament.ends_at);
+    const timeLeft = Math.max(0, endsAt - now);
+    const days = Math.floor(timeLeft/86400000);
+    const hours = Math.floor((timeLeft%86400000)/3600000);
+
+    // Get scores for this tournament
+    const scores = await sbFetch('leaderboard?game=in.('+tGames.map(g=>`"${g.name}"`).join(',')+')'+'&order=score.desc&limit=50', { method:'GET', prefer:'' }).catch(()=>[]);
+
+    el.innerHTML = `
+      <div style="background:#111;border:1px solid var(--accent);border-radius:10px;padding:15px;margin-bottom:20px;text-align:center;">
+        <div style="color:#555;font-size:0.75em;letter-spacing:2px;margin-bottom:5px;">WEEK ${weekNum} TOURNAMENT</div>
+        <div style="color:var(--accent);font-size:1.1em;font-weight:bold;">⏱ Ends in ${days}d ${hours}h</div>
+      </div>
+      <div style="margin-bottom:20px;">
+        <div style="color:#aaa;font-size:0.8em;letter-spacing:2px;margin-bottom:12px;">THIS WEEK'S GAMES:</div>
+        ${tGames.map(g=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#111;border:1px solid #222;border-radius:8px;padding:12px 15px;margin-bottom:8px;">
+            <span style="color:white;font-weight:bold;">${escHtml(g.name)}</span>
+            <button onclick="closeModal('tournamentsModal');showLaunchConfirm('${g.url}')" 
+              style="background:var(--accent);color:#000;border:none;padding:6px 14px;border-radius:6px;font-weight:bold;font-family:Consolas,monospace;cursor:pointer;font-size:0.85em;">▶ Play</button>
+          </div>`).join('')}
+      </div>
+      <div style="color:#aaa;font-size:0.8em;letter-spacing:2px;margin-bottom:12px;">TOURNAMENT STANDINGS:</div>
+      ${scores && scores.length ? `
+        <table style="width:100%;border-collapse:collapse;">
+          ${scores.slice(0,10).map((s,i)=>`
+            <tr style="border-bottom:1px solid #111;${i<3?'color:var(--accent);':'color:#ccc;'}">
+              <td style="padding:8px 5px;font-weight:bold;">${['🥇','🥈','🥉'][i]||i+1}</td>
+              <td style="padding:8px 5px;">${escHtml(s.player_name)}</td>
+              <td style="padding:8px 5px;color:#555;font-size:0.85em;">${escHtml(s.game)}</td>
+              <td style="padding:8px 5px;text-align:right;font-weight:bold;">${Number(s.score).toLocaleString()}</td>
+            </tr>`).join('')}
+        </table>` : '<div style="color:#333;text-align:center;padding:15px;font-size:0.85em;">No scores yet this week — be first!</div>'}
+    `;
+  } catch(e) {
+    el.innerHTML='<div style="color:#ff5555;text-align:center;padding:20px;">Error: '+e.message+'</div>';
+  }
+}
+
+// ===== UTILITIES =====
+function closeModal(id) { document.getElementById(id).style.display='none'; }
+function escHtml(str) { if(!str)return''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Sync profile on load
+window.addEventListener('DOMContentLoaded', ()=>{
+  setTimeout(syncProfileToSupabase, 2000);
+});
+</script>
