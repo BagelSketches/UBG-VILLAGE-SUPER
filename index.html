@@ -95,9 +95,8 @@
   body.system-cursor #customCursor { display: none !important; }
   
   /* Ensure custom cursor works inside modals */
-  #leaderboardModal *, #profileModal *, #friendsModal *, #tournamentsModal * { cursor: none !important; }
-  body.system-cursor #leaderboardModal *, body.system-cursor #profileModal *, 
-  body.system-cursor #friendsModal *, body.system-cursor #tournamentsModal * { cursor: default !important; }
+  #leaderboardModal *, #tournamentsModal * { cursor: none !important; }
+  body.system-cursor #leaderboardModal *, body.system-cursor #tournamentsModal * { cursor: default !important; }
 
   #customCursor {
     position: fixed;
@@ -1195,12 +1194,15 @@ function setupOverlayAutoHide() {
 }
 
 document.getElementById("closeGame").onclick = () => {
+  const closedGameTitle = document.getElementById("gameTitle").innerText;
   document.getElementById("gameOverlay").style.display = "none";
   document.getElementById("gameFrame").src = "";
   document.getElementById("gameTitle").innerText = "No game";
   document.title = originalDocumentTitle;
   if (wasCursorEnabledBeforeGame) document.body.classList.remove("system-cursor");
   clearTimeout(mouseMoveTimer);
+  // Check if this was a tournament game
+  checkIfTournamentGame(closedGameTitle);
 };
 
 function updateFPS() {
@@ -1637,8 +1639,6 @@ window.addEventListener("DOMContentLoaded", () => {
         <div class="nav-item" onclick="window.open('chatroom.html', '_blank')"><i data-lucide="message-square"></i><span class="tooltip">Chat</span></div>
         <div class="nav-item" onclick="window.open('https://discord.gg/qDrefFBQUs', '_blank')"><i data-lucide="hash"></i><span class="tooltip">Discord</span></div>
         <div class="nav-item" onclick="window.open('https://forms.gle/46p18CeutMtCjqyPA', '_blank')"><i data-lucide="clipboard-list"></i><span class="tooltip">Suggest</span></div>
-        <div class="nav-item" onclick="openProfile()"><i data-lucide="user"></i><span class="tooltip">Profile</span></div>
-        <div class="nav-item" onclick="openFriends()"><i data-lucide="users"></i><span class="tooltip">Friends</span></div>
         <div class="nav-item" onclick="openTournaments()"><i data-lucide="trophy"></i><span class="tooltip">Tournaments</span></div>
         <div class="nav-item" onclick="toggleSettingsModal()"><i data-lucide="settings"></i><span class="tooltip">Settings</span></div>
       </div>`;
@@ -1771,75 +1771,6 @@ window.addEventListener("DOMContentLoaded", () => {
   </div>
 </div>
 
-<!-- PROFILE MODAL -->
-<div id="profileModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
-  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:420px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 0 30px var(--bgGlow);position:relative;">
-    <span onclick="closeModal('profileModal')" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
-    <h2 style="color:var(--accent);margin:0 0 25px 0;text-align:center;letter-spacing:3px;">👤 PROFILE</h2>
-    <div style="text-align:center;margin-bottom:25px;">
-      <div id="profileAvatar" style="width:80px;height:80px;border-radius:50%;margin:0 auto 15px;border:3px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:2em;background:#111;"></div>
-      <div id="profileUsername" style="color:var(--accent);font-size:1.4em;font-weight:bold;letter-spacing:2px;"></div>
-      <div id="profileCode" style="color:#333;font-size:0.75em;margin-top:5px;font-family:Consolas,monospace;"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px;">
-      <div style="background:#111;border:1px solid #222;border-radius:8px;padding:15px;text-align:center;">
-        <div id="statGamesPlayed" style="color:var(--accent);font-size:1.8em;font-weight:bold;">0</div>
-        <div style="color:#555;font-size:0.75em;letter-spacing:1px;margin-top:4px;">GAMES PLAYED</div>
-      </div>
-      <div style="background:#111;border:1px solid #222;border-radius:8px;padding:15px;text-align:center;">
-        <div id="statFavoriteGame" style="color:var(--accent);font-size:0.9em;font-weight:bold;">—</div>
-        <div style="color:#555;font-size:0.75em;letter-spacing:1px;margin-top:4px;">FAVORITE GAME</div>
-      </div>
-    </div>
-    <div style="margin-bottom:15px;">
-      <label style="color:#aaa;font-size:0.85em;letter-spacing:1px;display:block;margin-bottom:6px;">USERNAME</label>
-      <input type="text" id="profileUsernameInput" maxlength="20" placeholder="Enter username..."
-        style="width:100%;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;box-sizing:border-box;">
-    </div>
-
-    <div style="margin-bottom:20px;">
-      <label style="color:#aaa;font-size:0.85em;letter-spacing:1px;display:block;margin-bottom:6px;">AVATAR EMOJI</label>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        <span onclick="selectAvatar('🎮')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🎮</span>
-        <span onclick="selectAvatar('👾')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">👾</span>
-        <span onclick="selectAvatar('🕹️')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🕹️</span>
-        <span onclick="selectAvatar('🏆')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🏆</span>
-        <span onclick="selectAvatar('⚡')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">⚡</span>
-        <span onclick="selectAvatar('🔥')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🔥</span>
-        <span onclick="selectAvatar('💀')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">💀</span>
-        <span onclick="selectAvatar('🌐')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🌐</span>
-        <span onclick="selectAvatar('🎯')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🎯</span>
-        <span onclick="selectAvatar('🦊')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🦊</span>
-        <span onclick="selectAvatar('🐉')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🐉</span>
-        <span onclick="selectAvatar('🤖')" style="font-size:1.8em;cursor:pointer;padding:5px;border-radius:8px;border:1px solid #222;transition:0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='#222'">🤖</span>
-      </div>
-    </div>
-    <button onclick="saveProfile()" style="width:100%;background:var(--accent);color:#000;border:none;padding:12px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;font-size:15px;cursor:pointer;letter-spacing:2px;">SAVE PROFILE</button>
-  </div>
-</div>
-
-<!-- FRIENDS MODAL -->
-<div id="friendsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
-  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:480px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 0 30px var(--bgGlow);position:relative;">
-    <span onclick="closeModal('friendsModal')" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
-    <h2 style="color:var(--accent);margin:0 0 5px 0;text-align:center;letter-spacing:3px;">👥 FRIENDS</h2>
-    <p style="color:#555;text-align:center;font-size:0.8em;letter-spacing:1px;margin:0 0 20px 0;">Share your friend code to connect</p>
-    <div style="background:#111;border:1px solid var(--accent);border-radius:10px;padding:15px;text-align:center;margin-bottom:20px;">
-      <div style="color:#555;font-size:0.75em;letter-spacing:2px;margin-bottom:8px;">YOUR FRIEND CODE</div>
-      <div id="myFriendCode" style="color:var(--accent);font-size:2em;font-weight:bold;letter-spacing:6px;font-family:Consolas,monospace;"></div>
-      <button onclick="copyFriendCode()" style="margin-top:10px;background:transparent;color:var(--accent);border:1px solid var(--accent);padding:6px 16px;border-radius:6px;font-family:Consolas,monospace;font-size:12px;cursor:pointer;">📋 Copy Code</button>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:20px;">
-      <input type="text" id="addFriendInput" placeholder="Enter friend code..." maxlength="6"
-        style="flex:1;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:16px;outline:none;text-transform:uppercase;letter-spacing:4px;text-align:center;">
-      <button onclick="addFriend()" style="background:var(--accent);color:#000;border:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;cursor:pointer;">ADD</button>
-    </div>
-    <div id="friendsList" style="display:flex;flex-direction:column;gap:10px;">
-      <div style="color:#333;text-align:center;padding:20px;font-size:0.85em;">No friends added yet</div>
-    </div>
-  </div>
-</div>
-
 <!-- TOURNAMENTS MODAL -->
 <div id="tournamentsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
   <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:540px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 0 30px var(--bgGlow);position:relative;">
@@ -1849,6 +1780,104 @@ window.addEventListener("DOMContentLoaded", () => {
     <div id="tournamentContent"><div style="color:#555;text-align:center;padding:20px;">Loading...</div></div>
   </div>
 </div>
+
+
+
+
+<!-- TOURNAMENT SCORE PROMPT -->
+<div id="tournamentScorePrompt" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
+  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:380px;max-width:95vw;box-shadow:0 0 30px var(--bgGlow);text-align:center;font-family:Consolas,monospace;">
+    <div style="font-size:2em;margin-bottom:10px;">🏟️</div>
+    <h2 style="color:var(--accent);margin:0 0 8px 0;letter-spacing:3px;">TOURNAMENT GAME!</h2>
+    <p style="color:#aaa;font-size:0.85em;margin:0 0 20px 0;" id="tspGameName"></p>
+    <p style="color:#ccc;font-size:0.9em;margin:0 0 20px 0;">Want to submit your score to the tournament leaderboard?</p>
+    <div style="display:flex;gap:10px;margin-bottom:15px;">
+      <input type="text" id="tspPlayerName" placeholder="Your name" maxlength="20"
+        style="flex:1;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
+      <input type="number" id="tspScore" placeholder="Score" min="0"
+        style="width:100px;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="submitTournamentScore()" style="flex:1;background:var(--accent);color:#000;border:none;padding:12px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;font-size:14px;cursor:pointer;letter-spacing:1px;">🏆 SUBMIT</button>
+      <button onclick="dismissTournamentPrompt()" style="flex:1;background:transparent;color:#555;border:1px solid #333;padding:12px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;cursor:pointer;">Skip</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ===== TOURNAMENT SCORE PROMPT =====
+let currentTournamentGames = [];
+let lastPlayedGameTitle = '';
+
+// Load tournament games list so we know which games are in the tournament
+async function loadTournamentGames() {
+  try {
+    const now = new Date();
+    const weekNum = Math.floor((now - new Date(now.getFullYear(),0,1)) / 604800000);
+    const weekId = now.getFullYear()+'_W'+weekNum;
+    const data = await sbFetch('tournaments?week_id=eq.'+weekId+'&select=games', { method:'GET', prefer:'' });
+    if (data && data.length) {
+      currentTournamentGames = JSON.parse(data[0].games || '[]').map(g => g.name.toLowerCase());
+    }
+  } catch(e) {}
+}
+
+function checkIfTournamentGame(gameTitle) {
+  if (!gameTitle || gameTitle === 'No game' || gameTitle === '🌐 Proxy') return;
+  const lower = gameTitle.toLowerCase();
+  const isTournament = currentTournamentGames.some(tg => lower.includes(tg) || tg.includes(lower));
+  if (!isTournament) return;
+  lastPlayedGameTitle = gameTitle;
+  // Pre-fill name from leaderboard saved name
+  const savedName = localStorage.getItem('lbPlayerName') || '';
+  document.getElementById('tspPlayerName').value = savedName;
+  document.getElementById('tspScore').value = '';
+  document.getElementById('tspGameName').innerText = gameTitle;
+  document.getElementById('tournamentScorePrompt').style.display = 'flex';
+  setTimeout(() => { document.getElementById('tspScore').focus(); }, 100);
+}
+
+async function submitTournamentScore() {
+  const name = document.getElementById('tspPlayerName').value.trim();
+  const score = parseInt(document.getElementById('tspScore').value);
+  if (!name) { alert('Please enter your name!'); return; }
+  if (isNaN(score) || score < 0) { alert('Please enter a valid score!'); return; }
+
+  const cap = getScoreCap(lastPlayedGameTitle);
+  if (score > cap) { alert('Score too high! Max: ' + cap.toLocaleString()); return; }
+
+  localStorage.setItem('lbPlayerName', name);
+  const btn = document.querySelector('#tournamentScorePrompt button[onclick="submitTournamentScore()"]');
+  if (btn) { btn.innerText = 'Submitting...'; btn.disabled = true; }
+
+  try {
+    await sbFetch('leaderboard', {
+      method: 'POST',
+      body: JSON.stringify({ game: lastPlayedGameTitle, player_name: name, score, screenshot_url: null })
+    });
+    dismissTournamentPrompt();
+    // Show quick confirmation
+    const toast = document.getElementById('scoreToast');
+    document.getElementById('toastScoreVal').innerText = '🏟️ Tournament score submitted!';
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 3000);
+  } catch(e) {
+    alert('Failed to submit: ' + e.message);
+  } finally {
+    if (btn) { btn.innerText = '🏆 SUBMIT'; btn.disabled = false; }
+  }
+}
+
+function dismissTournamentPrompt() {
+  document.getElementById('tournamentScorePrompt').style.display = 'none';
+}
+
+// Load tournament games on page load
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadTournamentGames, 3000);
+});
+</script>
 
 </body>
 </html>
@@ -2025,123 +2054,6 @@ async function submitDetectedScore() {
 function dismissToast(){document.getElementById('scoreToast').style.display='none';}
 document.getElementById('closeGame').addEventListener('click', stopScoreDetection);
 
-// ===== PROFILE =====
-function getProfile() {
-  return JSON.parse(localStorage.getItem('ubgProfile')||'{"username":"","title":"Newbie","avatar":"🎮","gamesPlayed":0,"gameHistory":{}}');
-}
-
-function saveProfile() {
-  const p = getProfile();
-  p.username = document.getElementById('profileUsernameInput').value.trim() || p.username;
-  localStorage.setItem('ubgProfile', JSON.stringify(p));
-  localStorage.setItem('lbPlayerName', p.username);
-  renderProfile();
-  alert('Profile saved!');
-}
-
-function selectAvatar(emoji) {
-  const p = getProfile();
-  p.avatar = emoji;
-  localStorage.setItem('ubgProfile', JSON.stringify(p));
-  document.getElementById('profileAvatar').innerText = emoji;
-}
-
-function renderProfile() {
-  const p = getProfile();
-  document.getElementById('profileAvatar').innerText = p.avatar || '🎮';
-  document.getElementById('profileUsername').innerText = p.username || 'Anonymous';
-  document.getElementById('profileCode').innerText = 'Code: ' + getFriendCode();
-  document.getElementById('profileUsernameInput').value = p.username || '';
-  document.getElementById('statGamesPlayed').innerText = p.gamesPlayed || 0;
-  const history = p.gameHistory || {};
-  const fav = Object.entries(history).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById('statFavoriteGame').innerText = fav ? fav[0].substring(0,15) : '—';
-}
-
-function openProfile() { renderProfile(); document.getElementById('profileModal').style.display='flex'; }
-
-// Track games played in profile
-const _origLaunchForProfile = window.launchGame;
-window.launchGame = function(url) {
-  if (_origLaunchForProfile) _origLaunchForProfile(url);
-  const p = getProfile();
-  p.gamesPlayed = (p.gamesPlayed||0)+1;
-  const gameName = url.split('/').pop().replace('.html','').substring(0,20);
-  p.gameHistory = p.gameHistory||{};
-  p.gameHistory[gameName] = (p.gameHistory[gameName]||0)+1;
-  localStorage.setItem('ubgProfile', JSON.stringify(p));
-  setTimeout(()=>startScoreDetection(),3000);
-};
-
-// ===== FRIEND CODES =====
-function getFriendCode() {
-  let code = localStorage.getItem('friendCode');
-  if (!code) { code = Math.random().toString(36).substring(2,8).toUpperCase(); localStorage.setItem('friendCode', code); }
-  return code;
-}
-
-function openFriends() {
-  document.getElementById('myFriendCode').innerText = getFriendCode();
-  renderFriendsList();
-  document.getElementById('friendsModal').style.display='flex';
-}
-
-function copyFriendCode() {
-  navigator.clipboard.writeText(getFriendCode()).then(()=>alert('Friend code copied!')).catch(()=>alert('Code: '+getFriendCode()));
-}
-
-async function addFriend() {
-  const code = document.getElementById('addFriendInput').value.trim().toUpperCase();
-  if (code.length !== 6) { alert('Friend codes are 6 characters!'); return; }
-  if (code === getFriendCode()) { alert("That's your own code!"); return; }
-  try {
-    const data = await sbFetch('profiles?friend_code=eq.'+code+'&select=username,friend_code,title,avatar', { method:'GET', prefer:'' });
-    if (!data || !data.length) { alert('No player found with that code.'); return; }
-    const friend = data[0];
-    let friends = JSON.parse(localStorage.getItem('friendsList')||'[]');
-    if (friends.find(f=>f.friend_code===code)) { alert('Already friends!'); return; }
-    friends.push(friend);
-    localStorage.setItem('friendsList', JSON.stringify(friends));
-    renderFriendsList();
-    document.getElementById('addFriendInput').value='';
-    alert('Added '+friend.username+'!');
-  } catch(e) { alert('Error: '+e.message); }
-}
-
-function renderFriendsList() {
-  const friends = JSON.parse(localStorage.getItem('friendsList')||'[]');
-  const list = document.getElementById('friendsList');
-  if (!friends.length) { list.innerHTML='<div style="color:#333;text-align:center;padding:20px;font-size:0.85em;">No friends added yet</div>'; return; }
-  list.innerHTML = friends.map((f,i) => `
-    <div style="display:flex;align-items:center;gap:12px;background:#111;border:1px solid #222;border-radius:10px;padding:12px 15px;">
-      <span style="font-size:1.8em;">${f.avatar||'🎮'}</span>
-      <div style="flex:1;">
-        <div style="color:var(--accent);font-weight:bold;">${escHtml(f.username)}</div>
-        <div style="color:#555;font-size:0.8em;">${f.friend_code}</div>
-      </div>
-      <button onclick="removeFriend(${i})" style="background:transparent;color:#555;border:1px solid #333;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:0.8em;">Remove</button>
-    </div>`).join('');
-}
-
-function removeFriend(i) {
-  let friends = JSON.parse(localStorage.getItem('friendsList')||'[]');
-  friends.splice(i,1);
-  localStorage.setItem('friendsList', JSON.stringify(friends));
-  renderFriendsList();
-}
-
-// Save profile to Supabase so friends can find you
-async function syncProfileToSupabase() {
-  const p = getProfile();
-  if (!p.username) return;
-  try {
-    await sbFetch('profiles', {
-      method:'POST', prefer:'resolution=merge-duplicates',
-      body:JSON.stringify({ friend_code:getFriendCode(), username:p.username, title:p.title, avatar:p.avatar })
-    });
-  } catch(e) { console.log('Profile sync:', e.message); }
-}
-
 // ===== TOURNAMENTS =====
 async function openTournaments() {
   document.getElementById('tournamentsModal').style.display='flex';
@@ -2220,6 +2132,5 @@ function escHtml(str) { if(!str)return''; return String(str).replace(/&/g,'&amp;
 
 // Sync profile on load
 window.addEventListener('DOMContentLoaded', ()=>{
-  setTimeout(syncProfileToSupabase, 2000);
 });
 </script>
