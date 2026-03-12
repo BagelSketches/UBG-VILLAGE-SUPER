@@ -93,10 +93,6 @@
 
   body.system-cursor * { cursor: default !important; }
   body.system-cursor #customCursor { display: none !important; }
-  
-  /* Ensure custom cursor works inside modals */
-  #leaderboardModal *, #tournamentsModal * { cursor: none !important; }
-  body.system-cursor #leaderboardModal *, body.system-cursor #tournamentsModal * { cursor: default !important; }
 
   #customCursor {
     position: fixed;
@@ -108,7 +104,7 @@
     pointer-events: none;
     transform: translate(-50%, -50%);
     transition: all 0.1s ease-out;
-    z-index: 99999;
+    z-index: 10002;
   }
 
   button:hover ~ #customCursor, 
@@ -859,7 +855,6 @@
     <div style="display: flex; align-items: center;">
       <span id="fpsDisplay">FPS: --</span>
       <button id="panicButton">🚨 Panic! (<span id="hotkeyDisplay">Ctrl+Shift+P</span>)</button>
-      <button onclick="openLeaderboard()" style="margin-left:5px;">🏆 Leaderboard</button>
       <button id="closeGame">✖ Close</button>
       <button onclick="toggleFullscreen('frame')" style="margin-left: 10px;">⛶ Frame FS</button>
       <button onclick="toggleFullscreen('window')">⛶ Window FS</button>
@@ -902,7 +897,6 @@
       <button onclick="filterByCategory('casual', this)" data-filter="casual">Casual/Clicker</button>
       <button onclick="filterByCategory('sports', this)" data-filter="sports">Sports</button>
       <button onclick="filterByCategory('horror', this)" data-filter="horror">Horror</button>
-      <button onclick="filterByCategory('puzzle', this)" data-filter="puzzle">Puzzle</button>
       <button onclick="filterByCategory('utility', this)" data-filter="utility">Utilities</button>
   </div>
   
@@ -1194,15 +1188,12 @@ function setupOverlayAutoHide() {
 }
 
 document.getElementById("closeGame").onclick = () => {
-  const closedGameTitle = document.getElementById("gameTitle").innerText;
   document.getElementById("gameOverlay").style.display = "none";
   document.getElementById("gameFrame").src = "";
   document.getElementById("gameTitle").innerText = "No game";
   document.title = originalDocumentTitle;
   if (wasCursorEnabledBeforeGame) document.body.classList.remove("system-cursor");
   clearTimeout(mouseMoveTimer);
-  // Check if this was a tournament game
-  checkIfTournamentGame(closedGameTitle);
 };
 
 function updateFPS() {
@@ -1285,9 +1276,9 @@ function filterGames(event) {
   }
   document.querySelectorAll("#allGamesGrid button").forEach(btn => {
     const textContent = btn.innerText.toLowerCase(); 
-    const category = (btn.getAttribute("data-category") || '').toLowerCase();
+    const category = btn.getAttribute("data-category");
     const matchesSearch = textContent.includes(search);
-    const matchesCategory = activeCategory === 'all' || category === activeCategory.toLowerCase();
+    const matchesCategory = activeCategory === 'all' || category === activeCategory;
     if (matchesSearch && matchesCategory) { btn.style.display = ""; visibleCount++; }
     else btn.style.display = "none";
   });
@@ -1341,10 +1332,9 @@ function displayRecentGames() {
     header.classList.add("visible");
     container.innerHTML = recent.map(g => {
         const button = [...document.querySelectorAll("#allGamesGrid button")].find(b => b.getAttribute('data-url') === g.url);
-        const category = button ? (button.getAttribute('data-category') || 'casual').toLowerCase() : 'casual';
-        const categoryLabel = button ? button.querySelector('.game-card-tag')?.innerText || 'Casual' : 'Casual';
-        return `<button onclick="showLaunchConfirm('${g.url}')" data-category="${category}" data-url="${g.url}">
-            <span class="game-card-tag" data-category-text="${categoryLabel}">${categoryLabel}</span>
+        const category = button ? button.querySelector('.game-card-tag')?.getAttribute('data-category-text') || 'Casual' : 'Casual'; 
+        return `<button onclick="showLaunchConfirm('${g.url}')" data-category="${g.category}" data-url="${g.url}">
+            <span class="game-card-tag" data-category-text="${category}">${category}</span>
             <img src="${g.img}">
             ${g.name}
           </button>`;
@@ -1638,8 +1628,8 @@ window.addEventListener("DOMContentLoaded", () => {
         <div class="nav-item" onclick="window.open('https://docs.google.com/document/d/19p_96cdCEagzxN0KKRSJc2ys5oE2kYrI4Z3IaI5PA8Y/edit', '_blank')"><i data-lucide="tv"></i><span class="tooltip">Movies</span></div>
         <div class="nav-item" onclick="window.open('chatroom.html', '_blank')"><i data-lucide="message-square"></i><span class="tooltip">Chat</span></div>
         <div class="nav-item" onclick="window.open('https://discord.gg/qDrefFBQUs', '_blank')"><i data-lucide="hash"></i><span class="tooltip">Discord</span></div>
+        <div class="nav-item" onclick="window.open('https://devilapig247.github.io/dig/', '_blank')"><i data-lucide="shovel"></i><span class="tooltip">Dig</span></div>
         <div class="nav-item" onclick="window.open('https://forms.gle/46p18CeutMtCjqyPA', '_blank')"><i data-lucide="clipboard-list"></i><span class="tooltip">Suggest</span></div>
-        <div class="nav-item" onclick="openTournaments()"><i data-lucide="trophy"></i><span class="tooltip">Tournaments</span></div>
         <div class="nav-item" onclick="toggleSettingsModal()"><i data-lucide="settings"></i><span class="tooltip">Settings</span></div>
       </div>`;
     document.body.insertAdjacentHTML('afterbegin', sidebar);
@@ -1682,455 +1672,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
-<!-- LEADERBOARD MODAL -->
-<div id="leaderboardModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:10005; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
-  <div style="background:#0a0a0a; border:2px solid var(--accent); border-radius:15px; padding:30px; width:500px; max-width:95vw; max-height:85vh; overflow-y:auto; box-shadow:0 0 30px var(--bgGlow); position:relative;">
-    <span onclick="closeLeaderboard()" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
-    <h2 style="color:var(--accent);margin:0 0 5px 0;text-align:center;letter-spacing:3px;">🏆 LEADERBOARD</h2>
-    <p id="lbGameName" style="color:#aaa;text-align:center;margin:0 0 20px 0;font-size:0.85em;letter-spacing:2px;text-transform:uppercase;"></p>
 
-    <!-- Submit score -->
-    <div style="display:flex;gap:8px;margin-bottom:10px;">
-      <input type="text" id="lbPlayerName" placeholder="Your name" maxlength="20"
-        style="flex:1;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
-      <input type="number" id="lbScoreInput" placeholder="Score" min="0"
-        style="width:110px;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
-      <button onclick="submitScore()" 
-        style="background:var(--accent);color:#000;border:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;cursor:pointer;transition:0.2s;">
-        SUBMIT
-      </button>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:20px;align-items:center;">
-      <input type="text" id="lbScreenshotInput" placeholder="📸 Screenshot URL (optional proof)" 
-        style="flex:1;background:#000;border:1px solid #333;color:#aaa;padding:8px 12px;border-radius:8px;font-family:Consolas,monospace;font-size:13px;outline:none;">
-      <button id="lbAdminBtn" onclick="toggleAdminMode()"
-        style="background:transparent;color:#444;border:1px solid #333;padding:8px 12px;border-radius:8px;font-family:Consolas,monospace;font-size:12px;cursor:pointer;white-space:nowrap;">
-        🔐 Admin
-      </button>
-    </div>
-
-    <!-- Scores table -->
-    <div id="lbScoresList" style="width:100%;">
-      <div style="color:#555;text-align:center;padding:20px;">Loading scores...</div>
-    </div>
-  </div>
-</div>
-
-<!-- Score auto-detect toast -->
-<div id="scoreToast" style="display:none;position:fixed;bottom:80px;right:30px;background:#0a0a0a;border:2px solid var(--accent);color:var(--accent);padding:15px 20px;border-radius:10px;z-index:10006;font-family:Consolas,monospace;box-shadow:0 0 15px var(--bgGlow);max-width:300px;">
-  <div style="font-weight:bold;margin-bottom:8px;">📊 Score Detected!</div>
-  <div id="toastScoreVal" style="font-size:1.4em;font-weight:bold;margin-bottom:10px;"></div>
-  <div style="display:flex;gap:8px;">
-    <button onclick="submitDetectedScore()" style="flex:1;background:var(--accent);color:#000;border:none;padding:8px;border-radius:6px;font-weight:bold;cursor:pointer;font-family:Consolas,monospace;">Submit</button>
-    <button onclick="dismissToast()" style="flex:1;background:transparent;color:var(--accent);border:1px solid var(--accent);padding:8px;border-radius:6px;cursor:pointer;font-family:Consolas,monospace;">Dismiss</button>
-  </div>
-</div>
-
-
-
-
-<!-- ===================== MODALS ===================== -->
-
-<!-- LEADERBOARD MODAL -->
-<div id="leaderboardModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
-  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:520px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 0 30px var(--bgGlow);position:relative;">
-    <span onclick="closeLeaderboard()" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
-    <h2 style="color:var(--accent);margin:0 0 5px 0;text-align:center;letter-spacing:3px;">🏆 LEADERBOARD</h2>
-    <p id="lbGameName" style="color:#aaa;text-align:center;margin:0 0 20px 0;font-size:0.85em;letter-spacing:2px;text-transform:uppercase;"></p>
-    <div style="display:flex;gap:8px;margin-bottom:10px;">
-      <input type="text" id="lbPlayerName" placeholder="Your name" maxlength="20"
-        style="flex:1;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
-      <input type="number" id="lbScoreInput" placeholder="Score" min="0"
-        style="width:110px;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
-      <button onclick="submitScore()" style="background:var(--accent);color:#000;border:none;padding:10px 18px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;cursor:pointer;">SUBMIT</button>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:20px;align-items:center;">
-      <input type="file" id="lbScreenshotFile" accept="image/*" onchange="previewScreenshot(this)" style="display:none;">
-      <button onclick="document.getElementById('lbScreenshotFile').click()"
-        style="background:#000;color:#aaa;border:1px solid #333;padding:8px 14px;border-radius:8px;font-family:Consolas,monospace;font-size:13px;cursor:pointer;">
-        📸 Upload Screenshot
-      </button>
-      <span id="lbScreenshotStatus" style="color:#555;font-size:0.8em;font-family:Consolas,monospace;flex:1;">No file chosen</span>
-      <button id="lbAdminBtn" onclick="toggleAdminMode()"
-        style="background:transparent;color:#444;border:1px solid #333;padding:8px 12px;border-radius:8px;font-family:Consolas,monospace;font-size:12px;cursor:pointer;">
-        🔐 Admin
-      </button>
-    </div>
-    <input type="hidden" id="lbScreenshotInput" value="">
-    <div id="lbScoresList"><div style="color:#555;text-align:center;padding:20px;">Loading scores...</div></div>
-  </div>
-</div>
-
-<!-- SCORE TOAST -->
-<div id="scoreToast" style="display:none;position:fixed;bottom:80px;right:30px;background:#0a0a0a;border:2px solid var(--accent);color:var(--accent);padding:15px 20px;border-radius:10px;z-index:10006;font-family:Consolas,monospace;box-shadow:0 0 15px var(--bgGlow);max-width:300px;">
-  <div style="font-weight:bold;margin-bottom:8px;">📊 Score Detected!</div>
-  <div id="toastScoreVal" style="font-size:1.4em;font-weight:bold;margin-bottom:10px;"></div>
-  <div style="display:flex;gap:8px;">
-    <button onclick="submitDetectedScore()" style="flex:1;background:var(--accent);color:#000;border:none;padding:8px;border-radius:6px;font-weight:bold;cursor:pointer;font-family:Consolas,monospace;">Submit</button>
-    <button onclick="dismissToast()" style="flex:1;background:transparent;color:var(--accent);border:1px solid var(--accent);padding:8px;border-radius:6px;cursor:pointer;font-family:Consolas,monospace;">Dismiss</button>
-  </div>
-</div>
-
-<!-- TOURNAMENTS MODAL -->
-<div id="tournamentsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
-  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:540px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 0 30px var(--bgGlow);position:relative;">
-    <span onclick="closeModal('tournamentsModal')" style="position:absolute;top:15px;right:20px;color:var(--accent);font-size:24px;cursor:pointer;font-weight:bold;">✖</span>
-    <h2 style="color:var(--accent);margin:0 0 5px 0;text-align:center;letter-spacing:3px;">🏟️ TOURNAMENTS</h2>
-    <p style="color:#555;text-align:center;font-size:0.8em;letter-spacing:1px;margin:0 0 20px 0;">Weekly competitions — new tournament every Monday</p>
-    <div id="tournamentContent"><div style="color:#555;text-align:center;padding:20px;">Loading...</div></div>
-  </div>
-</div>
-
-
-
-
-<!-- TOURNAMENT SCORE PROMPT -->
-<div id="tournamentScorePrompt" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10005;align-items:center;justify-content:center;backdrop-filter:blur(5px);">
-  <div style="background:#0a0a0a;border:2px solid var(--accent);border-radius:15px;padding:30px;width:380px;max-width:95vw;box-shadow:0 0 30px var(--bgGlow);text-align:center;font-family:Consolas,monospace;">
-    <div style="font-size:2em;margin-bottom:10px;">🏟️</div>
-    <h2 style="color:var(--accent);margin:0 0 8px 0;letter-spacing:3px;">TOURNAMENT GAME!</h2>
-    <p style="color:#aaa;font-size:0.85em;margin:0 0 20px 0;" id="tspGameName"></p>
-    <p style="color:#ccc;font-size:0.9em;margin:0 0 20px 0;">Want to submit your score to the tournament leaderboard?</p>
-    <div style="display:flex;gap:10px;margin-bottom:15px;">
-      <input type="text" id="tspPlayerName" placeholder="Your name" maxlength="20"
-        style="flex:1;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
-      <input type="number" id="tspScore" placeholder="Score" min="0"
-        style="width:100px;background:#000;border:2px solid var(--accent);color:var(--accent);padding:10px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;outline:none;">
-    </div>
-    <div style="display:flex;gap:10px;">
-      <button onclick="submitTournamentScore()" style="flex:1;background:var(--accent);color:#000;border:none;padding:12px;border-radius:8px;font-weight:bold;font-family:Consolas,monospace;font-size:14px;cursor:pointer;letter-spacing:1px;">🏆 SUBMIT</button>
-      <button onclick="dismissTournamentPrompt()" style="flex:1;background:transparent;color:#555;border:1px solid #333;padding:12px;border-radius:8px;font-family:Consolas,monospace;font-size:14px;cursor:pointer;">Skip</button>
-    </div>
-  </div>
-</div>
-
-
-<script>
-// ===== TOURNAMENT SCORE PROMPT =====
-let currentTournamentGames = [];
-let lastPlayedGameTitle = '';
-
-// Load tournament games list so we know which games are in the tournament
-async function loadTournamentGames() {
-  try {
-    const now = new Date();
-    const weekNum = Math.floor((now - new Date(now.getFullYear(),0,1)) / 604800000);
-    const weekId = now.getFullYear()+'_W'+weekNum;
-    const data = await sbFetch('tournaments?week_id=eq.'+weekId+'&select=games', { method:'GET', prefer:'' });
-    if (data && data.length) {
-      currentTournamentGames = JSON.parse(data[0].games || '[]').map(g => g.name.toLowerCase());
-    }
-  } catch(e) {}
-}
-
-function checkIfTournamentGame(gameTitle) {
-  if (!gameTitle || gameTitle === 'No game' || gameTitle === '🌐 Proxy') return;
-  const lower = gameTitle.toLowerCase();
-  const isTournament = currentTournamentGames.some(tg => lower.includes(tg) || tg.includes(lower));
-  if (!isTournament) return;
-  lastPlayedGameTitle = gameTitle;
-  // Pre-fill name from leaderboard saved name
-  const savedName = localStorage.getItem('lbPlayerName') || '';
-  document.getElementById('tspPlayerName').value = savedName;
-  document.getElementById('tspScore').value = '';
-  document.getElementById('tspGameName').innerText = gameTitle;
-  document.getElementById('tournamentScorePrompt').style.display = 'flex';
-  setTimeout(() => { document.getElementById('tspScore').focus(); }, 100);
-}
-
-async function submitTournamentScore() {
-  const name = document.getElementById('tspPlayerName').value.trim();
-  const score = parseInt(document.getElementById('tspScore').value);
-  if (!name) { alert('Please enter your name!'); return; }
-  if (isNaN(score) || score < 0) { alert('Please enter a valid score!'); return; }
-
-  const cap = getScoreCap(lastPlayedGameTitle);
-  if (score > cap) { alert('Score too high! Max: ' + cap.toLocaleString()); return; }
-
-  localStorage.setItem('lbPlayerName', name);
-  const btn = document.querySelector('#tournamentScorePrompt button[onclick="submitTournamentScore()"]');
-  if (btn) { btn.innerText = 'Submitting...'; btn.disabled = true; }
-
-  try {
-    await sbFetch('leaderboard', {
-      method: 'POST',
-      body: JSON.stringify({ game: lastPlayedGameTitle, player_name: name, score, screenshot_url: null })
-    });
-    dismissTournamentPrompt();
-    // Show quick confirmation
-    const toast = document.getElementById('scoreToast');
-    document.getElementById('toastScoreVal').innerText = '🏟️ Tournament score submitted!';
-    toast.style.display = 'block';
-    setTimeout(() => toast.style.display = 'none', 3000);
-  } catch(e) {
-    alert('Failed to submit: ' + e.message);
-  } finally {
-    if (btn) { btn.innerText = '🏆 SUBMIT'; btn.disabled = false; }
-  }
-}
-
-function dismissTournamentPrompt() {
-  document.getElementById('tournamentScorePrompt').style.display = 'none';
-}
-
-// Load tournament games on page load
-window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(loadTournamentGames, 3000);
-});
-</script>
 
 </body>
 </html>
-<script>
-const SUPABASE_URL = 'https://uicvpfwiuwwqzrmrhdio.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_SU0dFx-A0GzwbW0v9_pJJw_m4MSHrkn';
-const ADMIN_PASSWORD = 'ubgadmin2025';
-const SCORE_CAPS = {"slope": 9999, "cookie": 999999999999, "retrobowl": 9999, "subway": 9999999, "minecraft": 9999999, "paperio": 100, "polytrack": 999999, "pvz": 999999, "bloons": 999999, "bitlife": 999, "coreball": 9999, "drive mad": 9999, "basketball": 9999, "time shooter": 9999, "vex": 9999, "run 3": 9999999, "slither": 9999999};
-
-let currentLbGame = '';
-let detectedScore = null;
-let isAdminMode = false;
-let scoreDetectionInterval = null;
-
-// ===== SUPABASE HELPER =====
-async function sbFetch(path, options = {}) {
-  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
-    ...options,
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': options.prefer || 'return=representation',
-      ...(options.headers || {})
-    }
-  });
-  if (!res.ok) { const err = await res.text(); throw new Error(err); }
-  return res.status === 204 ? null : res.json();
-}
-
-// ===== LEADERBOARD =====
-function getScoreCap(gameName) {
-  const lower = gameName.toLowerCase();
-  for (const [key, cap] of Object.entries(SCORE_CAPS)) { if (lower.includes(key)) return cap; }
-  return 999999999;
-}
-
-function openLeaderboard() {
-  currentLbGame = document.getElementById('gameTitle').innerText || 'Unknown Game';
-  document.getElementById('lbGameName').innerText = currentLbGame;
-  const savedName = localStorage.getItem('lbPlayerName') || getProfile().username || '';
-  document.getElementById('lbPlayerName').value = savedName;
-  document.getElementById('lbScoreInput').value = '';
-  document.getElementById('lbScreenshotInput').value = '';
-  document.getElementById('lbScreenshotStatus').innerText = 'No file chosen';
-  document.getElementById('leaderboardModal').style.display = 'flex';
-  loadScores();
-}
-
-function closeLeaderboard() { document.getElementById('leaderboardModal').style.display = 'none'; }
-
-async function loadScores() {
-  const list = document.getElementById('lbScoresList');
-  list.innerHTML = '<div style="color:#555;text-align:center;padding:20px;">Loading...</div>';
-  try {
-    const data = await sbFetch('leaderboard?game=eq.' + encodeURIComponent(currentLbGame) + '&order=score.desc&limit=20', { method: 'GET', prefer: '' });
-    renderScores(data || []);
-  } catch(e) {
-    list.innerHTML = '<div style="color:#ff5555;text-align:center;padding:20px;">Failed to load.<br><small>' + e.message + '</small></div>';
-  }
-}
-
-function renderScores(scores) {
-  const list = document.getElementById('lbScoresList');
-  if (!scores.length) { list.innerHTML = '<div style="color:#555;text-align:center;padding:30px;">No scores yet — be the first!</div>'; return; }
-  const medals = ['🥇','🥈','🥉'];
-  list.innerHTML = `<table style="width:100%;border-collapse:collapse;">
-    <thead><tr style="color:#555;font-size:0.8em;text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid #222;">
-      <td style="padding:8px 5px;">#</td><td style="padding:8px 5px;">Player</td>
-      <td style="padding:8px 5px;text-align:right;">Score</td>
-      <td style="padding:8px 5px;text-align:center;">Proof</td>
-      ${isAdminMode ? '<td style="padding:8px 5px;">Del</td>' : ''}
-    </tr></thead><tbody>
-    ${scores.map((s,i) => `<tr style="border-bottom:1px solid #111;${i<3?'color:var(--accent);':'color:#ccc;'}">
-      <td style="padding:10px 5px;font-weight:bold;">${medals[i]||(i+1)}</td>
-      <td style="padding:10px 5px;">${escHtml(s.player_name)}</td>
-      <td style="padding:10px 5px;text-align:right;font-weight:bold;">${Number(s.score).toLocaleString()}</td>
-      <td style="padding:10px 5px;text-align:center;">${s.screenshot_url?`<a href="${escHtml(s.screenshot_url)}" target="_blank" style="color:var(--accent);font-size:0.8em;">📸</a>`:'<span style="color:#333;">—</span>'}</td>
-      ${isAdminMode?`<td style="padding:10px 5px;"><button onclick="deleteScore('${s.id}')" style="background:#f00;color:#fff;border:none;padding:3px 7px;border-radius:4px;cursor:pointer;font-size:0.75em;">DEL</button></td>`:''}
-    </tr>`).join('')}
-    </tbody></table>`;
-}
-
-function previewScreenshot(input) {
-  const status = document.getElementById('lbScreenshotStatus');
-  if (input.files && input.files[0]) { status.style.color='var(--accent)'; status.innerText='✅ '+input.files[0].name; }
-  else { status.style.color='#555'; status.innerText='No file chosen'; }
-}
-
-async function uploadScreenshot(file) {
-  const ext = file.name.split('.').pop();
-  const fileName = Date.now()+'_'+Math.random().toString(36).substring(2,8)+'.'+ext;
-  const res = await fetch(SUPABASE_URL+'/storage/v1/object/screenshots/'+fileName, {
-    method:'POST', headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':file.type,'x-upsert':'true'}, body:file
-  });
-  if (!res.ok) throw new Error('Upload failed: '+(await res.text()));
-  return SUPABASE_URL+'/storage/v1/object/public/screenshots/'+fileName;
-}
-
-async function submitScore() {
-  const name = document.getElementById('lbPlayerName').value.trim();
-  const score = parseInt(document.getElementById('lbScoreInput').value);
-  const file = document.getElementById('lbScreenshotFile').files[0] || null;
-  if (!name) { alert('Please enter your name!'); return; }
-  if (isNaN(score) || score < 0) { alert('Please enter a valid score!'); return; }
-  const cap = getScoreCap(currentLbGame);
-  if (score > cap) { alert('Score too high! Max: '+cap.toLocaleString()+'. Suspicious scores are rejected.'); return; }
-  localStorage.setItem('lbPlayerName', name);
-  const btn = document.querySelector('#leaderboardModal button[onclick="submitScore()"]');
-  if (btn) { btn.innerText='Submitting...'; btn.disabled=true; }
-  try {
-    let screenshotUrl = null;
-    if (file) { document.getElementById('lbScreenshotStatus').innerText='⬆️ Uploading...'; screenshotUrl = await uploadScreenshot(file); document.getElementById('lbScreenshotStatus').innerText='✅ Uploaded!'; }
-    await sbFetch('leaderboard', { method:'POST', body:JSON.stringify({ game:currentLbGame, player_name:name, score, screenshot_url:screenshotUrl }) });
-    document.getElementById('lbScoreInput').value='';
-    document.getElementById('lbScreenshotFile').value='';
-    document.getElementById('lbScreenshotStatus').innerText='No file chosen';
-    document.getElementById('lbScreenshotStatus').style.color='#555';
-    loadScores();
-  } catch(e) { alert('Failed: '+e.message); }
-  finally { if(btn){btn.innerText='SUBMIT';btn.disabled=false;} }
-}
-
-async function deleteScore(id) {
-  if (!isAdminMode) return;
-  try { await sbFetch('leaderboard?id=eq.'+id, { method:'DELETE', prefer:'' }); loadScores(); }
-  catch(e) { alert('Delete failed: '+e.message); }
-}
-
-function toggleAdminMode() {
-  if (isAdminMode) { isAdminMode=false; document.getElementById('lbAdminBtn').innerText='🔐 Admin'; loadScores(); return; }
-  const pw = prompt('Admin password:');
-  if (pw === ADMIN_PASSWORD) { isAdminMode=true; document.getElementById('lbAdminBtn').innerText='🔓 ON'; loadScores(); }
-  else if (pw !== null) alert('Wrong password.');
-}
-
-// Auto score detection
-function startScoreDetection() {
-  stopScoreDetection();
-  const selectors = ['#score','#scoreDisplay','#scoreValue','#score-value','#currentScore','#points','.score','.scoreDisplay','.current-score','[id*="score"]:not(body)','[id*="point"]:not(body)'];
-  scoreDetectionInterval = setInterval(() => {
-    try {
-      const frame = document.getElementById('gameFrame');
-      if (!frame||!frame.contentDocument) return;
-      const doc = frame.contentDocument;
-      for (const sel of selectors) {
-        try {
-          const el = doc.querySelector(sel);
-          if (el) {
-            const text = el.innerText||el.textContent||'';
-            const match = text.match(/[0-9][0-9,.]*/);
-            if (match) { const val=parseInt(match[0].replace(/[,.]/g,'')); if(!isNaN(val)&&val>0){showScoreToast(val);return;} }
-          }
-        } catch(e2){}
-      }
-    } catch(e){}
-  }, 5000);
-}
-
-function stopScoreDetection() { if(scoreDetectionInterval){clearInterval(scoreDetectionInterval);scoreDetectionInterval=null;} dismissToast(); }
-function showScoreToast(score) { if(detectedScore===score)return; detectedScore=score; document.getElementById('toastScoreVal').innerText=Number(score).toLocaleString()+' pts'; document.getElementById('scoreToast').style.display='block'; }
-async function submitDetectedScore() {
-  if(detectedScore===null)return; dismissToast();
-  currentLbGame=document.getElementById('gameTitle').innerText||'Unknown Game';
-  const name=localStorage.getItem('lbPlayerName')||getProfile().username||'';
-  if(!name){openLeaderboard();document.getElementById('lbScoreInput').value=detectedScore;return;}
-  if(detectedScore>getScoreCap(currentLbGame))return;
-  try {
-    await sbFetch('leaderboard',{method:'POST',body:JSON.stringify({game:currentLbGame,player_name:name,score:detectedScore,screenshot_url:null})});
-    document.getElementById('toastScoreVal').innerText='✅ Submitted!'; document.getElementById('scoreToast').style.display='block';
-    setTimeout(()=>document.getElementById('scoreToast').style.display='none',2000);
-  } catch(e){console.error(e);}
-}
-function dismissToast(){document.getElementById('scoreToast').style.display='none';}
-document.getElementById('closeGame').addEventListener('click', stopScoreDetection);
-
-// ===== TOURNAMENTS =====
-async function openTournaments() {
-  document.getElementById('tournamentsModal').style.display='flex';
-  loadTournaments();
-}
-
-async function loadTournaments() {
-  const el = document.getElementById('tournamentContent');
-  el.innerHTML='<div style="color:#555;text-align:center;padding:20px;">Loading...</div>';
-  try {
-    // Get current week number
-    const now = new Date();
-    const weekNum = Math.floor((now - new Date(now.getFullYear(),0,1)) / 604800000);
-    const weekId = now.getFullYear()+'_W'+weekNum;
-
-    // Get or create tournament
-    let data = await sbFetch('tournaments?week_id=eq.'+weekId+'&select=*', { method:'GET', prefer:'' });
-    let tournament;
-    if (!data || !data.length) {
-      // Create new tournament for this week
-      const games = [...document.querySelectorAll('#allGamesGrid button')];
-      const picked = [];
-      const used = new Set();
-      while (picked.length < 3 && picked.length < games.length) {
-        const g = games[Math.floor(Math.random()*games.length)];
-        const url = g.getAttribute('data-url');
-        if (!used.has(url)) { used.add(url); picked.push({ name:g.innerText.trim(), url }); }
-      }
-      const created = await sbFetch('tournaments', { method:'POST', body:JSON.stringify({ week_id:weekId, games:JSON.stringify(picked), ends_at: new Date(now.getTime()+7*86400000).toISOString() }) });
-      tournament = created[0];
-    } else { tournament = data[0]; }
-
-    const tGames = JSON.parse(tournament.games||'[]');
-    const endsAt = new Date(tournament.ends_at);
-    const timeLeft = Math.max(0, endsAt - now);
-    const days = Math.floor(timeLeft/86400000);
-    const hours = Math.floor((timeLeft%86400000)/3600000);
-
-    // Get scores for this tournament
-    const scores = await sbFetch('leaderboard?game=in.('+tGames.map(g=>`"${g.name}"`).join(',')+')'+'&order=score.desc&limit=50', { method:'GET', prefer:'' }).catch(()=>[]);
-
-    el.innerHTML = `
-      <div style="background:#111;border:1px solid var(--accent);border-radius:10px;padding:15px;margin-bottom:20px;text-align:center;">
-        <div style="color:#555;font-size:0.75em;letter-spacing:2px;margin-bottom:5px;">WEEK ${weekNum} TOURNAMENT</div>
-        <div style="color:var(--accent);font-size:1.1em;font-weight:bold;">⏱ Ends in ${days}d ${hours}h</div>
-      </div>
-      <div style="margin-bottom:20px;">
-        <div style="color:#aaa;font-size:0.8em;letter-spacing:2px;margin-bottom:12px;">THIS WEEK'S GAMES:</div>
-        ${tGames.map(g=>`
-          <div style="display:flex;justify-content:space-between;align-items:center;background:#111;border:1px solid #222;border-radius:8px;padding:12px 15px;margin-bottom:8px;">
-            <span style="color:white;font-weight:bold;">${escHtml(g.name)}</span>
-            <button onclick="closeModal('tournamentsModal');showLaunchConfirm('${g.url}')" 
-              style="background:var(--accent);color:#000;border:none;padding:6px 14px;border-radius:6px;font-weight:bold;font-family:Consolas,monospace;cursor:pointer;font-size:0.85em;">▶ Play</button>
-          </div>`).join('')}
-      </div>
-      <div style="color:#aaa;font-size:0.8em;letter-spacing:2px;margin-bottom:12px;">TOURNAMENT STANDINGS:</div>
-      ${scores && scores.length ? `
-        <table style="width:100%;border-collapse:collapse;">
-          ${scores.slice(0,10).map((s,i)=>`
-            <tr style="border-bottom:1px solid #111;${i<3?'color:var(--accent);':'color:#ccc;'}">
-              <td style="padding:8px 5px;font-weight:bold;">${['🥇','🥈','🥉'][i]||i+1}</td>
-              <td style="padding:8px 5px;">${escHtml(s.player_name)}</td>
-              <td style="padding:8px 5px;color:#555;font-size:0.85em;">${escHtml(s.game)}</td>
-              <td style="padding:8px 5px;text-align:right;font-weight:bold;">${Number(s.score).toLocaleString()}</td>
-            </tr>`).join('')}
-        </table>` : '<div style="color:#333;text-align:center;padding:15px;font-size:0.85em;">No scores yet this week — be first!</div>'}
-    `;
-  } catch(e) {
-    el.innerHTML='<div style="color:#ff5555;text-align:center;padding:20px;">Error: '+e.message+'</div>';
-  }
-}
-
-// ===== UTILITIES =====
-function closeModal(id) { document.getElementById(id).style.display='none'; }
-function escHtml(str) { if(!str)return''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// Sync profile on load
-window.addEventListener('DOMContentLoaded', ()=>{
-});
-</script>
