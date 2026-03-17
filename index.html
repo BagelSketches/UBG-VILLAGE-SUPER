@@ -699,6 +699,10 @@
     box-shadow: 0 0 25px var(--bgGlow) !important;
   }
 
+  .game-hidden {
+    display: none !important;
+  }
+
   .game-buttons .tag, .game-buttons .game-tag, .game-buttons span:not(.hover-tooltip) {
     display: none !important;
     opacity: 0 !important;
@@ -884,106 +888,90 @@
   <h1 id="recentlyPlayedHeader">Recently Played</h1>
   <div id="recentlyPlayed" class="game-buttons"></div> 
   
-  <div class="search-container">
-      <input type="text" id="searchBar" placeholder="Search for game..." onkeyup="filterGames(event)" oninput="toggleClearButton(); showSuggestions()">
-      <button id="clearSearchBtn" onclick="clearSearch()">✖</button>
-      <div id="searchSuggestions" style="display: none;"></div>
-  </div>
-  
-  <div id="categoryFilters" style="text-align: center; margin-bottom: 20px;">
-      <button onclick="filterByCategory('all', this)" data-filter="all" class="active">All</button>
-      <button onclick="filterByCategory('action', this)" data-filter="action">Action/Shooter</button>
-      <button onclick="filterByCategory('io', this)" data-filter="io">.io Games</button>
-      <button onclick="filterByCategory('casual', this)" data-filter="casual">Casual/Clicker</button>
-      <button onclick="filterByCategory('sports', this)" data-filter="sports">Sports</button>
-      <button onclick="filterByCategory('horror', this)" data-filter="horror">Horror</button>
-      <button onclick="filterByCategory('utility', this)" data-filter="utility">Utilities</button>
-  </div>
-  
-  <p id="noResultsMessage">❌ No games match your search or filter criteria. Try a different term or category.</p>
+
 
   <div class="game-buttons" id="allGamesGrid">
-    <button onclick="showLaunchConfirm('GAMES/bloons5.html')" data-category="action" data-url="GAMES/bloons5.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/75.png">Bloons Tower Defense 5</button>
-    <button onclick="showLaunchConfirm('bitlife/bitlife.html')" data-category="casual" data-url="bitlife/bitlife.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="img/3.webp">Bitlife</button>
-    <button onclick="showLaunchConfirm('https://devilapig247.github.io/block-blast/')" data-category="puzzle" data-url="https://devilapig247.github.io/block-blast/"> <span class="game-card-tag" data-category-text="casual">Puzzle</span> <img src="img/4.webp">Block Blast</button>
-    <button onclick="showLaunchConfirm('CookieClicker/cookieclicker.html')" data-category="casual" data-url="CookieClicker/cookieclicker.html"> <span class="game-card-tag" data-category-text="casual">Clicker</span> <img src="img/6.webp">Cookie Clicker</button>
-    <button onclick="showLaunchConfirm('Coreball/coreball.html')" data-category="casual" data-url="Coreball/coreball.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="img/7.webp">Coreball</button>
-    <button onclick="showLaunchConfirm('Drive Mad.html')" data-category="sports" data-url="Drive Mad.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="img/8.webp">Drive Mad</button>
-    <button onclick="showLaunchConfirm('paperio2/paper.html')" data-category="io" data-url="paperio2/paper.html"> <span class="game-card-tag" data-category-text="io">.io Game</span> <img src="img/12.webp">Paper.io 2</button>
-    <button onclick="showLaunchConfirm('polytrack.3-main/polytrack.html')" data-category="sports" data-url="polytrack.3-main/polytrack.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="img/13.webp">PolyTrack</button>
-    <button onclick="showLaunchConfirm('pvz/pvz.html')" data-category="action" data-url="pvz/pvz.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="img/15.webp">PVZ</button>
-    <button onclick="showLaunchConfirm('Retrobowl/retro.html')" data-category="sports" data-url="Retrobowl/retro.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="img/17.webp">Retrobowl</button>
-    <button onclick="showLaunchConfirm('Slope plus.html')" data-category="action" data-url="Slope plus.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="img/19.webp">Slope</button>
-    <button onclick="showLaunchConfirm('SubwaySurfers/subwaysurfers.html')" data-category="action" data-url="SubwaySurfers/subwaysurfers.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="img/21.webp">Subway Surfers</button>
-    <button onclick="showLaunchConfirm('TimeShooter/timeshooter.html')" data-category="action" data-url="TimeShooter/timeshooter.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="img/23.webp">Time Shooter</button>
-    <button onclick="showLaunchConfirm('Minecraft.html')" data-category="action" data-url="Minecraft.html"> <span class="game-card-tag" data-category-text="action">Sandbox</span> <img src="img/minecraft.jpg">Minecraft</button>
-    <button onclick="showLaunchConfirm('BasketballStarsUnblocked.github.io/index.html')" data-category="sports" data-url="BasketballStarsUnblocked.github.io/index.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="img/basketball-stars.png">Basketball Stars</button>
-    <button onclick="showLaunchConfirm('https://devilapig247.github.io/granny/')" data-category="horror" data-url="https://devilapig247.github.io/granny/"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="img/granny logo.png">Granny</button>
-    <button onclick="showLaunchConfirm('Baldi remaster/baldi.html')" data-category="horror" data-url="Baldi remaster/baldi.html"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="img/466.png">Baldi</button>
-    <button onclick="showLaunchConfirm('GAMES/CC3D.html')" data-category="action" data-url="GAMES/CC3D.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/164.png">Crazy Cattle 3D</button>
-    <button onclick="showLaunchConfirm('DR3D/Dr3d.html')" data-category="action" data-url="DR3D/Dr3d.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/211.png">Death Run 3D</button>
-    <button onclick="showLaunchConfirm('GAMES/Bacon May Die.html')" data-category="action" data-url="GAMES/Bacon May Die.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/268.png">Bacon May Die</button>
-    <button onclick="showLaunchConfirm('GAMES/BlackJack.html')" data-category="casual" data-url="GAMES/BlackJack.html"> <span class="game-card-tag" data-category-text="casual">Card</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/312.png">BlackJack</button>
-    <button onclick="showLaunchConfirm('https://devilapig247.github.io/backshot-roulette/')" data-category="horror" data-url="https://devilapig247.github.io/backshot-roulette/"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/205.png">Buckshot Roulette</button>
-    <button onclick="showLaunchConfirm('GAMES/Crossy Road.html')" data-category="casual" data-url="GAMES/Crossy Road.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/24.png">Crossy Road</button>
-    <button onclick="showLaunchConfirm('https://devilapig247.github.io/FANF/')" data-category="horror" data-url="https://devilapig247.github.io/FANF/"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/38.png">FNAF</button>
-    <button onclick="showLaunchConfirm('GAMES/Fruit Ninja.html')" data-category="casual" data-url="GAMES/Fruit Ninja.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/261.png">Fruit Ninja</button>
-    <button onclick="showLaunchConfirm('GAMES/Getaway Shootout.html')" data-category="action" data-url="GAMES/Getaway Shootout.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/338.png">Getaway Shootout</button>
-    <button onclick="showLaunchConfirm('GAMES/Getting Over It with Bennett Foddy.html')" data-category="casual" data-url="GAMES/Getting Over It with Bennett Foddy.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/557.png">Getting over it</button>
-    <button onclick="showLaunchConfirm('GAMES/Google Baseball.html')" data-category="sports" data-url="GAMES/Google Baseball.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/257.png">Google Baseball</button>
-    <button onclick="showLaunchConfirm('GAMES/Granny 2.html')" data-category="horror" data-url="GAMES/Granny 2.html"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/125.png">Granny 2</button>
-    <button onclick="showLaunchConfirm('GAMES/Gunspin.html')" data-category="action" data-url="GAMES/Gunspin.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/91.png">Gunspin</button>
-    <button onclick="showLaunchConfirm('GAMES/Jetpack Joyride.html')" data-category="action" data-url="GAMES/Jetpack Joyride.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/7.png">Jetpack Joyride</button>
-    <button onclick="showLaunchConfirm('GAMES/Monster Tracks.html')" data-category="sports" data-url="GAMES/Monster Tracks.html"> <span class="game-card-tag" data-category-text="sports">Sports</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/36.png">Monster Tracks</button>
-    <button onclick="showLaunchConfirm('GAMES/OvO 3 Dimensions.html')" data-category="action" data-url="GAMES/OvO 3 Dimensions.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/3.png">OvO 3</button>
-    <button onclick="showLaunchConfirm('GAMES/Papas Pizeria.html')" data-category="casual" data-url="GAMES/Papas Pizeria.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/227.png">Papas Pizzeria</button>
-    <button onclick="showLaunchConfirm('GAMES/Ragdoll Archers.html')" data-category="action" data-url="GAMES/Ragdoll Archers.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/186.png">Ragdoll Archers</button>
-    <button onclick="showLaunchConfirm('GAMES/Ragdoll Hit.html')" data-category="action" data-url="GAMES/Ragdoll Hit.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/44.png">Ragdoll Hit</button>
-    <button onclick="showLaunchConfirm('GAMES/Rainbow Obby.html')" data-category="action" data-url="GAMES/Rainbow Obby.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/307.png">Rainbow Obby</button>
-    <button onclick="showLaunchConfirm('GAMES/Run 3.html')" data-category="action" data-url="GAMES/Run 3.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/177.png">Run 3</button>
-    <button onclick="showLaunchConfirm('SB.html')" data-category="casual" data-url="SB.html"> <span class="game-card-tag" data-category-text="utility">Sandbox</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/309.png">Sandboxels</button>
-    <button onclick="showLaunchConfirm('GAMES/Slice it All.html')" data-category="casual" data-url="GAMES/Slice it All.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/128.png">Slice it All</button>
-    <button onclick="showLaunchConfirm('GAMES/Slime Rancher.html')" data-category="casual" data-url="GAMES/Slime Rancher.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/591.png">Slime Rancher</button>
-    <button onclick="showLaunchConfirm('GAMES/Slither.io.html')" data-category="io" data-url="GAMES/Slither.io.html"> <span class="game-card-tag" data-category-text="io">.io Game</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/461.png">Slither.io</button>
-    <button onclick="showLaunchConfirm('GAMES/Slowroads.html')" data-category="casual" data-url="GAMES/Slowroads.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/369.png">Slowroads</button>
-    <button onclick="showLaunchConfirm('GAMES/Snow Rider 3D.html')" data-category="action" data-url="GAMES/Snow Rider 3D.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/119.png">Snow Rider 3D</button>
-    <button onclick="showLaunchConfirm('GAMES/Soundboard.html')" data-category="utility" data-url="GAMES/Soundboard.html"> <span class="game-card-tag" data-category-text="utility">Utility</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/179.png">Soundboard</button>
-    <button onclick="showLaunchConfirm('GAMES/Spiral Roll.html')" data-category="casual" data-url="GAMES/Spiral Roll.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/349.png">Spiral Roll</button>
-    <button onclick="showLaunchConfirm('GAMES/Thats Not My Neighbor.html')" data-category="horror" data-url="GAMES/Thats Not My Neighbor.html"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/216.png">That's Not My Neighbor</button>
-    <button onclick="showLaunchConfirm('GAMES/Vex 5.html')" data-category="action" data-url="GAMES/Vex 5.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/50.png">Vex 5</button>
-    <button onclick="showLaunchConfirm('GAMES/Gunblood.html')" data-category="action" data-url="GAMES/Gunblood.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="gunblood.png">Gunblood</button>
-    <button onclick="showLaunchConfirm('GAMES/Slender.html')" data-category="horror" data-url="GAMES/Slender.html"> <span class="game-card-tag" data-category-text="horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/451.png">Slenderman</button>
-    <button onclick="showLaunchConfirm('GAMES/1v1.lol.html')" data-category="action" data-url="GAMES/1v1.lol.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/58.png">1v1.lol</button>
-    <button onclick="showLaunchConfirm('GAMES/Clustertruck.html')" data-category="action" data-url="GAMES/Clustertruck.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/81.png">Clustertruck</button>
-    <button onclick="showLaunchConfirm('GAMES/Escape road.html')" data-category="action" data-url="GAMES/Escape road.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/264.png">Escape Road</button>
-    <button onclick="showLaunchConfirm('GAMES/Rooftop Snipers.html')" data-category="action" data-url="GAMES/Rooftop Snipers.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/283.png">Rooftop Snipers</button>
-    <button onclick="showLaunchConfirm('GAMES/Hollow Knight.html')" data-category="action" data-url="GAMES/Hollow Knight.html"> <span class="game-card-tag" data-category-text="action">Platformer</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/468.png">Hollow Knight</button>
-    <button onclick="showLaunchConfirm('GAMES/Plinko.html')" data-category="casual" data-url="GAMES/Plinko.html"> <span class="game-card-tag" data-category-text="casual">Casual</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/544.png">Plinko</button>
-    <button onclick="showLaunchConfirm('GAMES/R.E.P.O.html')" data-category="action" data-url="GAMES/R.E.P.O.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/195.png">R.E.P.O</button>
-    <button onclick="showLaunchConfirm('GAMES/Sandtris.html')" data-category="casual" data-url="GAMES/Sandtris.html"> <span class="game-card-tag" data-category-text="casual">Puzzle</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/311.png">Sandtris</button>
-    <button onclick="showLaunchConfirm('GAMES/Tunnel Rush.html')" data-category="action" data-url="GAMES/Tunnel Rush.html"> <span class="game-card-tag" data-category-text="action">Action</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/206.png">Tunnel Rush</button>
-    <button onclick="showLaunchConfirm('Celeste.html')" data-category="action" data-url="Celeste.html"> <span class="game-card-tag" data-category-text="action">Platformer</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/623.png">Celeste</button>
-    <button onclick="showLaunchConfirm('ULTRAKILL.html')" data-category="action" data-url="ULTRAKILL.html"> <span class="game-card-tag" data-category-text="action">Shooter</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/196.png">ULTRAKILL</button>
-    <button onclick="showLaunchConfirm('balatroo.html')" data-category="casual" data-url="balatroo.html"> <span class="game-card-tag" data-category-text="casual">Card</span> <img src="Balatro.jpg">Balatro</button>
-    <button onclick="showLaunchConfirm('fnaf2.html')" data-category="Horror" data-url="fnaf2.html"> <span class="game-card-tag" data-category-text="Horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/39.png">FNAF 2</button>
-    <button onclick="showLaunchConfirm('fnaf3.html')" data-category="Horror" data-url="fnaf3.html"> <span class="game-card-tag" data-category-text="Horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/40.png">FNAF 3</button>
-    <button onclick="showLaunchConfirm('fnaf4.html')" data-category="Horror" data-url="fnaf4.html"> <span class="game-card-tag" data-category-text="Horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/41.png">FNAF 4</button>
-    <button onclick="showLaunchConfirm('fnafsl.html')" data-category="Horror" data-url="fnafsl.html"> <span class="game-card-tag" data-category-text="Horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/185.png">FNAF Sister location</button>
-    <button onclick="showLaunchConfirm('fnafucn.html')" data-category="Horror" data-url="fnafucn.html"> <span class="game-card-tag" data-category-text="Horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/192.png">FNAF Ultimate Custom Night</button>
-    <button onclick="showLaunchConfirm('RCH.html')" data-category="Horror" data-url="RCH.html"> <span class="game-card-tag" data-category-text="Horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/670.png">Raldis crackhouse</button>
-    <button onclick="showLaunchConfirm('FNAE.html')" data-category="Horror" data-url="FNAE.html"> <span class="game-card-tag" data-category-text="Horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/710.png">Five Nights At Epstiens</button>
-    <button onclick="showLaunchConfirm('IL.html')" data-category="Horror" data-url="IL.html"> <span class="game-card-tag" data-category-text="Horror">Horror</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/705.png">Iron lung</button>
-    <button onclick="showLaunchConfirm('UY.html')" data-category="Puzzle" data-url="UY.html"> <span class="game-card-tag" data-category-text="Puzzle">Puzzle</span> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/456.png">Undertale Yellow</button>
-    <button onclick="showLaunchConfirm('PE.html')" data-category="Action" data-url="PE.html"> <span class="game-card-tag" data-category-text="Action">Action</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/506.png">Pokemon emerald</button>
-    <button onclick="showLaunchConfirm('PFR.html')" data-category="Action" data-url="PFR.html"> <span class="game-card-tag" data-category-text="Action">Action</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/694.png">Pokemon fire red</button>
-    <button onclick="showLaunchConfirm('PHG.html')" data-category="Action" data-url="PHG.html"> <span class="game-card-tag" data-category-text="Action">Action</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/696.png">Pokemon heartgold</button>
-    <button onclick="showLaunchConfirm('PR.html')" data-category="Action" data-url="PR.html"> <span class="game-card-tag" data-category-text="Action">Action</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/505.png">Pokemon red</button>
-    <button onclick="showLaunchConfirm('OR.html')" data-category="Action" data-url="OR.html"> <span class="game-card-tag" data-category-text="Action">Action</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/659.png">Orange roulette</button>
-    <button onclick="showLaunchConfirm('BTR.html')" data-category="Puzzle" data-url="BTR.html"> <span class="game-card-tag" data-category-text="Puzzle">Puzzle</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/76.png">Bob The Robber 2</button>
-    <button onclick="showLaunchConfirm('deltarune.html')" data-category="Puzzle" data-url="deltarune.html"> <span class="game-card-tag" data-category-text="Puzzle">Puzzle</span> <img src="deltarune.png">Deltarune</button>
-    <button onclick="showLaunchConfirm('SE.html')" data-category="Puzzle" data-url="SE.html"> <span class="game-card-tag" data-category-text="Puzzle">Puzzle</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/318.png">Side effects</button>
-    <button onclick="showLaunchConfirm('RB4.html')" data-category="Puzzle" data-url="RB4.html"> <span class="game-card-tag" data-category-text="Puzzle">Puzzle</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/242.png">Red ball 4</button>
-    <button onclick="showLaunchConfirm('F11.html')" data-category="Action" data-url="F11.html"> <span class="game-card-tag" data-category-text="Action">Action</span> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/685.png">FIFA 11</button>
+    <button onclick="showLaunchConfirm('GAMES/bloons5.html')" data-category="action" data-url="GAMES/bloons5.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/75.png">Bloons Tower Defense 5</button>
+    <button onclick="showLaunchConfirm('bitlife/bitlife.html')" data-category="casual" data-url="bitlife/bitlife.html"> <img src="img/3.webp">Bitlife</button>
+    <button onclick="showLaunchConfirm('https://devilapig247.github.io/block-blast/')" data-category="puzzle" data-url="https://devilapig247.github.io/block-blast/"> <img src="img/4.webp">Block Blast</button>
+    <button onclick="showLaunchConfirm('CookieClicker/cookieclicker.html')" data-category="casual" data-url="CookieClicker/cookieclicker.html"> <img src="img/6.webp">Cookie Clicker</button>
+    <button onclick="showLaunchConfirm('Coreball/coreball.html')" data-category="casual" data-url="Coreball/coreball.html"> <img src="img/7.webp">Coreball</button>
+    <button onclick="showLaunchConfirm('Drive Mad.html')" data-category="sports" data-url="Drive Mad.html"> <img src="img/8.webp">Drive Mad</button>
+    <button onclick="showLaunchConfirm('paperio2/paper.html')" data-category="io" data-url="paperio2/paper.html"> <img src="img/12.webp">Paper.io 2</button>
+    <button onclick="showLaunchConfirm('polytrack.3-main/polytrack.html')" data-category="sports" data-url="polytrack.3-main/polytrack.html"> <img src="img/13.webp">PolyTrack</button>
+    <button onclick="showLaunchConfirm('pvz/pvz.html')" data-category="action" data-url="pvz/pvz.html"> <img src="img/15.webp">PVZ</button>
+    <button onclick="showLaunchConfirm('Retrobowl/retro.html')" data-category="sports" data-url="Retrobowl/retro.html"> <img src="img/17.webp">Retrobowl</button>
+    <button onclick="showLaunchConfirm('Slope plus.html')" data-category="action" data-url="Slope plus.html"> <img src="img/19.webp">Slope</button>
+    <button onclick="showLaunchConfirm('SubwaySurfers/subwaysurfers.html')" data-category="action" data-url="SubwaySurfers/subwaysurfers.html"> <img src="img/21.webp">Subway Surfers</button>
+    <button onclick="showLaunchConfirm('TimeShooter/timeshooter.html')" data-category="action" data-url="TimeShooter/timeshooter.html"> <img src="img/23.webp">Time Shooter</button>
+    <button onclick="showLaunchConfirm('Minecraft.html')" data-category="action" data-url="Minecraft.html"> <img src="img/minecraft.jpg">Minecraft</button>
+    <button onclick="showLaunchConfirm('BasketballStarsUnblocked.github.io/index.html')" data-category="sports" data-url="BasketballStarsUnblocked.github.io/index.html"> <img src="img/basketball-stars.png">Basketball Stars</button>
+    <button onclick="showLaunchConfirm('https://devilapig247.github.io/granny/')" data-category="horror" data-url="https://devilapig247.github.io/granny/"> <img src="img/granny logo.png">Granny</button>
+    <button onclick="showLaunchConfirm('Baldi remaster/baldi.html')" data-category="horror" data-url="Baldi remaster/baldi.html"> <img src="img/466.png">Baldi</button>
+    <button onclick="showLaunchConfirm('GAMES/CC3D.html')" data-category="action" data-url="GAMES/CC3D.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/164.png">Crazy Cattle 3D</button>
+    <button onclick="showLaunchConfirm('DR3D/Dr3d.html')" data-category="action" data-url="DR3D/Dr3d.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/211.png">Death Run 3D</button>
+    <button onclick="showLaunchConfirm('GAMES/Bacon May Die.html')" data-category="action" data-url="GAMES/Bacon May Die.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/268.png">Bacon May Die</button>
+    <button onclick="showLaunchConfirm('GAMES/BlackJack.html')" data-category="casual" data-url="GAMES/BlackJack.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/312.png">BlackJack</button>
+    <button onclick="showLaunchConfirm('https://devilapig247.github.io/backshot-roulette/')" data-category="horror" data-url="https://devilapig247.github.io/backshot-roulette/"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/205.png">Buckshot Roulette</button>
+    <button onclick="showLaunchConfirm('GAMES/Crossy Road.html')" data-category="casual" data-url="GAMES/Crossy Road.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/24.png">Crossy Road</button>
+    <button onclick="showLaunchConfirm('https://devilapig247.github.io/FANF/')" data-category="horror" data-url="https://devilapig247.github.io/FANF/"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/38.png">FNAF</button>
+    <button onclick="showLaunchConfirm('GAMES/Fruit Ninja.html')" data-category="casual" data-url="GAMES/Fruit Ninja.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/261.png">Fruit Ninja</button>
+    <button onclick="showLaunchConfirm('GAMES/Getaway Shootout.html')" data-category="action" data-url="GAMES/Getaway Shootout.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/338.png">Getaway Shootout</button>
+    <button onclick="showLaunchConfirm('GAMES/Getting Over It with Bennett Foddy.html')" data-category="casual" data-url="GAMES/Getting Over It with Bennett Foddy.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/557.png">Getting over it</button>
+    <button onclick="showLaunchConfirm('GAMES/Google Baseball.html')" data-category="sports" data-url="GAMES/Google Baseball.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/257.png">Google Baseball</button>
+    <button onclick="showLaunchConfirm('GAMES/Granny 2.html')" data-category="horror" data-url="GAMES/Granny 2.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/125.png">Granny 2</button>
+    <button onclick="showLaunchConfirm('GAMES/Gunspin.html')" data-category="action" data-url="GAMES/Gunspin.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/91.png">Gunspin</button>
+    <button onclick="showLaunchConfirm('GAMES/Jetpack Joyride.html')" data-category="action" data-url="GAMES/Jetpack Joyride.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/7.png">Jetpack Joyride</button>
+    <button onclick="showLaunchConfirm('GAMES/Monster Tracks.html')" data-category="sports" data-url="GAMES/Monster Tracks.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/36.png">Monster Tracks</button>
+    <button onclick="showLaunchConfirm('GAMES/OvO 3 Dimensions.html')" data-category="action" data-url="GAMES/OvO 3 Dimensions.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/3.png">OvO 3</button>
+    <button onclick="showLaunchConfirm('GAMES/Papas Pizeria.html')" data-category="casual" data-url="GAMES/Papas Pizeria.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/227.png">Papas Pizzeria</button>
+    <button onclick="showLaunchConfirm('GAMES/Ragdoll Archers.html')" data-category="action" data-url="GAMES/Ragdoll Archers.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/186.png">Ragdoll Archers</button>
+    <button onclick="showLaunchConfirm('GAMES/Ragdoll Hit.html')" data-category="action" data-url="GAMES/Ragdoll Hit.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/44.png">Ragdoll Hit</button>
+    <button onclick="showLaunchConfirm('GAMES/Rainbow Obby.html')" data-category="action" data-url="GAMES/Rainbow Obby.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/307.png">Rainbow Obby</button>
+    <button onclick="showLaunchConfirm('GAMES/Run 3.html')" data-category="action" data-url="GAMES/Run 3.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/177.png">Run 3</button>
+    <button onclick="showLaunchConfirm('SB.html')" data-category="casual" data-url="SB.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/309.png">Sandboxels</button>
+    <button onclick="showLaunchConfirm('GAMES/Slice it All.html')" data-category="casual" data-url="GAMES/Slice it All.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/128.png">Slice it All</button>
+    <button onclick="showLaunchConfirm('GAMES/Slime Rancher.html')" data-category="casual" data-url="GAMES/Slime Rancher.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/591.png">Slime Rancher</button>
+    <button onclick="showLaunchConfirm('GAMES/Slither.io.html')" data-category="io" data-url="GAMES/Slither.io.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/461.png">Slither.io</button>
+    <button onclick="showLaunchConfirm('GAMES/Slowroads.html')" data-category="casual" data-url="GAMES/Slowroads.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/369.png">Slowroads</button>
+    <button onclick="showLaunchConfirm('GAMES/Snow Rider 3D.html')" data-category="action" data-url="GAMES/Snow Rider 3D.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/119.png">Snow Rider 3D</button>
+    <button onclick="showLaunchConfirm('GAMES/Soundboard.html')" data-category="utility" data-url="GAMES/Soundboard.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/179.png">Soundboard</button>
+    <button onclick="showLaunchConfirm('GAMES/Spiral Roll.html')" data-category="casual" data-url="GAMES/Spiral Roll.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/349.png">Spiral Roll</button>
+    <button onclick="showLaunchConfirm('GAMES/Thats Not My Neighbor.html')" data-category="horror" data-url="GAMES/Thats Not My Neighbor.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/216.png">That's Not My Neighbor</button>
+    <button onclick="showLaunchConfirm('GAMES/Vex 5.html')" data-category="action" data-url="GAMES/Vex 5.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/50.png">Vex 5</button>
+    <button onclick="showLaunchConfirm('GAMES/Gunblood.html')" data-category="action" data-url="GAMES/Gunblood.html"> <img src="gunblood.png">Gunblood</button>
+    <button onclick="showLaunchConfirm('GAMES/Slender.html')" data-category="horror" data-url="GAMES/Slender.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/451.png">Slenderman</button>
+    <button onclick="showLaunchConfirm('GAMES/1v1.lol.html')" data-category="action" data-url="GAMES/1v1.lol.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/58.png">1v1.lol</button>
+    <button onclick="showLaunchConfirm('GAMES/Clustertruck.html')" data-category="action" data-url="GAMES/Clustertruck.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/81.png">Clustertruck</button>
+    <button onclick="showLaunchConfirm('GAMES/Escape road.html')" data-category="action" data-url="GAMES/Escape road.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/264.png">Escape Road</button>
+    <button onclick="showLaunchConfirm('GAMES/Rooftop Snipers.html')" data-category="action" data-url="GAMES/Rooftop Snipers.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/283.png">Rooftop Snipers</button>
+    <button onclick="showLaunchConfirm('GAMES/Hollow Knight.html')" data-category="action" data-url="GAMES/Hollow Knight.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/468.png">Hollow Knight</button>
+    <button onclick="showLaunchConfirm('GAMES/Plinko.html')" data-category="casual" data-url="GAMES/Plinko.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/544.png">Plinko</button>
+    <button onclick="showLaunchConfirm('GAMES/R.E.P.O.html')" data-category="action" data-url="GAMES/R.E.P.O.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/195.png">R.E.P.O</button>
+    <button onclick="showLaunchConfirm('GAMES/Sandtris.html')" data-category="casual" data-url="GAMES/Sandtris.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/311.png">Sandtris</button>
+    <button onclick="showLaunchConfirm('GAMES/Tunnel Rush.html')" data-category="action" data-url="GAMES/Tunnel Rush.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/206.png">Tunnel Rush</button>
+    <button onclick="showLaunchConfirm('Celeste.html')" data-category="action" data-url="Celeste.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/623.png">Celeste</button>
+    <button onclick="showLaunchConfirm('ULTRAKILL.html')" data-category="action" data-url="ULTRAKILL.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/196.png">ULTRAKILL</button>
+    <button onclick="showLaunchConfirm('balatroo.html')" data-category="casual" data-url="balatroo.html"> <img src="Balatro.jpg">Balatro</button>
+    <button onclick="showLaunchConfirm('fnaf2.html')" data-category="Horror" data-url="fnaf2.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/39.png">FNAF 2</button>
+    <button onclick="showLaunchConfirm('fnaf3.html')" data-category="Horror" data-url="fnaf3.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/40.png">FNAF 3</button>
+    <button onclick="showLaunchConfirm('fnaf4.html')" data-category="Horror" data-url="fnaf4.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/41.png">FNAF 4</button>
+    <button onclick="showLaunchConfirm('fnafsl.html')" data-category="Horror" data-url="fnafsl.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/185.png">FNAF Sister location</button>
+    <button onclick="showLaunchConfirm('fnafucn.html')" data-category="Horror" data-url="fnafucn.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/192.png">FNAF Ultimate Custom Night</button>
+    <button onclick="showLaunchConfirm('RCH.html')" data-category="Horror" data-url="RCH.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/670.png">Raldis crackhouse</button>
+    <button onclick="showLaunchConfirm('FNAE.html')" data-category="Horror" data-url="FNAE.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/710.png">Five Nights At Epstiens</button>
+    <button onclick="showLaunchConfirm('IL.html')" data-category="Horror" data-url="IL.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/705.png">Iron lung</button>
+    <button onclick="showLaunchConfirm('UY.html')" data-category="Puzzle" data-url="UY.html"> <img src="https://cdn.jsdelivr.net/gh/gn-math/covers@main/456.png">Undertale Yellow</button>
+    <button onclick="showLaunchConfirm('PE.html')" data-category="Action" data-url="PE.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/506.png">Pokemon emerald</button>
+    <button onclick="showLaunchConfirm('PFR.html')" data-category="Action" data-url="PFR.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/694.png">Pokemon fire red</button>
+    <button onclick="showLaunchConfirm('PHG.html')" data-category="Action" data-url="PHG.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/696.png">Pokemon heartgold</button>
+    <button onclick="showLaunchConfirm('PR.html')" data-category="Action" data-url="PR.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/505.png">Pokemon red</button>
+    <button onclick="showLaunchConfirm('OR.html')" data-category="Action" data-url="OR.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/659.png">Orange roulette</button>
+    <button onclick="showLaunchConfirm('BTR.html')" data-category="Puzzle" data-url="BTR.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/76.png">Bob The Robber 2</button>
+    <button onclick="showLaunchConfirm('deltarune.html')" data-category="Puzzle" data-url="deltarune.html"> <img src="deltarune.png">Deltarune</button>
+    <button onclick="showLaunchConfirm('SE.html')" data-category="Puzzle" data-url="SE.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/318.png">Side effects</button>
+    <button onclick="showLaunchConfirm('RB4.html')" data-category="Puzzle" data-url="RB4.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/242.png">Red ball 4</button>
+    <button onclick="showLaunchConfirm('F11.html')" data-category="Action" data-url="F11.html"> <img src="https://cdn.jsdelivr.net/gh/%67%6e%2d%6d%61%74%68/covers@main/685.png">FIFA 11</button>
   </div>
 </div>
 
@@ -1275,12 +1263,12 @@ function filterGames(event) {
       if (searchSuggestions) searchSuggestions.style.display = 'none';
   }
   document.querySelectorAll("#allGamesGrid button").forEach(btn => {
-    const textContent = btn.innerText.toLowerCase(); 
-    const category = btn.getAttribute("data-category");
+    const textContent = (btn.getAttribute('data-title') || btn.textContent).toLowerCase().trim(); 
+    const category = (btn.getAttribute("data-category") || '').toLowerCase();
     const matchesSearch = textContent.includes(search);
     const matchesCategory = activeCategory === 'all' || category === activeCategory;
-    if (matchesSearch && matchesCategory) { btn.style.display = ""; visibleCount++; }
-    else btn.style.display = "none";
+    if (matchesSearch && matchesCategory) { btn.classList.remove('game-hidden'); visibleCount++; }
+    else btn.classList.add('game-hidden');
   });
   if (noResultsMessage) {
     noResultsMessage.style.display = (visibleCount === 0 && (search.length > 0 || activeCategory !== 'all')) ? "block" : "none";
@@ -1295,7 +1283,7 @@ function filterByCategory(category, element) {
 }
 
 function openRandomGame() {
-  let visible = [...document.querySelectorAll("#allGamesGrid button")].filter(b => b.style.display != "none");
+  let visible = [...document.querySelectorAll("#allGamesGrid button")].filter(b => !b.classList.contains('game-hidden'));
   if (visible.length > 0) showLaunchConfirm(visible[Math.floor(Math.random() * visible.length)]?.getAttribute('data-url')); 
 }
 
@@ -1333,9 +1321,7 @@ function displayRecentGames() {
     container.innerHTML = recent.map(g => {
         const button = [...document.querySelectorAll("#allGamesGrid button")].find(b => b.getAttribute('data-url') === g.url);
         const category = button ? button.querySelector('.game-card-tag')?.getAttribute('data-category-text') || 'Casual' : 'Casual'; 
-        return `<button onclick="showLaunchConfirm('${g.url}')" data-category="${g.category}" data-url="${g.url}">
-            <span class="game-card-tag" data-category-text="${category}">${category}</span>
-            <img src="${g.img}">
+        return `<button onclick="showLaunchConfirm('${g.url}')" data-category="${g.category}" data-url="${g.url}"> <img src="${g.img}">
             ${g.name}
           </button>`;
     }).join("");
