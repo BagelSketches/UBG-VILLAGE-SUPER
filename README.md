@@ -1,1 +1,1 @@
-A simple unblocked games site                                 Im the original starwalker
+I'm the original starwalker
